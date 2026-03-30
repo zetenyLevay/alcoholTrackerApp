@@ -8,7 +8,9 @@ import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.DrinkItem
 
 @Composable
-fun RecentList(drinks: List<UserDrinkLog>) {
+fun RecentList(
+    drinks: List<UserDrinkLog>
+) {
     if (drinks.isEmpty()) {
         Text("No recent drinks found")
     } else {

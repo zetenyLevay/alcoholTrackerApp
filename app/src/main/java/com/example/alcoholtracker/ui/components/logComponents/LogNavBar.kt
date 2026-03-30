@@ -34,9 +34,6 @@ fun LogNavBar(navController: NavController, currentDestination: NavDestination?)
                 selected = currentDestination?.hierarchy?.any { it.hasRoute(destination.route::class) } == true,
                 onClick = {
                     navController.navigate(destination.route) {
-                        // Instead of popping to the app root, we swap the current log screen
-                        // with the new one. This keeps the underlying screen (like List)
-                        // on the stack and avoids messing with its state.
                         currentDestination?.id?.let { id ->
                             popUpTo(id) {
                                 inclusive = true

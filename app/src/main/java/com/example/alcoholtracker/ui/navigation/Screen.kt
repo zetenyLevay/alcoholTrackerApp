@@ -34,3 +34,6 @@ object Finance
 
 @Serializable
 object Health
+
+@Serializable
+data class DetailedItem(val logId: Int)

@@ -76,7 +76,10 @@ fun CurrentDayText() {
 }
 
 @Composable
-fun LogDrinkTopBar(onBackClick: () -> Unit) {
+fun LogDrinkTopBar(
+    onBackClick: () -> Unit,
+    isEdit: Boolean
+) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -84,7 +87,12 @@ fun LogDrinkTopBar(onBackClick: () -> Unit) {
         ),
         title = {
             Row {
-                Text("Log a Drink")
+                if (isEdit) {
+                    Text("Edit Drink")
+                } else {
+                    Text("Log Drink")
+                }
+
             }
         },
         modifier = Modifier.statusBarsPadding(),

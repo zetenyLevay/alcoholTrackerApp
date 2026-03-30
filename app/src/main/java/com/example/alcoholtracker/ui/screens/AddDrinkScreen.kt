@@ -57,7 +57,7 @@ fun AddDrinkScreen(
 
     val drinkToEdit by viewModel.drinkToEdit.collectAsState()
 
-    val edit = drinkToEdit != null
+    val isEdit = drinkToEdit != null
 
     Log.d("DrinkToEdit", drinkToEdit.toString())
 
@@ -91,7 +91,8 @@ fun AddDrinkScreen(
     Scaffold(
         topBar = {
             LogDrinkTopBar(
-                onBackClick = { onBackClick() }
+                onBackClick = { onBackClick() },
+                isEdit = isEdit
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -112,7 +113,7 @@ fun AddDrinkScreen(
                         dateTime = getLocalDateTime(selectedDate, selectedTime),
                         logId = drinkToEdit?.logId
                     )
-                    if (edit) {
+                    if (isEdit) {
                         viewModel.updateDrink(drinkToEdit!!.logId, request)
                         onAddDrink()
                     } else {
@@ -122,7 +123,7 @@ fun AddDrinkScreen(
                 },
                 icon = { Icon(Icons.Filled.Add, "Add Button") },
                 text = {
-                    if (edit) {
+                    if (isEdit) {
                         Text("Update Drink")
                     } else {
                         Text("Add Drink")

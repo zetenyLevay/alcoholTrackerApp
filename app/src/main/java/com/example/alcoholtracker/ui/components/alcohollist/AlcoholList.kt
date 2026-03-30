@@ -20,6 +20,7 @@ import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 fun AlcoholListComposable(
     listType: AlcoholListType,
     onEditClick: (UserDrinkLog) -> Unit,
+    onItemClick: (UserDrinkLog) -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     userDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
 ) {
@@ -29,7 +30,7 @@ fun AlcoholListComposable(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
-            
+
             items(
                 items = drinkLogs,
                 key = { it.logId })
@@ -39,7 +40,8 @@ fun AlcoholListComposable(
                     onRemove = { userDrinkLogViewModel.deleteDrink(item) },
                     modifier = Modifier.animateItem(tween(200)),
                     listType = listType,
-                    onEditClick = { onEditClick(it) }
+                    onEditClick = { onEditClick(it) },
+                    onItemClick = { onItemClick(it) }
                 )
             }
         }

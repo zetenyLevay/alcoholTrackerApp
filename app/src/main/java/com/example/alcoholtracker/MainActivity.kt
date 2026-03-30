@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alcoholtracker.ui.components.BottomNavigationBar
 import com.example.alcoholtracker.ui.components.logComponents.LogNavBar
 import com.example.alcoholtracker.ui.navigation.AddDrink
+import com.example.alcoholtracker.ui.navigation.DetailedItem
 import com.example.alcoholtracker.ui.navigation.Details
 import com.example.alcoholtracker.ui.navigation.Home
 import com.example.alcoholtracker.ui.navigation.List
@@ -35,6 +36,7 @@ import com.example.alcoholtracker.ui.navigation.Profile
 import com.example.alcoholtracker.ui.navigation.Search
 import com.example.alcoholtracker.ui.screens.AddDrinkScreen
 import com.example.alcoholtracker.ui.screens.AnalyticsScreen
+import com.example.alcoholtracker.ui.screens.DetailedItemScreen
 import com.example.alcoholtracker.ui.screens.HomeScreen
 import com.example.alcoholtracker.ui.screens.ListScreen
 import com.example.alcoholtracker.ui.screens.ProfileScreen
@@ -148,6 +150,9 @@ fun MainScreen() {
                 HomeScreen(
                     onFABClick = {
                         navController.navigate(AddDrink())
+                    },
+                    onItemClick = {
+                        navController.navigate(DetailedItem(it.logId))
                     }
                 )
             }
@@ -158,6 +163,9 @@ fun MainScreen() {
                     },
                     onEditClick = {
                         navController.navigate(AddDrink(it.logId))
+                    },
+                    onItemClick = {
+                        navController.navigate(DetailedItem(it.logId))
                     }
                 )
             }
@@ -181,7 +189,12 @@ fun MainScreen() {
 
             }
             composable<Search> {
-                SearchScreen(onBackClick = { navController.popBackStack() })
+                SearchScreen(
+                    onBackClick = { navController.popBackStack() },
+                )
+            }
+            composable<DetailedItem> {
+                DetailedItemScreen()
             }
         }
 

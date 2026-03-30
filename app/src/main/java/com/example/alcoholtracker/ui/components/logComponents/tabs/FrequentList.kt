@@ -4,17 +4,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.ui.components.AlcoholListType
+import com.example.alcoholtracker.ui.components.DrinkItem
 
 @Composable
-fun FrequentList(drinks: List<UserDrinkLog>) {
+fun FrequentList(
+    drinks: List<UserDrinkLog>
 
+) {
     if (drinks.isEmpty()) {
         Text("No frequent drinks found")
     } else {
         LazyColumn() {
             items(drinks.size) { index ->
-                val drink = drinks[index]
-                Text("${drink.name} - ${drink.alcoholPercentage}%")
+                DrinkItem(drinks[index], AlcoholListType.LOG, {}, {})
             }
         }
     }

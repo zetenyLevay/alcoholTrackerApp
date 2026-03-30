@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -19,18 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.data.model.UserDrinkLog
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun DrinkItem(
     item: UserDrinkLog,
     listType: AlcoholListType,
     onEditClick: (UserDrinkLog) -> Unit,
-    onAddClick: (UserDrinkLog) -> Unit
+    onAddClick: (UserDrinkLog) -> Unit,
 ) {
     ListItem(
 
-        modifier = Modifier.heightIn(72.dp),
+        modifier = Modifier
+            .heightIn(72.dp),
         headlineContent = {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(item.name, modifier = Modifier.weight(1f))
@@ -87,17 +88,5 @@ fun DrinkItem(
 
         }
     )
-}
-
-@Composable
-fun ExpandedDrinkItem(item: UserDrinkLog) {
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val time = item.date.toLocalTime().format(timeFormatter)
-
-    Column(modifier = Modifier.padding(start = 16.dp, bottom = 12.dp, top = 4.dp)) {
-        Text("Recipient: ${item.recipient ?: "None"}")
-        Text("Category: ${item.category}")
-        Text("Time: $time")
-    }
-
+    HorizontalDivider()
 }

@@ -55,7 +55,8 @@ fun SearchScreen(
     Scaffold(
         topBar = {
             LogDrinkTopBar(
-                onBackClick = { onBackClick() }
+                onBackClick = { onBackClick() },
+                isEdit = false
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
