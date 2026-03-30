@@ -29,11 +29,7 @@ fun AlcoholListComposable(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {
-
-            item {
-                Header(listType)
-            }
-
+            
             items(
                 items = drinkLogs,
                 key = { it.logId })

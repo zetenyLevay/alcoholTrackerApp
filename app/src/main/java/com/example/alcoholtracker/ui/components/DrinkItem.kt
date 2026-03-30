@@ -3,6 +3,7 @@ package com.example.alcoholtracker.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
@@ -27,13 +28,9 @@ fun DrinkItem(
     onEditClick: (UserDrinkLog) -> Unit,
     onAddClick: (UserDrinkLog) -> Unit
 ) {
-
-    val isCompact = listType == AlcoholListType.HOME
-
-
-
     ListItem(
-        
+
+        modifier = Modifier.heightIn(72.dp),
         headlineContent = {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(item.name, modifier = Modifier.weight(1f))

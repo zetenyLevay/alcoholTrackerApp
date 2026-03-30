@@ -8,13 +8,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.alcoholtracker.ui.navigation.AddDrink
 import com.example.alcoholtracker.ui.navigation.Search
 
@@ -22,7 +20,7 @@ data class LogNavRoute<T : Any>(val name: String, val route: T, val icon: ImageV
 
 
 @Composable
-fun LogNavBar(navController: NavController) {
+fun LogNavBar(navController: NavController, currentDestination: NavDestination?) {
 
     val topLevelRoutes = listOf(
         LogNavRoute("Search", Search, Icons.Default.Search),
@@ -31,21 +29,22 @@ fun LogNavBar(navController: NavController) {
 
 
     NavigationBar {
-
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
         topLevelRoutes.forEach { destination ->
             NavigationBarItem(
                 selected = currentDestination?.hierarchy?.any { it.hasRoute(destination.route::class) } == true,
                 onClick = {
                     navController.navigate(destination.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                        // Instead of popping to the app root, we swap the current log screen
+                        // with the new one. This keeps the underlying screen (like List)
+                        // on the stack and avoids messing with its state.
+                        currentDestination?.id?.let { id ->
+                            popUpTo(id) {
+                                inclusive = true
+                                saveState = true
+                            }
                         }
 
                         launchSingleTop = true
-
                         restoreState = true
                     }
 

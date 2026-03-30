@@ -4,6 +4,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -55,11 +59,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.e("problem", "i am starting")
         setContent {
             SnapNotifyProvider {
                 AlcoholTrackerTheme {
@@ -77,7 +76,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        Log.e("problem", "i am starting")
     }
 }
 
@@ -95,15 +98,42 @@ fun MainScreen() {
     }
 
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val showBottomBar = remember(currentDestination) {
+        currentDestination?.hierarchy?.any {
+            it.hasRoute(Home::class) ||
+                    it.hasRoute(List::class) ||
+                    it.hasRoute(Overview::class) ||
+                    it.hasRoute(Profile::class)
+        } ?: false
+    }
+
+    val showLogBar = remember(currentDestination) {
+        currentDestination?.hierarchy?.any {
+            it.hasRoute(AddDrink::class) || it.hasRoute(Search::class)
+        } ?: false
+    }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (shouldShowBottomBar(navController)) {
-                BottomNavigationBar(navController)
-            } else if (shouldShowLogNavBar(navController)) {
-                LogNavBar(navController)
+            AnimatedContent(
+                targetState = when {
+                    showBottomBar -> 0
+                    showLogBar -> 1
+                    else -> -1
+                },
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                },
+                label = "BottomBarTransition"
+            ) { state ->
+                when (state) {
+                    0 -> BottomNavigationBar(navController, currentDestination)
+                    1 -> LogNavBar(navController, currentDestination)
+                }
             }
         }
     ) { innerPadding ->
@@ -157,23 +187,3 @@ fun MainScreen() {
 
     }
 }
-
-@Composable
-fun shouldShowBottomBar(navController: NavController): Boolean {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.hierarchy?.any {
-        it.hasRoute(Home::class) ||
-                it.hasRoute(List::class) ||
-                it.hasRoute(Overview::class) ||
-                it.hasRoute(Profile::class)
-    } ?: false
-}
-
-@Composable
-fun shouldShowLogNavBar(navController: NavController): Boolean {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.hierarchy?.any {
-        it.hasRoute(AddDrink::class) || it.hasRoute(Search::class)
-    } ?: false
-}
-
