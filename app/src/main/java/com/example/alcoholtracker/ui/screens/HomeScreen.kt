@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.HomeTopBar
@@ -44,7 +43,7 @@ import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 @Composable
 fun HomeScreen(
     onFABClick: () -> Unit,
-    onItemClick: (UserDrinkLog) -> Unit,
+    onItemClick: (Int) -> Unit,
     progressBarViewModel: ProgressBarViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
     userDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),

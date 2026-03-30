@@ -45,6 +45,21 @@ data class UserDrinkLog(
     @ColumnInfo("isFavorite")
     val isFavorite: Boolean,
 
+    @ColumnInfo("imgURI")
+    val imgURI: String?,
+
+    @ColumnInfo("notes")
+    val notes: String?,
+
+    @ColumnInfo("locationName")
+    val locationName: String?,
+
+    @ColumnInfo("longitude")
+    val longitude: Double?,
+
+    @ColumnInfo("latitude")
+    val latitude: Double?,
+
 
     @Embedded(prefix = "unit_")
     val drinkUnit: DrinkUnit?,

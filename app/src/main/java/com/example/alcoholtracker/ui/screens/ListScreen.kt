@@ -7,7 +7,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListComposable
@@ -15,8 +14,8 @@ import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListComposabl
 @Composable
 fun ListScreen(
     onFABClick: () -> Unit,
-    onEditClick: (UserDrinkLog) -> Unit,
-    onItemClick: (UserDrinkLog) -> Unit,
+    onEditClick: (Int) -> Unit,
+    onItemClick: (Int) -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

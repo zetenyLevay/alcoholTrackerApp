@@ -7,10 +7,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 
 @Composable
-fun DetailedItemScreen() {
+fun DetailedItemScreen(
+    logId: Int,
+    viewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
+) {
+
+
+    val userDrink by viewModel.drinkById.collectAsState()
+
+    LaunchedEffect(logId) {
+        viewModel.getDrinkById(logId)
+    }
+
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
@@ -20,6 +37,7 @@ fun DetailedItemScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             Text("Detailed Item Screen")
+            Text(userDrink?.name ?: "No Drink")
         }
     }
 }

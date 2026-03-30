@@ -1,7 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,14 +51,19 @@ import java.time.LocalTime
 fun AddDrinkScreen(
     onAddDrink: () -> Unit,
     onBackClick: () -> Unit,
+    drinkToEditId: Int?,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
 ) {
 
-    val drinkToEdit by viewModel.drinkToEdit.collectAsState()
 
-    val isEdit = drinkToEdit != null
+    val isEdit = drinkToEditId != null
+    val drinkToEdit by viewModel.drinkById.collectAsState()
 
-    Log.d("DrinkToEdit", drinkToEdit.toString())
+    LaunchedEffect(drinkToEditId) {
+        if (drinkToEditId != null) {
+            viewModel.getDrinkById(drinkToEditId)
+        }
+    }
 
 
     var alcoholPercentage by remember { mutableDoubleStateOf(0.0) }

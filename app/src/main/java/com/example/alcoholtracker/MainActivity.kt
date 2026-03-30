@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.alcoholtracker.ui.components.BottomNavigationBar
 import com.example.alcoholtracker.ui.components.logComponents.LogNavBar
 import com.example.alcoholtracker.ui.navigation.AddDrink
@@ -152,7 +153,7 @@ fun MainScreen() {
                         navController.navigate(AddDrink())
                     },
                     onItemClick = {
-                        navController.navigate(DetailedItem(it.logId))
+                        navController.navigate(DetailedItem(it))
                     }
                 )
             }
@@ -162,21 +163,25 @@ fun MainScreen() {
                         navController.navigate(AddDrink(null))
                     },
                     onEditClick = {
-                        navController.navigate(AddDrink(it.logId))
+                        navController.navigate(AddDrink(it))
                     },
                     onItemClick = {
-                        navController.navigate(DetailedItem(it.logId))
+                        navController.navigate(DetailedItem(it))
                     }
                 )
             }
-            composable<AddDrink> {
+            composable<AddDrink> { backStackEntry ->
+
+                val drinkToEdit: AddDrink = backStackEntry.toRoute()
+
                 AddDrinkScreen(
                     onAddDrink = {
                         navController.popBackStack()
                     },
                     onBackClick = {
                         navController.popBackStack()
-                    }
+                    },
+                    drinkToEditId = drinkToEdit.logId
                 )
             }
             composable<Profile> {
@@ -193,8 +198,9 @@ fun MainScreen() {
                     onBackClick = { navController.popBackStack() },
                 )
             }
-            composable<DetailedItem> {
-                DetailedItemScreen()
+            composable<DetailedItem> { backStackEntry ->
+                val item: DetailedItem = backStackEntry.toRoute()
+                DetailedItemScreen(item.logId)
             }
         }
 

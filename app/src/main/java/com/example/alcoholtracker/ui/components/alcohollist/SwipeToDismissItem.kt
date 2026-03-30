@@ -31,8 +31,8 @@ fun SwipeToDismissItem(
     onRemove: () -> Unit,
     modifier: Modifier,
     listType: AlcoholListType,
-    onEditClick: (UserDrinkLog) -> Unit,
-    onItemClick: (UserDrinkLog) -> Unit
+    onEditClick: (Int) -> Unit,
+    onItemClick: (Int) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeToDismissState = rememberSwipeToDismissBoxState(
@@ -76,7 +76,7 @@ fun SwipeToDismissItem(
                 )
             }
         },
-        modifier = Modifier.clickable(onClick = { onItemClick(item) })
+        modifier = Modifier.clickable(onClick = { onItemClick(item.logId) })
     ) {
         DrinkItem(item, listType, { onEditClick(it) }, {})
 

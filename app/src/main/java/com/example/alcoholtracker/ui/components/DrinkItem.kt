@@ -25,7 +25,7 @@ import com.example.alcoholtracker.data.model.UserDrinkLog
 fun DrinkItem(
     item: UserDrinkLog,
     listType: AlcoholListType,
-    onEditClick: (UserDrinkLog) -> Unit,
+    onEditClick: (Int) -> Unit,
     onAddClick: (UserDrinkLog) -> Unit,
 ) {
     ListItem(
@@ -71,7 +71,7 @@ fun DrinkItem(
 
                 when (listType) {
                     AlcoholListType.FULL -> IconButton(onClick = {
-                        onEditClick(item)
+                        onEditClick(item.logId)
                     }) {
                         Icon(Icons.Default.Edit, "Edit")
                     }

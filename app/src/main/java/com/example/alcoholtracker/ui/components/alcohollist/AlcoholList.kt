@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
@@ -19,8 +18,8 @@ import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 @Composable
 fun AlcoholListComposable(
     listType: AlcoholListType,
-    onEditClick: (UserDrinkLog) -> Unit,
-    onItemClick: (UserDrinkLog) -> Unit,
+    onEditClick: (Int) -> Unit,
+    onItemClick: (Int) -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     userDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
 ) {
