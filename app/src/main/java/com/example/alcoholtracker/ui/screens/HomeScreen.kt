@@ -1,16 +1,17 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ fun HomeScreen(
     val userId by authViewModel.getUserID()
     // val userDrinkLogs by userDrinkLogViewModel.getDrinkLogs(userId!!).collectAsState()
     val twoDayDrinkLogs by userDrinkLogViewModel.getTwoDaySummary(userId!!).collectAsState()
+    Log.d("HomeScreen", "I am being redrawn")
     var showDialog by remember { mutableStateOf(false) }
     val currentType by progressBarViewModel.currentType.collectAsState()
     val drinkCount = twoDayDrinkLogs.size
@@ -82,7 +84,7 @@ fun HomeScreen(
 
             Column {
 
-                OutlinedCard(
+                Card(
                     modifier = Modifier
                         .padding(16.dp)
                         .clip(RoundedCornerShape(12.dp))

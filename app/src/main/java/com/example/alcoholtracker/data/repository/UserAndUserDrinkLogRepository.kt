@@ -40,7 +40,6 @@ class UserAndUserDrinkLogRepository @Inject constructor(private val userAndUserD
     }
 
     fun getTwoDayLogsByUser(userId: String): Flow<List<UserDrinkLog>> {
-        Log.d("TwoDay", "Getting twodaylogs by userid for user: $userId")
         return userAndUserDrinkLogDao.getTwoDayLogs(userId)
     }
 

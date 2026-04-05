@@ -11,9 +11,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.R
 import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.domain.model.DrinkCategory.BEER
+import com.example.alcoholtracker.domain.model.DrinkCategory.COCKTAIL
+import com.example.alcoholtracker.domain.model.DrinkCategory.OTHER
+import com.example.alcoholtracker.domain.model.DrinkCategory.SPIRIT
+import com.example.alcoholtracker.domain.model.DrinkCategory.WINE
 import com.example.alcoholtracker.ui.components.DetailTopBar
+import com.example.alcoholtracker.ui.components.detailitemcomponents.ImageCard
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 
 @Composable
@@ -25,10 +33,18 @@ fun DetailedItemScreen(
 ) {
 
 
-    val userDrink by viewModel.drinkById.collectAsState()
-
     LaunchedEffect(logId) {
         viewModel.getDrinkById(logId)
+    }
+    val userDrink by viewModel.drinkById.collectAsState()
+
+    val src = when (userDrink?.category) {
+        BEER -> R.drawable.beer_icon
+        WINE -> 1
+        SPIRIT -> 2
+        COCKTAIL -> 3
+        OTHER -> 4
+        else -> R.drawable.beer_icon
     }
 
 
@@ -50,8 +66,15 @@ fun DetailedItemScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(top = innerPadding.calculateTopPadding())
+                .padding(horizontal = 24.dp)
         ) {
+            ImageCard(
+                src = src,
+                title = userDrink?.name ?: "No Drink",
+                description = "A glass of ${userDrink?.category?.name ?: "Nothing"}"
+            )
             Text("Detailed Item Screen")
             Text(userDrink?.name ?: "No Drink")
         }

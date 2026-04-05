@@ -1,15 +1,16 @@
 package com.example.compose
+
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF9E3D00)
+val primaryLight = Color(0xFF9E3D00) // Amber High-Light
 val onPrimaryLight = Color(0xFFFFFFFF)
-val primaryContainerLight = Color(0xFFC64F00)
+val primaryContainerLight = Color(0xFFC64F00) // From gradient spec
 val onPrimaryContainerLight = Color(0xFFFFFBFF)
-val secondaryLight = Color(0xFF7D5700)
+val secondaryLight = Color(0xFF77574D) // Malt Brown
 val onSecondaryLight = Color(0xFFFFFFFF)
 val secondaryContainerLight = Color(0xFFE6A400)
 val onSecondaryContainerLight = Color(0xFF5A3E00)
-val tertiaryLight = Color(0xFF8F000D)
+val tertiaryLight = Color(0xFF735C00) // Liquid Gauge Gold
 val onTertiaryLight = Color(0xFFFFFFFF)
 val tertiaryContainerLight = Color(0xFFB22222)
 val onTertiaryContainerLight = Color(0xFFFFC8C2)
@@ -17,10 +18,10 @@ val errorLight = Color(0xFFAE2F34)
 val onErrorLight = Color(0xFFFFFFFF)
 val errorContainerLight = Color(0xFFFF6B6B)
 val onErrorContainerLight = Color(0xFF6D0010)
-val backgroundLight = Color(0xFFFFF8F6)
-val onBackgroundLight = Color(0xFF251913)
-val surfaceLight = Color(0xFFFDF8F6)
-val onSurfaceLight = Color(0xFF1C1B1A)
+val backgroundLight = Color(0xFFFFF8F6) // Cream Vellum
+val onBackgroundLight = Color(0xFF251913) // Organic Black
+val surfaceLight = Color(0xFFFFF8F6) // Cream Vellum Base
+val onSurfaceLight = Color(0xFF251913) // Organic Black
 val surfaceVariantLight = Color(0xFFEDE0D6)
 val onSurfaceVariantLight = Color(0xFF4D453E)
 val outlineLight = Color(0xFF7F756D)
@@ -30,12 +31,12 @@ val inverseSurfaceLight = Color(0xFF31302F)
 val inverseOnSurfaceLight = Color(0xFFF4F0ED)
 val inversePrimaryLight = Color(0xFFFFB595)
 val surfaceDimLight = Color(0xFFDDD9D7)
-val surfaceBrightLight = Color(0xFFFDF8F6)
+val surfaceBrightLight = Color(0xFFFFF8F6)
 val surfaceContainerLowestLight = Color(0xFFFFFFFF)
-val surfaceContainerLowLight = Color(0xFFF7F3F0)
-val surfaceContainerLight = Color(0xFFF1EDEB)
-val surfaceContainerHighLight = Color(0xFFEBE7E5)
-val surfaceContainerHighestLight = Color(0xFFE6E2DF)
+val surfaceContainerLowLight = Color(0xFFFFF1EC) // Tonal Layering 1
+val surfaceContainerLight = Color(0xFFFFE9E1) // Tonal Layering 2 (Interactive)
+val surfaceContainerHighLight = Color(0xFFFCE3DA) // Tonal Layering 3 (Input Fields)
+val surfaceContainerHighestLight = Color(0xFFF6DDD4) // Tonal Layering 4 (Raised)
 
 val primaryLightMediumContrast = Color(0xFF612200)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)

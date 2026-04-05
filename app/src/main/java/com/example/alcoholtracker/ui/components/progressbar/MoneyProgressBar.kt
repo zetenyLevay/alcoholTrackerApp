@@ -14,11 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,47 +34,63 @@ import com.example.alcoholtracker.data.model.UserDrinkLog
 
 class MoneyProgressBar : ProgressBarInterface {
     @Composable
-    override fun ProgressBarCard(logs: List<UserDrinkLog>, target: Double, onEditClick: () -> Unit) {
+    override fun ProgressBarCard(
+        logs: List<UserDrinkLog>,
+        target: Double,
+        onEditClick: () -> Unit
+    ) {
 
 
         val summary = twoDaySummaryGetter(logs)
 
 
-        OutlinedCard(modifier = Modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .height(150.dp)
-            .fillMaxWidth(),
+        Card(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .height(150.dp)
+                .fillMaxWidth(),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ))
+            )
+        )
 
 
-            {
+        {
 
 
-                Box {
-                    IconButton(onClick = onEditClick
-                        , modifier = Modifier
+            Box {
+                IconButton(
+                    onClick = onEditClick, modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(12.dp)
-                        .size(20.dp)) {
-                        Icon(Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    }
+                        .size(20.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Edit",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
 
-                    ProgressText(summary.totalCost, summary.drinkCount, summary.totalAmount.toInt(),target)
+                ProgressText(
+                    summary.totalCost,
+                    summary.drinkCount,
+                    summary.totalAmount.toInt(),
+                    target
+                )
 
 
-                    Box(modifier = Modifier
+                Box(
+                    modifier = Modifier
                         .fillMaxSize(),
-                        contentAlignment = Alignment.BottomCenter)
-                    {
-                        ProgressBar(progressCalculator(summary.totalCost, target))
-                    }
+                    contentAlignment = Alignment.BottomCenter
+                )
+                {
+                    ProgressBar(progressCalculator(summary.totalCost, target))
                 }
             }
+        }
     }
 
     @Composable
@@ -122,30 +138,38 @@ class MoneyProgressBar : ProgressBarInterface {
     }
 
     @Composable
-    override fun ProgressText(money: Double,
-                              count: Int,
-                              amount: Int,
-                              target: Double) {
+    override fun ProgressText(
+        money: Double,
+        count: Int,
+        amount: Int,
+        target: Double
+    ) {
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "$money/$target$",
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "$money/$target$",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 4.dp))
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
             Row {
-                Text(text = "$count drinks, ${amount}ml",
+                Text(
+                    text = "$count drinks, ${amount}ml",
                     modifier = Modifier.padding(end = 12.dp),
                     fontSize = 12.sp
                 )
             }
         }
     }
+
     override fun progressCalculator(unCalculatedScore: Double, target: Double): Float {
 
-        val score = unCalculatedScore/target
+        val score = unCalculatedScore / target
 
         return if (score in 0.0..1.0)
             score.toFloat()

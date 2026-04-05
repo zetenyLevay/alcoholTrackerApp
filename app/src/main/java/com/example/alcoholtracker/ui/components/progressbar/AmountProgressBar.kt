@@ -14,11 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,21 +31,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.alcoholtracker.data.model.UserDrinkLog
 
-class AmountProgressBar: ProgressBarInterface {
+class AmountProgressBar : ProgressBarInterface {
 
     @Composable
-    override fun ProgressBarCard(logs: List<UserDrinkLog>, target: Double, onEditClick: () -> Unit) {
+    override fun ProgressBarCard(
+        logs: List<UserDrinkLog>,
+        target: Double,
+        onEditClick: () -> Unit
+    ) {
 
         val summary = twoDaySummaryGetter(logs)
 
-        OutlinedCard(modifier = Modifier
-            .padding(16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .height(150.dp)
-            .fillMaxWidth(),
+        Card(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .height(150.dp)
+                .fillMaxWidth(),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ))
+            )
+        )
         {
             Box {
 
@@ -62,7 +68,12 @@ class AmountProgressBar: ProgressBarInterface {
                     )
                 }
 
-                ProgressText(summary.totalCost, summary.drinkCount, summary.totalAmount.toInt(), target)
+                ProgressText(
+                    summary.totalCost,
+                    summary.drinkCount,
+                    summary.totalAmount.toInt(),
+                    target
+                )
 
                 Box(
                     modifier = Modifier
@@ -121,21 +132,28 @@ class AmountProgressBar: ProgressBarInterface {
     }
 
     @Composable
-    override fun ProgressText(money: Double,
-                              count: Int,
-                              amount: Int,
-                              target: Double) {
+    override fun ProgressText(
+        money: Double,
+        count: Int,
+        amount: Int,
+        target: Double
+    ) {
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "${amount}/${target}ml",
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "${amount}/${target}ml",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 4.dp))
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
             Row {
-                Text(text = "$money$ , $count drinks",
+                Text(
+                    text = "$money$ , $count drinks",
                     modifier = Modifier.padding(end = 12.dp),
                     fontSize = 12.sp
                 )
@@ -143,12 +161,11 @@ class AmountProgressBar: ProgressBarInterface {
         }
 
 
-
     }
 
     override fun progressCalculator(unCalculatedScore: Double, target: Double): Float {
 
-        val score = unCalculatedScore/target
+        val score = unCalculatedScore / target
 
         return if (score in 0.0..1.0)
             score.toFloat()
