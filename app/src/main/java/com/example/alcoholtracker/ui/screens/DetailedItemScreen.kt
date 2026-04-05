@@ -12,11 +12,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.ui.components.DetailTopBar
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 
 @Composable
 fun DetailedItemScreen(
     logId: Int,
+    onBackClick: () -> Unit,
+    onEditClick: (UserDrinkLog) -> Unit,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
 ) {
 
@@ -32,6 +36,18 @@ fun DetailedItemScreen(
         containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .fillMaxSize(),
+        topBar = {
+            DetailTopBar(
+                onEditClick = {
+                    onEditClick(userDrink!!)
+                },
+                onDeleteClick = {
+                    viewModel.deleteDrink(userDrink!!)
+                    onBackClick()
+                },
+                onBackClick = { onBackClick() }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)

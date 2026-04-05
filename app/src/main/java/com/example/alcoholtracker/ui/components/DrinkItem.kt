@@ -12,6 +12,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,7 +87,18 @@ fun DrinkItem(
             }
 
 
-        }
+        },
+        colors = ListItemColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            headlineColor = MaterialTheme.colorScheme.onSurface,
+            leadingIconColor = MaterialTheme.colorScheme.onSurface,
+            overlineColor = MaterialTheme.colorScheme.onSurface,
+            supportingTextColor = MaterialTheme.colorScheme.onSurface,
+            trailingIconColor = MaterialTheme.colorScheme.onSurface,
+            disabledHeadlineColor = MaterialTheme.colorScheme.onSurface,
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+        )
     )
     HorizontalDivider()
 }

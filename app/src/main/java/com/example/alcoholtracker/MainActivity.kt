@@ -200,7 +200,13 @@ fun MainScreen() {
             }
             composable<DetailedItem> { backStackEntry ->
                 val item: DetailedItem = backStackEntry.toRoute()
-                DetailedItemScreen(item.logId)
+                DetailedItemScreen(
+                    item.logId,
+                    onBackClick = { navController.popBackStack() },
+                    onEditClick = {
+                        navController.navigate(AddDrink(it.logId))
+                    },
+                )
             }
         }
 

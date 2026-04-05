@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.alcoholtracker.ui.components.detailitemcomponents.MinimalDropdownMenu
 import com.example.alcoholtracker.utils.getFormattedDate
 import java.time.LocalDate
 
@@ -106,6 +107,41 @@ fun LogDrinkTopBar(
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
+        }
+    )
+}
+
+@Composable
+fun DetailTopBar(
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        title = {
+            Text("Drink Details")
+        },
+        modifier = Modifier.statusBarsPadding(),
+        navigationIcon = {
+            IconButton(
+                onClick = { onBackClick() }
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
+        actions = {
+            MinimalDropdownMenu(
+                onEditClick = { onEditClick() },
+                onDeleteClick = { onDeleteClick() }
+            )
         }
     )
 }
