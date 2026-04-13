@@ -61,19 +61,23 @@ fun DetailedItemScreen(
                     viewModel.deleteDrink(userDrink!!)
                     onBackClick()
                 },
-                onBackClick = { onBackClick() }
+                onBackClick = { onBackClick() },
+                onFavoriteClick = {},
+                isFavorite = userDrink?.isFavorite?:false
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(top = innerPadding.calculateTopPadding())
-                .padding(horizontal = 24.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         ) {
             ImageCard(
                 src = src,
-                title = userDrink?.name ?: "No Drink",
-                description = "A glass of ${userDrink?.category?.name ?: "Nothing"}"
+                name = userDrink?.name ?: "No Drink",
+                description = "A glass of ${userDrink?.category?.name ?: "Nothing"}",
+                abv = userDrink?.alcoholPercentage ?: 0.0,
+                category = userDrink?.category?.name ?: "No Category"
             )
             Text("Detailed Item Screen")
             Text(userDrink?.name ?: "No Drink")

@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -115,7 +118,9 @@ fun LogDrinkTopBar(
 fun DetailTopBar(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    isFavorite: Boolean
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -138,6 +143,24 @@ fun DetailTopBar(
             }
         },
         actions = {
+            IconButton(
+                onClick = { onFavoriteClick() }
+            ) {
+                if (isFavorite) {
+                    Icon(
+                        Icons.Default.Favorite,
+                        contentDescription = "Favorite",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+                else{
+                    Icon(
+                        Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
             MinimalDropdownMenu(
                 onEditClick = { onEditClick() },
                 onDeleteClick = { onDeleteClick() }
