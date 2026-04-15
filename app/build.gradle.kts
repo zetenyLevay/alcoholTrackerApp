@@ -58,7 +58,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-fragment:1.3.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
     implementation("androidx.room:room-ktx:2.8.1")
-    implementation("io.github.ivamsi:snapnotify:1.0.4")
+    implementation("io.github.ivamsi:snapnotify:1.0.6")
 
     // Jetpack Compose Integration
     implementation("androidx.navigation:navigation-compose:2.9.5")

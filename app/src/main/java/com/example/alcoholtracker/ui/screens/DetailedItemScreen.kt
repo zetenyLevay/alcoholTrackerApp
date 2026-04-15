@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -98,10 +99,11 @@ fun DetailedItemScreen(
         Column(
             modifier = Modifier
                 .padding(top = innerPadding.calculateTopPadding())
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            Spacer(modifier = Modifier.height(12.dp))
             ImageCard(
                 src = userDrink?.imgURI?.toInt() ?: src,
                 name = userDrink?.name ?: "No Drink",
@@ -120,6 +122,7 @@ fun DetailedItemScreen(
                 notes = userDrink?.notes ?: "No Notes",
                 recipient = userDrink?.recipient ?: "No Recipient"
             )
+            Spacer(modifier = Modifier.height(12.dp))
 
         }
     }

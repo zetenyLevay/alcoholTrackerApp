@@ -25,7 +25,7 @@ fun AlcoholListComposable(
 ) {
 
     val userId by authViewModel.getUserID()
-    val drinkLogs by userDrinkLogViewModel.getDrinkLogs(userId!!).collectAsState()
+    val drinkLogs by userDrinkLogViewModel.allDrinkLogs.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn {

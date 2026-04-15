@@ -50,7 +50,7 @@ fun HomeScreen(
 ) {
     val userId by authViewModel.getUserID()
     // val userDrinkLogs by userDrinkLogViewModel.getDrinkLogs(userId!!).collectAsState()
-    val twoDayDrinkLogs by userDrinkLogViewModel.getTwoDaySummary(userId!!).collectAsState()
+    val twoDayDrinkLogs by userDrinkLogViewModel.twoDaySummary.collectAsState()
     Log.d("HomeScreen", "I am being redrawn")
     var showDialog by remember { mutableStateOf(false) }
     val currentType by progressBarViewModel.currentType.collectAsState()

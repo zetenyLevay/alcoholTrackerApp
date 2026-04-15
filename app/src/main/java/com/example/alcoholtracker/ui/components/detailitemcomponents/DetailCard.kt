@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.sharp.Layers
 import androidx.compose.material.icons.sharp.MonetizationOn
@@ -60,7 +61,7 @@ fun CardGrid(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ),
-                modifier = Modifier.weight(1f).height(80.dp)
+                modifier = Modifier.weight(1f).height(88.dp)
 
             ) {
                 Row(
@@ -85,16 +86,15 @@ fun CardGrid(
 
                     Column(
                         modifier = Modifier.padding(start = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         Text("COST",
                             fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                            fontStyle = MaterialTheme.typography.titleSmall.fontStyle,
+                            fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         Text(text = "€${cost}",
                             fontWeight = FontWeight.Bold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
                             fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                             maxLines = 1
                         )
@@ -106,7 +106,7 @@ fun CardGrid(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ),
-                modifier = Modifier.weight(1f).height(80.dp)
+                modifier = Modifier.weight(1f).height(88.dp)
 
             ) {
                 Row(
@@ -123,7 +123,7 @@ fun CardGrid(
                         contentAlignment = Alignment.Center
                     ){
                         Icon(
-                            imageVector = Icons.Filled.Layers,
+                            imageVector = Icons.Filled.LocalDrink,
                             contentDescription = "MONEY",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -131,16 +131,16 @@ fun CardGrid(
 
                     Column(
                         modifier = Modifier.padding(start = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+
                     ) {
                         Text("AMOUNT",
                             fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                            fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                            fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         Text(text = "${amount}ml",
                             fontWeight = FontWeight.Bold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
                             fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                             maxLines = 1
                         )
@@ -153,7 +153,7 @@ fun CardGrid(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ),
-                modifier = Modifier.height(80.dp).fillMaxWidth()
+                modifier = Modifier.height(88.dp).fillMaxWidth()
 
 
         ) {
@@ -171,17 +171,16 @@ fun CardGrid(
                     ){
                         Icon(
                             imageVector = Icons.Filled.AccessTime,
-                            contentDescription = "MONEY",
+                            contentDescription = "TIME",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 Column(
                         modifier = Modifier.padding(start = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         Text("TIMESTAMP",
                             fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                            fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                            fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                             )
                          Row(
                              horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -193,7 +192,7 @@ fun CardGrid(
                             )
                              Text(
                                 text = "\u2022",
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
