@@ -49,7 +49,7 @@ fun CategoryDropDown(
             text = "Category",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp, start = 4.dp, top = 16.dp)
+            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 16.dp)
         )
         ExposedDropdownMenuBox(
             expanded = expanded,

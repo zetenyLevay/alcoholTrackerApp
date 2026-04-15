@@ -82,13 +82,13 @@ fun AmountDropDown(
 
 
         Column() {
-            Row() {
+            Row(  ) {
                 Text(
                     text = "Amount",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .padding(bottom = 8.dp, start = 8.dp, top = 12.dp, end = 8.dp)
+                        .padding(start = 8.dp, bottom = 8.dp)
                         .weight(0.5F)
                 )
                 Text(
@@ -96,11 +96,13 @@ fun AmountDropDown(
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .padding(bottom = 8.dp, start = 16.dp, top = 12.dp)
+                        .padding(start = 16.dp, bottom = 8.dp)
                         .weight(1F)
                 )
             }
-            Row() {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 
                 OutlinedTextField(
                     value = amount.toString(),
@@ -112,8 +114,7 @@ fun AmountDropDown(
                         keyboardType = KeyboardType.Number
                     ),
                     modifier = Modifier
-                        .weight(0.5f)
-                        .padding(end = 8.dp),
+                        .weight(0.5f),
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true,
                     trailingIcon = {
@@ -167,8 +168,7 @@ fun AmountDropDown(
                             .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable)
                             .clickable {
                                 expanded = true
-                            }
-                            .padding(start = 8.dp),
+                            },
                         shape = RoundedCornerShape(24.dp)
 
                     )

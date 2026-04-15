@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.components.logComponents
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -72,14 +73,14 @@ fun DateAndTimePicker(
     }
 
     Column() {
-        Row() {
+        Row(  ) {
             Text(
                 text = "Time",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
 
-                    .padding(bottom = 8.dp, start = 8.dp, top = 12.dp, end = 8.dp)
+                    .padding(start = 8.dp, bottom = 8.dp)
                     .weight(0.5F)
             )
             Text(
@@ -87,12 +88,14 @@ fun DateAndTimePicker(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .padding(bottom = 8.dp, start = 16.dp, top = 12.dp)
+                    .padding(start = 16.dp, bottom = 8.dp)
                     .weight(1F)
             )
 
         }
-        Row() {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
 
             OutlinedTextField(
                 value = formattedTime,
@@ -117,8 +120,6 @@ fun DateAndTimePicker(
                             showTimeDialog = true
                         }
                     )
-                    .padding(end = 8.dp),
-
                 )
 
 
@@ -143,7 +144,6 @@ fun DateAndTimePicker(
                             showDateDialog = true
                         }
                     )
-                    .padding(start = 8.dp)
 
             )
 

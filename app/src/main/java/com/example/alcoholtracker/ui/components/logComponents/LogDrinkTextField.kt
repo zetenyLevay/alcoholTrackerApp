@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.alcoholtracker.domain.notImplemented
 import kotlin.math.round
 
 
@@ -36,19 +38,19 @@ fun ABVAndPriceTextFields(
 
 
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp)
         ) {
             Text(
                 text = "ABV",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp, start = 8.dp, top = 16.dp)
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
                 value = "$abv",
@@ -102,13 +104,12 @@ fun ABVAndPriceTextFields(
         Column(
             modifier = Modifier
                 .weight(1F)
-                .padding(start = 8.dp)
         ) {
             Text(
                 text = "Price",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp, start = 8.dp, top = 16.dp)
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
                 value = "$price",
@@ -156,6 +157,74 @@ fun ABVAndPriceTextFields(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
         }
+    }
+}
+
+@Composable
+fun LocationTextField(
+    location: String,
+    onLocationChange: (String) -> Unit
+){
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+                text = "Location",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            )
+
+        OutlinedTextField(
+            value = location,
+            onValueChange = {onLocationChange(it)},
+            colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        notImplemented()
+                    }
+                ) {
+                    Icon(Icons.Default.LocationOff, contentDescription = "Location")
+                }
+
+            }
+        )
+    }
+}
+
+@Composable
+fun NotesTextField(
+    notes: String,
+    onNotesChange: (String) -> Unit
+){
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+                text = "Notes",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            )
+
+        OutlinedTextField(
+            value = notes,
+            onValueChange = {onNotesChange(it)},
+            colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+        )
     }
 }
 

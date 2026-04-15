@@ -3,6 +3,7 @@ package com.example.alcoholtracker.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.data.model.Drink
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
+import com.example.alcoholtracker.domain.notImplemented
 import com.example.alcoholtracker.domain.usecase.DrinkCreateRequest
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getFinalAmount
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getLocalDateTime
@@ -40,6 +42,8 @@ import com.example.alcoholtracker.ui.components.logComponents.AmountDropDown
 import com.example.alcoholtracker.ui.components.logComponents.CategoryDropDown
 import com.example.alcoholtracker.ui.components.logComponents.DateAndTimePicker
 import com.example.alcoholtracker.ui.components.logComponents.DrinkAutoComplete
+import com.example.alcoholtracker.ui.components.logComponents.LocationTextField
+import com.example.alcoholtracker.ui.components.logComponents.NotesTextField
 import com.example.alcoholtracker.ui.components.logComponents.RecipientAutoComplete
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 import com.vamsi.snapnotify.SnapNotify
@@ -76,6 +80,8 @@ fun AddDrinkScreen(
     var recipient by remember { mutableStateOf("Me") }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf(LocalTime.now()) }
+    var locationName by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
     LaunchedEffect(drinkToEdit) {
@@ -88,6 +94,8 @@ fun AddDrinkScreen(
             recipient = it.recipient ?: "Me"
             selectedDate = it.date.toLocalDate()
             selectedTime = it.date.toLocalTime()
+            locationName = it.locationName ?: ""
+            notes = it.notes ?: ""
         }
     }
 
@@ -118,8 +126,8 @@ fun AddDrinkScreen(
                         logId = drinkToEdit?.logId,
                         isFavorite = drinkToEdit?.isFavorite ?: false,
                         imgURI = drinkToEdit?.imgURI,
-                        notes = drinkToEdit?.notes,
-                        locationName = drinkToEdit?.locationName,
+                        notes = notes,
+                        locationName = locationName,
                         longitude = drinkToEdit?.longitude,
                         latitude = drinkToEdit?.latitude
                     )
@@ -142,14 +150,10 @@ fun AddDrinkScreen(
 
             )
         },
-
-
         ) { innerPadding ->
-
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .padding(top = innerPadding.calculateTopPadding())
                 .fillMaxWidth()
@@ -203,6 +207,16 @@ fun AddDrinkScreen(
                     selectedDate = it
                 },
             )
+            LocationTextField(
+                location = locationName,
+                onLocationChange = { locationName = it }
+            )
+            NotesTextField(
+                notes = notes,
+                onNotesChange = { notes = it }
+            )
+            Spacer(modifier = Modifier.padding(bottom = 16.dp))
+
         }
     }
 }
@@ -211,6 +225,6 @@ inline fun tryOrNotify(block: () -> Unit) {
     try {
         block()
     } catch (e: NotImplementedError) {
-        SnapNotify.showError("Feature not implemented")
+        notImplemented()
     }
 }

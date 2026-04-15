@@ -209,6 +209,5 @@ fun MainScreen() {
                 )
             }
         }
-
     }
 }
