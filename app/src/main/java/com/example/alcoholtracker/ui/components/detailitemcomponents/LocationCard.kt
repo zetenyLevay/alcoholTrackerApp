@@ -75,16 +75,15 @@ fun LocationCard(
             Card(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    // Acts as a nice placeholder color before the map loads
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 modifier = Modifier
-                    .padding(start = total) // Keep the exact same indentation!
+                    .padding(start = total)
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
                 Image(
-                painter = painterResource(R.drawable.beer_icon),
+                painter = painterResource(R.drawable.map_placeholder),
                 contentDescription = "Map",
                     contentScale = ContentScale.Crop,
                 modifier = Modifier

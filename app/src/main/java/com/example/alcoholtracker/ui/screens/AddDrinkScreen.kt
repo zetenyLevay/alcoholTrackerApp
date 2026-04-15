@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -134,9 +135,12 @@ fun AddDrinkScreen(
                     if (isEdit) {
                         viewModel.updateDrink(drinkToEdit!!.logId, request)
                         onAddDrink()
+
                     } else {
+
                         viewModel.logDrink(request)
                         onAddDrink()
+
                     }
                 },
                 icon = { Icon(Icons.Filled.Add, "Add Button") },

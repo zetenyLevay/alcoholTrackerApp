@@ -28,8 +28,8 @@ class DrinkHandler @Inject constructor(
             drinkUnit = request.drinkUnit,
             isFavorite = false,
             imgURI = null,
-            notes = null,
-            locationName = null,
+            notes = request.notes,
+            locationName = request.locationName,
             latitude = null,
             longitude = null,
 
