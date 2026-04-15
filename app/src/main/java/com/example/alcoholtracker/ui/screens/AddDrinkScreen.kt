@@ -115,7 +115,13 @@ fun AddDrinkScreen(
                         inputAmount = selectedAmount.toDouble(),
                         drinkUnit = selectedDrinkUnit,
                         dateTime = getLocalDateTime(selectedDate, selectedTime),
-                        logId = drinkToEdit?.logId
+                        logId = drinkToEdit?.logId,
+                        isFavorite = drinkToEdit?.isFavorite ?: false,
+                        imgURI = drinkToEdit?.imgURI,
+                        notes = drinkToEdit?.notes,
+                        locationName = drinkToEdit?.locationName,
+                        longitude = drinkToEdit?.longitude,
+                        latitude = drinkToEdit?.latitude
                     )
                     if (isEdit) {
                         viewModel.updateDrink(drinkToEdit!!.logId, request)

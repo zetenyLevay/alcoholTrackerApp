@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeJoin
@@ -45,7 +46,7 @@ fun ImageCard(
 
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 12.dp
+            defaultElevation = 4.dp
         )
     ) {
         Box() {
@@ -54,6 +55,18 @@ fun ImageCard(
                 contentDescription = description,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0.5f to Color.Transparent,
+                            1.0f to Color.Black.copy(alpha = 0.8f) // 80% Black at the very bottom
+                        )
+                    )
+            )
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart).padding(start = 12.dp, bottom = 8.dp)
@@ -78,19 +91,7 @@ fun ImageCard(
 
                     Text(
                         text = name,
-                        color = Color.Black,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            drawStyle = Stroke(
-                                miter = 10f,
-                                width = 4f,
-                                join = StrokeJoin.Round 
-                            )
-                        ),
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = name,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )

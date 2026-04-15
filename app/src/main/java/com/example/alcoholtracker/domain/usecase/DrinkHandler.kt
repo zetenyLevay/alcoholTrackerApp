@@ -58,12 +58,12 @@ class DrinkHandler @Inject constructor(
             recipient = request.recipient,
             inputAmount = request.inputAmount,
             drinkUnit = request.drinkUnit,
-            isFavorite = false,
-            imgURI = null,
-            notes = null,
-            locationName = null,
-            latitude = null,
-            longitude = null,
+            isFavorite = request.isFavorite,
+            imgURI = request.imgURI,
+            notes = request.notes,
+            locationName = request.locationName,
+            latitude = request.latitude,
+            longitude = request.longitude,
 
             date = request.dateTime ?: LocalDateTime.now(),
 

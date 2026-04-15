@@ -153,6 +153,7 @@ class UserAndUserDrinkLogViewModel @Inject constructor(
     fun updateDrink(drinkToUpdate: Int, request: DrinkCreateRequest) {
         viewModelScope.launch {
             drinkHandler.editDrink(drinkToUpdate, request)
+            getDrinkById(drinkToUpdate)
         }
     }
 
