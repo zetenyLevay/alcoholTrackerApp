@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.LogDrinkTopBar
 import com.example.alcoholtracker.ui.components.logComponents.tabs.FavoritesList
 import com.example.alcoholtracker.ui.components.logComponents.tabs.FrequentList
@@ -35,22 +36,38 @@ import kotlinx.coroutines.launch
 fun SearchScreen(
     onBackClick: () -> Unit,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
-    auth: AuthViewModel = hiltViewModel()
+
 ) {
 
-    val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = { SearchTabs.entries.size })
-    val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
-    val userId = auth.userId.collectAsState().value
+
     val recentLogs = viewModel.recentDrinks.collectAsState().value
     val frequentLogs = viewModel.frequentLogs.collectAsState().value
     val favoriteLogs = viewModel.favoriteLogs.collectAsState().value
 
-    LaunchedEffect(userId) {
-        Log.d("SearchScreen", "userId: $userId")
-        viewModel.setUserId(userId!!)
-    }
+    SearchScreen(
+        recentLogs = recentLogs,
+        frequentLogs = frequentLogs,
+        favoriteLogs = favoriteLogs,
+        onBackClick = onBackClick,
+        onTyped = { viewModel.updateSearchQuery(it) }
+    )
 
+}
+
+@Composable
+fun SearchScreen(
+    recentLogs: List<UserDrinkLog>,
+    frequentLogs: List<UserDrinkLog>,
+    favoriteLogs: List<UserDrinkLog>,
+    onBackClick: () -> Unit,
+    onTyped: (String) -> Unit,
+
+
+    ){
+
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(pageCount = { SearchTabs.entries.size })
+    val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
     Scaffold(
         topBar = {
@@ -70,7 +87,7 @@ fun SearchScreen(
 
             SearchComponent(
                 onCameraClick = {},
-                onTyped = { viewModel.updateSearchQuery(it) }
+                onTyped = { onTyped(it)}
             )
 
             PrimaryTabRow(

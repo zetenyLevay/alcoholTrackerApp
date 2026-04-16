@@ -17,6 +17,15 @@ import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 fun ProfileScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
 ){
+    ProfileScreen(
+        onLogout = { authViewModel.logout() }
+    )
+}
+
+@Composable
+fun ProfileScreen(
+    onLogout: () -> Unit
+){
     Box (modifier = Modifier
         .fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -26,7 +35,7 @@ fun ProfileScreen(
 
         Button(
             onClick = {
-                authViewModel.logout()
+                onLogout()
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {

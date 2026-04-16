@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.vamsi.snapnotify.SnapNotify
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +28,6 @@ import javax.inject.Inject
 class UserAndUserDrinkLogViewModel @Inject constructor(
     private val userAndUserDrinkLogRepository: UserAndUserDrinkLogRepository,
     private val drinkHandler: DrinkHandler,
-    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -43,18 +43,15 @@ class UserAndUserDrinkLogViewModel @Inject constructor(
 
 
     fun getDrinkById(logId: Int?) {
+        _drinkById.value = null
+        if (logId == null) return
 
-        if (logId == null) {
-            _drinkById.value = null
-            return
-        } else {
-            viewModelScope.launch {
-                val drink = userAndUserDrinkLogRepository.getDrinkById(logId)
-                _drinkById.value = drink
-            }
+        viewModelScope.launch {
+
+            val drink = userAndUserDrinkLogRepository.getDrinkById(logId)
+             delay(300)
+            _drinkById.value = drink
         }
-
-
     }
 
 
@@ -127,10 +124,10 @@ class UserAndUserDrinkLogViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val twoDaySummary: StateFlow<List<UserDrinkLog>> = userId.flatMapLatest { id ->
+    val twoDaySummary: StateFlow<List<UserDrinkLog>?> = userId.flatMapLatest { id ->
         if (id.isEmpty()) flowOf(emptyList())
         else userAndUserDrinkLogRepository.getTwoDayLogsByUser(id)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     fun deleteDrink(log: UserDrinkLog) {
         viewModelScope.launch {

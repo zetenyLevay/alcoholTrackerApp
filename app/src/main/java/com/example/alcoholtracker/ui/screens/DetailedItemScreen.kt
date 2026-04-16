@@ -1,6 +1,8 @@
 package com.example.alcoholtracker.ui.screens
 
 import android.util.Log
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,6 +50,7 @@ import com.example.alcoholtracker.ui.components.detailitemcomponents.DetailRow
 import com.example.alcoholtracker.ui.components.detailitemcomponents.ImageCard
 import com.example.alcoholtracker.ui.components.detailitemcomponents.LocationCard
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
+import com.google.android.gms.tasks.Tasks.await
 
 @Composable
 fun DetailedItemScreen(
@@ -55,25 +59,59 @@ fun DetailedItemScreen(
     onEditClick: (UserDrinkLog) -> Unit,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
 ) {
-
-
-
-
     LaunchedEffect(logId) {
         viewModel.getDrinkById(logId)
     }
+
+
     val userDrink by viewModel.drinkById.collectAsState()
-    val src = when (userDrink?.category) {
-        BEER -> R.drawable.beer_icon
-        WINE -> 1
-        SPIRIT -> 2
-        COCKTAIL -> 3
-        OTHER -> 4
-        else -> R.drawable.beer_icon
+
+    Crossfade(userDrink, animationSpec = tween(1000)) { userDrinkState ->
+        if (userDrinkState == null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }else {
+
+            val src = when (userDrink?.category) {
+                BEER -> R.drawable.beer_icon
+                WINE -> 1
+                SPIRIT -> 2
+                COCKTAIL -> 3
+                OTHER -> 4
+                else -> R.drawable.beer_icon
+            }
+            DetailedItemScreen(
+                src = src,
+                userDrink = userDrink!!,
+                onBackClick = { onBackClick() },
+                onDeleteClick = { viewModel.deleteDrink(it) },
+                onEditClick = { onEditClick(it) },
+                onFavoriteClick = {
+                    viewModel.updateDrink(
+                        it.logId,
+                        createNewRequest(it.copy(isFavorite = !it.isFavorite))
+                    )
+                }
+            )
+        }
     }
+}
 
-
-
+@Composable
+fun DetailedItemScreen(
+    src: Int,
+    userDrink: UserDrinkLog,
+    onBackClick: () -> Unit,
+    onDeleteClick: (UserDrinkLog) -> Unit,
+    onEditClick: (UserDrinkLog) -> Unit,
+    onFavoriteClick: (UserDrinkLog) -> Unit,
+){
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
@@ -82,17 +120,14 @@ fun DetailedItemScreen(
         topBar = {
             DetailTopBar(
                 onEditClick = {
-                    onEditClick(userDrink!!)
+                    onEditClick(userDrink)
                 },
                 onDeleteClick = {
-                    viewModel.deleteDrink(userDrink!!)
-                    onBackClick()
+                    onDeleteClick(userDrink)
                 },
                 onBackClick = { onBackClick() },
-                onFavoriteClick =
-                    {val request = createNewRequest(userDrink!!.copy(isFavorite = !userDrink!!.isFavorite))
-                    viewModel.updateDrink(userDrink!!.logId, request) },
-                isFavorite = userDrink?.isFavorite ?: false
+                onFavoriteClick = { onFavoriteClick(userDrink) },
+                isFavorite = userDrink.isFavorite
             )
         }
     ) { innerPadding ->
@@ -105,22 +140,22 @@ fun DetailedItemScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
             ImageCard(
-                src = userDrink?.imgURI?.toInt() ?: src,
-                name = userDrink?.name ?: "No Drink",
-                description = "A glass of ${userDrink?.category?.name ?: "Nothing"}",
-                abv = userDrink?.alcoholPercentage ?: 0.0,
-                category = userDrink?.category?.name ?: "No Category"
+                src = userDrink.imgURI?.toInt() ?: src,
+                name = userDrink.name,
+                description = "A glass of ${userDrink.category.name }",
+                abv = userDrink.alcoholPercentage ?: 0.0,
+                category = userDrink.category.name
             )
             CardGrid(
-                cost = userDrink?.cost ?: 0.0,
-                amount = userDrink?.amount ?: 0,
-                dateTime = userDrink?.date ?: java.time.LocalDateTime.now()
+                cost = userDrink.cost ?: 0.0,
+                amount = userDrink.amount  ,
+                dateTime = userDrink.date
             )
             DetailRow()
             LocationCard(
-                location = userDrink?.locationName ?: "No Location",
-                notes = userDrink?.notes ?: "No Notes",
-                recipient = userDrink?.recipient ?: "No Recipient"
+                location = userDrink.locationName ?: "No Location",
+                notes = userDrink.notes ?: "No Notes",
+                recipient = userDrink.recipient ?: "No Recipient"
             )
             Spacer(modifier = Modifier.height(12.dp))
 

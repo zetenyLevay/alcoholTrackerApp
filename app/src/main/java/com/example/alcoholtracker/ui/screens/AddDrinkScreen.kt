@@ -3,6 +3,7 @@ package com.example.alcoholtracker.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.data.model.Drink
+import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.domain.notImplemented
@@ -58,18 +61,54 @@ fun AddDrinkScreen(
     onBackClick: () -> Unit,
     drinkToEditId: Int?,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
-) {
+
+){
 
 
-    val isEdit = drinkToEditId != null
-    val drinkToEdit by viewModel.drinkById.collectAsState()
 
     LaunchedEffect(drinkToEditId) {
         if (drinkToEditId != null) {
             viewModel.getDrinkById(drinkToEditId)
+        } else {
+
+            viewModel.getDrinkById(null)
         }
     }
+    val drinkToEdit by viewModel.drinkById.collectAsState()
 
+    if (drinkToEditId != null && drinkToEdit == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+    } else {
+
+        AddDrinkScreen(
+            drinkToEdit = drinkToEdit,
+            onBackClick = onBackClick,
+            onSaveDrink = { request ->
+                if (drinkToEditId != null) {
+                    viewModel.updateDrink(drinkToEditId, request)
+                } else {
+                    viewModel.logDrink(request)
+                }
+                onAddDrink()
+            }
+        )
+    }
+}
+
+@Composable
+fun AddDrinkScreen(
+    onBackClick: () -> Unit,
+    onSaveDrink: (DrinkCreateRequest) -> Unit,
+    drinkToEdit: UserDrinkLog?,
+) {
+
+    val isEdit = drinkToEdit != null
+    val scrollState = rememberScrollState()
 
     var alcoholPercentage by remember { mutableDoubleStateOf(0.0) }
     var cost by remember { mutableDoubleStateOf(0.0) }
@@ -83,7 +122,6 @@ fun AddDrinkScreen(
     var selectedTime by remember { mutableStateOf(LocalTime.now()) }
     var locationName by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    val scrollState = rememberScrollState()
 
     LaunchedEffect(drinkToEdit) {
         drinkToEdit?.let {
@@ -99,7 +137,6 @@ fun AddDrinkScreen(
             notes = it.notes ?: ""
         }
     }
-
 
     Scaffold(
         topBar = {
@@ -132,25 +169,10 @@ fun AddDrinkScreen(
                         longitude = drinkToEdit?.longitude,
                         latitude = drinkToEdit?.latitude
                     )
-                    if (isEdit) {
-                        viewModel.updateDrink(drinkToEdit!!.logId, request)
-                        onAddDrink()
-
-                    } else {
-
-                        viewModel.logDrink(request)
-                        onAddDrink()
-
-                    }
+                    onSaveDrink(request)
                 },
                 icon = { Icon(Icons.Filled.Add, "Add Button") },
-                text = {
-                    if (isEdit) {
-                        Text("Update Drink")
-                    } else {
-                        Text("Add Drink")
-                    }
-                }
+                text = {Text(if (isEdit) "Update Drink" else "Add Drink")}
 
             )
         },
@@ -223,6 +245,11 @@ fun AddDrinkScreen(
 
         }
     }
+}
+
+@Composable
+fun AddDrinkScreen(){
+
 }
 
 inline fun tryOrNotify(block: () -> Unit) {

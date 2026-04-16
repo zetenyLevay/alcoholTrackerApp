@@ -39,7 +39,6 @@ fun SwipeToDismissItem(
         confirmValueChange = { state ->
             if (state == SwipeToDismissBoxValue.EndToStart) {
                 coroutineScope.launch {
-                    delay(500)
                     onRemove()
                 }
                 true
