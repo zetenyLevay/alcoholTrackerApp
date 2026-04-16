@@ -29,6 +29,7 @@ fun ListScreen(
         onFABClick,
         onEditClick,
         onItemClick,
+        onRemove = {viewModel.deleteDrink(it)},
         drinkLogs
     )
 
@@ -39,6 +40,7 @@ fun ListScreen(
     onFABClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
+    onRemove: (UserDrinkLog) -> Unit,
     drinkLogs: List<UserDrinkLog>
 ){
     Scaffold(
@@ -53,7 +55,7 @@ fun ListScreen(
                 listType =  AlcoholListType.FULL,
                 onEditClick = { onEditClick(it) },
                 onItemClick = { onItemClick(it) },
-                onRemove = {},
+                onRemove = {onRemove(it)},
                 drinkLogs = drinkLogs
             )
         }

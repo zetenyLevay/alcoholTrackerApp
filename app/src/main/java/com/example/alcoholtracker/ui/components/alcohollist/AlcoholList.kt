@@ -34,8 +34,7 @@ fun AlcoholList(
             { item ->
                 SwipeToDismissItem(
                     item = item,
-                    onRemove = { onRemove(item) },
-                    modifier = Modifier.animateItem(tween(200)),
+                    onRemove = { onRemove(it) },
                     listType = listType,
                     onEditClick = { onEditClick(it) },
                     onItemClick = { onItemClick(it) }

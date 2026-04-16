@@ -2,6 +2,8 @@ package com.example.alcoholtracker.ui.screens
 
 
 import android.util.Log
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,28 +78,30 @@ fun AddDrinkScreen(
     }
     val drinkToEdit by viewModel.drinkById.collectAsState()
 
-    if (drinkToEditId != null && drinkToEdit == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-        }
-    } else {
-
-        AddDrinkScreen(
-            drinkToEdit = drinkToEdit,
-            onBackClick = onBackClick,
-            onSaveDrink = { request ->
-                if (drinkToEditId != null) {
-                    viewModel.updateDrink(drinkToEditId, request)
-                } else {
-                    viewModel.logDrink(request)
+    Crossfade(drinkToEdit, animationSpec = tween(1000)) { it ->
+            if (drinkToEditId != null && it == null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
-                onAddDrink()
+            } else {
+
+                AddDrinkScreen(
+                    drinkToEdit = drinkToEdit,
+                    onBackClick = onBackClick,
+                    onSaveDrink = { request ->
+                        if (drinkToEditId != null) {
+                            viewModel.updateDrink(drinkToEditId, request)
+                        } else {
+                            viewModel.logDrink(request)
+                        }
+                        onAddDrink()
+                    }
+                )
             }
-        )
-    }
+        }
 }
 
 @Composable

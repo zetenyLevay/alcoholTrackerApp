@@ -2,6 +2,7 @@
 
 package com.example.alcoholtracker.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -21,6 +22,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.ui.components.detailitemcomponents.MinimalDropdownMenu
 import com.example.alcoholtracker.utils.getFormattedDate
 import java.time.LocalDate
@@ -143,28 +145,33 @@ fun DetailTopBar(
             }
         },
         actions = {
-            IconButton(
-                onClick = { onFavoriteClick() }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isFavorite) {
-                    Icon(
-                        Icons.Default.Favorite,
-                        contentDescription = "Favorite",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
+                IconButton(
+                    onClick = { onFavoriteClick() }
+                ) {
+                    if (isFavorite) {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = "Favorite",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    else{
+                        Icon(
+                            Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
-                else{
-                    Icon(
-                        Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+                MinimalDropdownMenu(
+                    onEditClick = { onEditClick() },
+                    onDeleteClick = { onDeleteClick() }
+                )
             }
-            MinimalDropdownMenu(
-                onEditClick = { onEditClick() },
-                onDeleteClick = { onDeleteClick() }
-            )
         }
     )
 }

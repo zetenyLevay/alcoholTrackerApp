@@ -43,7 +43,6 @@ class UserAndUserDrinkLogViewModel @Inject constructor(
 
 
     fun getDrinkById(logId: Int?) {
-        _drinkById.value = null
         if (logId == null) return
 
         viewModelScope.launch {

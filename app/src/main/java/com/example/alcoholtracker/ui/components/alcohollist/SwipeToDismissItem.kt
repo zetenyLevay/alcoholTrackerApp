@@ -28,8 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SwipeToDismissItem(
     item: UserDrinkLog,
-    onRemove: () -> Unit,
-    modifier: Modifier,
+    onRemove: (UserDrinkLog) -> Unit,
     listType: AlcoholListType,
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit
@@ -39,7 +38,8 @@ fun SwipeToDismissItem(
         confirmValueChange = { state ->
             if (state == SwipeToDismissBoxValue.EndToStart) {
                 coroutineScope.launch {
-                    onRemove()
+                    delay(500)
+                    onRemove(item)
                 }
                 true
             } else false
