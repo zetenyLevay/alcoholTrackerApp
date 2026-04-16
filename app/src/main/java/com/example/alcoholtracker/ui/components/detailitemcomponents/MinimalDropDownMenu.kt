@@ -25,8 +25,6 @@ fun MinimalDropdownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(
-        modifier = Modifier
-            .padding(16.dp)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(

@@ -37,7 +37,8 @@ fun AlcoholList(
                     onRemove = { onRemove(it) },
                     listType = listType,
                     onEditClick = { onEditClick(it) },
-                    onItemClick = { onItemClick(it) }
+                    onItemClick = { onItemClick(it) },
+                    modifier = Modifier.animateItem(fadeOutSpec = tween(500))
                 )
             }
         }

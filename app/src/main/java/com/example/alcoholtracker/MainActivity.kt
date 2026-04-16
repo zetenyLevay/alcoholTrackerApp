@@ -5,6 +5,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -30,6 +34,7 @@ import com.example.alcoholtracker.ui.components.logComponents.LogNavBar
 import com.example.alcoholtracker.ui.navigation.AddDrink
 import com.example.alcoholtracker.ui.navigation.DetailedItem
 import com.example.alcoholtracker.ui.navigation.Details
+import com.example.alcoholtracker.ui.navigation.EditDrink
 import com.example.alcoholtracker.ui.navigation.Home
 import com.example.alcoholtracker.ui.navigation.List
 import com.example.alcoholtracker.ui.navigation.Overview
@@ -38,6 +43,7 @@ import com.example.alcoholtracker.ui.navigation.Search
 import com.example.alcoholtracker.ui.screens.AddDrinkScreen
 import com.example.alcoholtracker.ui.screens.AnalyticsScreen
 import com.example.alcoholtracker.ui.screens.DetailedItemScreen
+import com.example.alcoholtracker.ui.screens.EditDrinkScreen
 import com.example.alcoholtracker.ui.screens.HomeScreen
 import com.example.alcoholtracker.ui.screens.ListScreen
 import com.example.alcoholtracker.ui.screens.ProfileScreen
@@ -150,7 +156,7 @@ fun MainScreen() {
             composable<Home> {
                 HomeScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink())
+                        navController.navigate(AddDrink)
                     },
                     onItemClick = {
                         navController.navigate(DetailedItem(it))
@@ -160,19 +166,32 @@ fun MainScreen() {
             composable<List> {
                 ListScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink(null))
+                        navController.navigate(AddDrink)
                     },
                     onEditClick = {
-                        navController.navigate(AddDrink(it))
+
+                        navController.navigate(EditDrink(it))
                     },
                     onItemClick = {
                         navController.navigate(DetailedItem(it))
                     }
                 )
             }
-            composable<AddDrink> { backStackEntry ->
-
-                val drinkToEdit: AddDrink = backStackEntry.toRoute()
+            composable<AddDrink>(
+                enterTransition =  {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = LinearEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = EaseIn),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Up
+                    )
+                                   },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(1000))
+                },
+            ) {
 
                 AddDrinkScreen(
                     onAddDrink = {
@@ -181,7 +200,6 @@ fun MainScreen() {
                     onBackClick = {
                         navController.popBackStack()
                     },
-                    drinkToEditId = drinkToEdit.logId
                 )
             }
             composable<Profile> {
@@ -191,6 +209,22 @@ fun MainScreen() {
                 AnalyticsScreen()
             }
             composable<Details> {
+
+            }
+            composable<EditDrink> { backStackEntry ->
+
+
+                val item: EditDrink = backStackEntry.toRoute()
+                EditDrinkScreen(
+                    onAddDrink = {
+                        navController.popBackStack()
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    drinkToEditId = item.logId
+
+                )
 
             }
             composable<Search> {
@@ -204,7 +238,7 @@ fun MainScreen() {
                     item.logId,
                     onBackClick = { navController.popBackStack() },
                     onEditClick = {
-                        navController.navigate(AddDrink(it.logId))
+                        navController.navigate(EditDrink(it.logId))
                     },
                 )
             }

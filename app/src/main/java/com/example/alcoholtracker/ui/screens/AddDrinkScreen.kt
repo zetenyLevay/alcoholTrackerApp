@@ -56,56 +56,64 @@ import com.vamsi.snapnotify.SnapNotify
 import java.time.LocalDate
 import java.time.LocalTime
 
-
 @Composable
 fun AddDrinkScreen(
     onAddDrink: () -> Unit,
     onBackClick: () -> Unit,
-    drinkToEditId: Int?,
+    viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
+){
+    DrinkFormContent(
+        drinkToEdit = null,
+        onBackClick = onBackClick,
+        onSaveDrink = { request ->
+            viewModel.logDrink(request)
+            onAddDrink()
+        }
+    )
+}
+
+@Composable
+fun EditDrinkScreen(
+    onAddDrink: () -> Unit,
+    onBackClick: () -> Unit,
+    drinkToEditId: Int,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
 
 ){
 
+    Log.d("EditDrinkScreen", "drinkToEditId: $drinkToEditId")
 
 
     LaunchedEffect(drinkToEditId) {
-        if (drinkToEditId != null) {
             viewModel.getDrinkById(drinkToEditId)
-        } else {
 
-            viewModel.getDrinkById(null)
-        }
     }
     val drinkToEdit by viewModel.drinkById.collectAsState()
 
-    Crossfade(drinkToEdit, animationSpec = tween(1000)) { it ->
-            if (drinkToEditId != null && it == null) {
+    Crossfade(drinkToEdit, animationSpec = tween(1000)) {
+        if (it == null) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
-            } else {
+        } else {
+            DrinkFormContent(
+                drinkToEdit = drinkToEdit,
+                onBackClick = onBackClick,
+                onSaveDrink = { request ->
+                        viewModel.updateDrink(drinkToEditId, request)
 
-                AddDrinkScreen(
-                    drinkToEdit = drinkToEdit,
-                    onBackClick = onBackClick,
-                    onSaveDrink = { request ->
-                        if (drinkToEditId != null) {
-                            viewModel.updateDrink(drinkToEditId, request)
-                        } else {
-                            viewModel.logDrink(request)
-                        }
-                        onAddDrink()
-                    }
-                )
-            }
+                    onAddDrink()
+                })
         }
+    }
 }
 
+
 @Composable
-fun AddDrinkScreen(
+fun DrinkFormContent(
     onBackClick: () -> Unit,
     onSaveDrink: (DrinkCreateRequest) -> Unit,
     drinkToEdit: UserDrinkLog?,
@@ -155,6 +163,13 @@ fun AddDrinkScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
+
+                    val isFormValid = typedDrinkName.isNotBlank() || selectedDrink != null
+
+                    if (!isFormValid){
+                        return@ExtendedFloatingActionButton
+                    }
+
                     val request = DrinkCreateRequest(
                         name = selectedDrink?.name ?: typedDrinkName,
                         category = selectedCategory ?: DrinkCategory.OTHER,

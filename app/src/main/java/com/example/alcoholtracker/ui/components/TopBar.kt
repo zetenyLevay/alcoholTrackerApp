@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -19,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,12 +122,16 @@ fun DetailTopBar(
     onDeleteClick: () -> Unit,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    isFavorite: Boolean
+    isFavorite: Boolean,
+    scrollBehavior: TopAppBarScrollBehavior
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary ,
+            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
         title = {
             Text("Drink Details")
@@ -140,30 +144,24 @@ fun DetailTopBar(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
-        actions = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        actions =
+             {
                 IconButton(
                     onClick = { onFavoriteClick() }
                 ) {
                     if (isFavorite) {
                         Icon(
-                            Icons.Default.Favorite,
+                            Icons.Filled.Favorite,
                             contentDescription = "Favorite",
-                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     else{
                         Icon(
-                            Icons.Default.FavoriteBorder,
+                            Icons.Filled.FavoriteBorder,
                             contentDescription = "Favorite",
-                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -171,8 +169,9 @@ fun DetailTopBar(
                     onEditClick = { onEditClick() },
                     onDeleteClick = { onDeleteClick() }
                 )
-            }
-        }
+
+            },
+        scrollBehavior = scrollBehavior
     )
 }
 

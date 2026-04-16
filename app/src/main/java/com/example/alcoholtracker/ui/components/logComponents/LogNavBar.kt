@@ -24,7 +24,7 @@ fun LogNavBar(navController: NavController, currentDestination: NavDestination?)
 
     val topLevelRoutes = listOf(
         LogNavRoute("Search", Search, Icons.Default.Search),
-        LogNavRoute("Custom", AddDrink(), Icons.Default.Code),
+        LogNavRoute("Custom", AddDrink, Icons.Default.Code),
     )
 
 

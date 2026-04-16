@@ -67,9 +67,17 @@ fun LocationCard(
                     modifier = Modifier
                         .size(iconSize))
                 Spacer(modifier = Modifier.size(iconIndent))
-                Text(location,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = MaterialTheme.typography.headlineMedium.fontStyle,
+                Text(text = location.ifEmpty { "No Location" },
+                    fontWeight = if(location.isNotEmpty()){
+                        FontWeight.Bold}
+                    else{
+                        FontWeight.Thin
+                        },
+                    fontStyle = if (location.isEmpty()) {
+                        FontStyle.Italic
+                    } else {
+                        MaterialTheme.typography.headlineSmall.fontStyle
+                    },
                 )
             }
             Card(
@@ -101,9 +109,17 @@ fun LocationCard(
                 
 
 
-                    Text(recipient,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = MaterialTheme.typography.headlineSmall.fontStyle,
+                    Text(recipient.ifEmpty { "None" },
+                    fontWeight = if(recipient.isNotEmpty()){
+                        FontWeight.Bold}
+                    else{
+                        FontWeight.Thin
+                        },
+                    fontStyle = if (recipient.isEmpty()) {
+                        FontStyle.Italic
+                    } else {
+                        MaterialTheme.typography.headlineSmall.fontStyle
+                    },
                         fontSize = MaterialTheme.typography.labelLarge.fontSize
                 )
 
@@ -122,8 +138,12 @@ fun LocationCard(
                 Spacer(modifier = Modifier.size(iconIndent))
 
                 Text(
-                    notes,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = notes.ifEmpty { "No notes" },
+                    fontStyle = if (notes.isEmpty()) {
+                        FontStyle.Italic
+                    } else {
+                        MaterialTheme.typography.bodyMedium.fontStyle
+                    },
                 )
             }
         }

@@ -95,7 +95,8 @@ fun HomeScreen(
             onItemClick,
             { selectedType, selectedTarget ->
                 progressBarViewModel.updateTarget(selectedTarget, selectedType)
-            }
+            },
+            { userDrinkLogViewModel.deleteDrink(it) }
         )
     }
 
@@ -112,7 +113,8 @@ fun HomeScreen(
     progressBar: ProgressBarInterface,
     onFABClick: () -> Unit,
     onItemClick: (Int) -> Unit,
-    onTypeUpdated: (ProgressBarType, Double) -> Unit
+    onTypeUpdated: (ProgressBarType, Double) -> Unit,
+    onRemove: (UserDrinkLog) -> Unit
 
     ){
 
@@ -148,7 +150,7 @@ fun HomeScreen(
                         listType = AlcoholListType.HOME,
                         onEditClick = {},
                         onItemClick ={ onItemClick(it) },
-                        onRemove = {},
+                        onRemove = {onRemove(it)},
                         drinkLogs = twoDayDrinkLogs
 
                     )
