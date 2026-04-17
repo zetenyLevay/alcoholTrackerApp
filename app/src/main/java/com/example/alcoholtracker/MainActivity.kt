@@ -5,10 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -40,17 +36,17 @@ import com.example.alcoholtracker.ui.navigation.List
 import com.example.alcoholtracker.ui.navigation.Overview
 import com.example.alcoholtracker.ui.navigation.Profile
 import com.example.alcoholtracker.ui.navigation.Search
-import com.example.alcoholtracker.ui.screens.AddDrinkScreen
+import com.example.alcoholtracker.ui.screens.drinkform.AddDrinkScreen
 import com.example.alcoholtracker.ui.screens.AnalyticsScreen
 import com.example.alcoholtracker.ui.screens.DetailedItemScreen
-import com.example.alcoholtracker.ui.screens.EditDrinkScreen
+import com.example.alcoholtracker.ui.screens.drinkform.EditDrinkScreen
 import com.example.alcoholtracker.ui.screens.HomeScreen
 import com.example.alcoholtracker.ui.screens.ListScreen
 import com.example.alcoholtracker.ui.screens.ProfileScreen
 import com.example.alcoholtracker.ui.screens.SearchScreen
 import com.example.alcoholtracker.ui.screens.SignInScreen
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
-import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
 import com.example.compose.AlcoholTrackerTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -97,12 +93,12 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
 
     val authViewModel: AuthViewModel = hiltViewModel()
-    val drinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
+    val drinkFormViewModel: DrinkFormViewModel = hiltViewModel()
     val userId by authViewModel.userId.collectAsState()
 
     LaunchedEffect(userId) {
         userId?.let { uid ->
-            drinkLogViewModel.setUserId(uid)
+            drinkFormViewModel.setUserId(uid)
         }
     }
 

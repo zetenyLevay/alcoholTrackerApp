@@ -35,15 +35,17 @@ fun DrinkItem(
             .heightIn(72.dp),
         headlineContent = {
             Row(modifier = Modifier.fillMaxWidth()) {
-                Text(item.name, modifier = Modifier.weight(1f))
+                Text(item.name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
             }
 
         },
         supportingContent = {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    "${item.inputAmount?.toInt()} ${item.drinkUnit?.name}",
-                    modifier = Modifier.weight(1f)
+                    text = if (item.drinkUnit?.name == "milliliters") "${item.inputAmount?.toInt()} ${item.drinkUnit.name}"
+                    else "${item.inputAmount} ${item.drinkUnit?.name}",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -89,7 +91,7 @@ fun DrinkItem(
 
         },
         colors = ListItemColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             headlineColor = MaterialTheme.colorScheme.onSurface,
             leadingIconColor = MaterialTheme.colorScheme.onSurface,
             overlineColor = MaterialTheme.colorScheme.onSurface,

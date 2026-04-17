@@ -1,7 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,20 +29,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
-import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.DrinkBanner
 import com.example.alcoholtracker.ui.components.HomeTopBar
-import com.example.alcoholtracker.ui.components.alcohollist.AlcoholList
+import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListHome
 import com.example.alcoholtracker.ui.components.progressbar.AmountProgressBar
 import com.example.alcoholtracker.ui.components.progressbar.CountProgressBar
 import com.example.alcoholtracker.ui.components.progressbar.MoneyProgressBar
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarEditDialog
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarInterface
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
-import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 import com.example.alcoholtracker.ui.viewmodel.ProgressBarViewModel
-import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
 
 @Composable
 fun HomeScreen(
@@ -51,10 +47,10 @@ fun HomeScreen(
     onItemClick: (Int) -> Unit,
     progressBarViewModel: ProgressBarViewModel = hiltViewModel(),
 
-    userDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
+    userDrinkFormViewModel: DrinkFormViewModel = hiltViewModel(),
 ) {
 
-    val twoDayDrinkLogs by userDrinkLogViewModel.twoDaySummary.collectAsState()
+    val twoDayDrinkLogs by userDrinkFormViewModel.twoDaySummary.collectAsState()
     val currentType by progressBarViewModel.currentType.collectAsState()
 
 
@@ -96,7 +92,7 @@ fun HomeScreen(
             { selectedType, selectedTarget ->
                 progressBarViewModel.updateTarget(selectedTarget, selectedType)
             },
-            { userDrinkLogViewModel.deleteDrink(it) }
+            { userDrinkFormViewModel.deleteDrink(it) }
         )
     }
 
@@ -146,13 +142,11 @@ fun HomeScreen(
                 ) {
                     DrinkBanner(drinkCount)
                     HorizontalDivider()
-                    AlcoholList(
-                        listType = AlcoholListType.HOME,
+                    AlcoholListHome(
                         onEditClick = {},
                         onItemClick ={ onItemClick(it) },
                         onRemove = {onRemove(it)},
                         drinkLogs = twoDayDrinkLogs
-
                     )
                 }
 

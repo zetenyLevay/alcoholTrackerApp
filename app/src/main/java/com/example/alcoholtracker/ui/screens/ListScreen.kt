@@ -12,25 +12,25 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
-import com.example.alcoholtracker.ui.components.AlcoholListType
-import com.example.alcoholtracker.ui.components.alcohollist.AlcoholList
-import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
+import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListFull
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
+import java.time.LocalDate
 
 @Composable
 fun ListScreen(
     onFABClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
-    viewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
+    viewModel: DrinkFormViewModel = hiltViewModel()
 ) {
-    val drinkLogs by viewModel.allDrinkLogs.collectAsState()
+    val drinkLogs by viewModel.mappedDrinkLogs.collectAsState()
 
     ListScreen(
         onFABClick,
         onEditClick,
         onItemClick,
         onRemove = {viewModel.deleteDrink(it)},
-        drinkLogs
+        drinkLogs = drinkLogs
     )
 
 }
@@ -41,7 +41,7 @@ fun ListScreen(
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
     onRemove: (UserDrinkLog) -> Unit,
-    drinkLogs: List<UserDrinkLog>
+    drinkLogs: Map<LocalDate,List<UserDrinkLog>>
 ){
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -51,8 +51,7 @@ fun ListScreen(
 
         Surface(modifier = Modifier.padding(innerPadding)) {
 
-            AlcoholList(
-                listType =  AlcoholListType.FULL,
+            AlcoholListFull(
                 onEditClick = { onEditClick(it) },
                 onItemClick = { onItemClick(it) },
                 onRemove = {onRemove(it)},

@@ -24,13 +24,13 @@ import com.example.alcoholtracker.ui.components.analytics.FinanceCharts
 import com.example.alcoholtracker.ui.components.analytics.HealthCharts
 import com.example.alcoholtracker.ui.components.analytics.OverviewCharts
 import com.example.alcoholtracker.ui.navigation.AnalyticsTabs
-import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AnalyticsScreen(
     // onCardClick: (String, List<ChartEntry>, @Composable (Modifier?, List<ChartEntry>) -> Unit) -> Unit,
-    userDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel()
+    userDrinkFormViewModel: DrinkFormViewModel = hiltViewModel()
 ) {
 
     val scope = rememberCoroutineScope()

@@ -1,6 +1,5 @@
 package com.example.alcoholtracker.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -28,16 +26,15 @@ import com.example.alcoholtracker.ui.components.logComponents.tabs.FrequentList
 import com.example.alcoholtracker.ui.components.logComponents.tabs.RecentList
 import com.example.alcoholtracker.ui.components.logComponents.tabs.SearchComponent
 import com.example.alcoholtracker.ui.navigation.SearchTabs
-import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
-import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
+    viewModel: DrinkFormViewModel = hiltViewModel(),
 
-) {
+    ) {
 
 
     val recentLogs = viewModel.recentDrinks.collectAsState().value
