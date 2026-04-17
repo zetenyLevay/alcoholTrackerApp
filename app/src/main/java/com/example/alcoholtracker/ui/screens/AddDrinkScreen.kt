@@ -40,6 +40,7 @@ import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.domain.notImplemented
 import com.example.alcoholtracker.domain.usecase.DrinkCreateRequest
+import com.example.alcoholtracker.domain.usecase.adddrinkfuns.createNewRequest
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getFinalAmount
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getLocalDateTime
 import com.example.alcoholtracker.ui.components.LogDrinkTopBar
@@ -51,8 +52,12 @@ import com.example.alcoholtracker.ui.components.logComponents.DrinkAutoComplete
 import com.example.alcoholtracker.ui.components.logComponents.LocationTextField
 import com.example.alcoholtracker.ui.components.logComponents.NotesTextField
 import com.example.alcoholtracker.ui.components.logComponents.RecipientAutoComplete
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormEvents
+import com.example.alcoholtracker.ui.viewmodel.DrinkFormState
+import com.example.alcoholtracker.ui.viewmodel.DrinkViewModel
 import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 import com.vamsi.snapnotify.SnapNotify
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -61,14 +66,61 @@ fun AddDrinkScreen(
     onAddDrink: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
+    drinkViewModel: DrinkViewModel = hiltViewModel()
 ){
-    DrinkFormContent(
-        drinkToEdit = null,
-        onBackClick = onBackClick,
-        onSaveDrink = { request ->
-            viewModel.logDrink(request)
-            onAddDrink()
+
+
+    val drinkUiState = drinkViewModel.uiState.collectAsState()
+    val formState = viewModel.formState.collectAsState()
+    val recipientOptions = viewModel.recipientOptions.collectAsState(initial = emptyList())
+    val categoryOptions = DrinkCategory.entries.toList()
+    val amountOptions = drinkViewModel.getDrinkUnitsForCategory(formState.value.selectedCategory)
+    val drinkOptions = drinkUiState.value.suggestions
+
+    LaunchedEffect(formState.value.drinkName, formState.value.selectedCategory) {
+
+        delay(300)
+        if (formState.value.drinkName.isNotBlank()) {
+            drinkViewModel.searchDrinks(formState.value.drinkName, formState.value.selectedCategory)
         }
+    }
+
+     val events = remember(viewModel) {
+        DrinkFormEvents(
+            onDrinkNameChange = viewModel::updateDrinkName,
+            onCategoryChange = viewModel::updateSelectedCategory,
+            onDrinkChange = viewModel::updateSelectedDrink,
+            onDrinkUnitChange = viewModel::updateSelectedDrinkUnit,
+            onAmountChange = { viewModel.updateSelectedAmount(it, formState.value.selectedDrinkUnit) },
+            onABVChange = viewModel::updateABV,
+            onPriceChange = viewModel::updatePrice,
+            onRecipientChange = viewModel::updateRecipient,
+            onDateChange = viewModel::updateSelectedDate,
+            onTimeChange = viewModel::updateSelectedTime,
+            onNotesChange = viewModel::updateNotes,
+            onLocationChange = viewModel::updateLocation,
+            onSaveDrink = {
+                if (formState.value.drinkName.isNotBlank() ) {
+                    val request = createNewRequest(formState.value)
+                    viewModel.logDrink(request)
+                    onAddDrink()
+                }
+            }
+        )
+    }
+
+
+
+
+    DrinkFormContent(
+        onBackClick = onBackClick,
+        categoryOptions = categoryOptions,
+        amountOptions = amountOptions,
+        drinkOptions = drinkOptions,
+        recipientOptions = recipientOptions.value,
+        state = formState.value,
+        events = events
+
     )
 }
 
@@ -78,17 +130,55 @@ fun EditDrinkScreen(
     onBackClick: () -> Unit,
     drinkToEditId: Int,
     viewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
-
+    drinkViewModel: DrinkViewModel = hiltViewModel()
 ){
 
-    Log.d("EditDrinkScreen", "drinkToEditId: $drinkToEditId")
+
+
+    val drinkUiState = drinkViewModel.uiState.collectAsState()
+    val formState = viewModel.formState.collectAsState()
+    val recipientOptions = viewModel.recipientOptions.collectAsState(initial = emptyList())
+    val categoryOptions = DrinkCategory.entries.toList()
+    val amountOptions = drinkViewModel.getDrinkUnitsForCategory(formState.value.selectedCategory)
+    val drinkOptions = drinkUiState.value.suggestions
+
+    val events = remember(viewModel) {
+        DrinkFormEvents(
+            onDrinkNameChange = viewModel::updateDrinkName,
+            onCategoryChange = viewModel::updateSelectedCategory,
+            onDrinkChange = viewModel::updateSelectedDrink,
+            onDrinkUnitChange = viewModel::updateSelectedDrinkUnit,
+            onAmountChange = { viewModel.updateSelectedAmount(formState.value.inputAmount, formState.value.selectedDrinkUnit) },
+            onABVChange = viewModel::updateABV,
+            onPriceChange = viewModel::updatePrice,
+            onRecipientChange = viewModel::updateRecipient,
+            onDateChange = viewModel::updateSelectedDate,
+            onTimeChange = viewModel::updateSelectedTime,
+            onNotesChange = viewModel::updateNotes,
+            onLocationChange = viewModel::updateLocation,
+            onSaveDrink = {
+                if (formState.value.drinkName.isNotBlank() ) {
+                    val request = createNewRequest(formState.value)
+                    viewModel.updateDrink(drinkToEditId,request)
+                    onAddDrink()
+                }
+            }
+        )
+    }
 
 
     LaunchedEffect(drinkToEditId) {
-            viewModel.getDrinkById(drinkToEditId)
-
+        viewModel.getDrinkById(drinkToEditId)
     }
     val drinkToEdit by viewModel.drinkById.collectAsState()
+
+    LaunchedEffect(drinkToEdit) {
+    drinkToEdit?.let { loadedDrink ->
+        viewModel.populateFormForEdit(loadedDrink)
+    }
+}
+
+
 
     Crossfade(drinkToEdit, animationSpec = tween(1000)) {
         if (it == null) {
@@ -100,13 +190,14 @@ fun EditDrinkScreen(
                 }
         } else {
             DrinkFormContent(
-                drinkToEdit = drinkToEdit,
                 onBackClick = onBackClick,
-                onSaveDrink = { request ->
-                        viewModel.updateDrink(drinkToEditId, request)
-
-                    onAddDrink()
-                })
+                categoryOptions = categoryOptions,
+                amountOptions = amountOptions,
+                drinkOptions = drinkOptions,
+                recipientOptions = recipientOptions.value,
+                state = formState.value.copy(isEdit = true),
+                events = events
+            )
         }
     }
 }
@@ -115,46 +206,22 @@ fun EditDrinkScreen(
 @Composable
 fun DrinkFormContent(
     onBackClick: () -> Unit,
-    onSaveDrink: (DrinkCreateRequest) -> Unit,
-    drinkToEdit: UserDrinkLog?,
+    categoryOptions: List<DrinkCategory>,
+    amountOptions: List<DrinkUnit>,
+    drinkOptions: List<Drink>,
+    recipientOptions: List<String>,
+    state: DrinkFormState,
+    events: DrinkFormEvents,
+
 ) {
 
-    val isEdit = drinkToEdit != null
     val scrollState = rememberScrollState()
-
-    var alcoholPercentage by remember { mutableDoubleStateOf(0.0) }
-    var cost by remember { mutableDoubleStateOf(0.0) }
-    var selectedCategory by remember { mutableStateOf<DrinkCategory?>(null) }
-    var selectedDrink by remember { mutableStateOf<Drink?>(null) }
-    var selectedDrinkUnit by remember { mutableStateOf<DrinkUnit?>(DrinkUnit("milliliters", 1)) }
-    var selectedAmount by remember { mutableIntStateOf(500) }
-    var typedDrinkName by remember { mutableStateOf("") }
-    var recipient by remember { mutableStateOf("Me") }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var selectedTime by remember { mutableStateOf(LocalTime.now()) }
-    var locationName by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-
-    LaunchedEffect(drinkToEdit) {
-        drinkToEdit?.let {
-            alcoholPercentage = it.alcoholPercentage ?: 0.0
-            cost = it.cost ?: 0.0
-            selectedCategory = it.category
-            selectedAmount = it.amount
-            typedDrinkName = it.name
-            recipient = it.recipient ?: "Me"
-            selectedDate = it.date.toLocalDate()
-            selectedTime = it.date.toLocalTime()
-            locationName = it.locationName ?: ""
-            notes = it.notes ?: ""
-        }
-    }
 
     Scaffold(
         topBar = {
             LogDrinkTopBar(
                 onBackClick = { onBackClick() },
-                isEdit = isEdit
+                isEdit = state.isEdit
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -162,36 +229,9 @@ fun DrinkFormContent(
             .fillMaxSize(),
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = {
-
-                    val isFormValid = typedDrinkName.isNotBlank() || selectedDrink != null
-
-                    if (!isFormValid){
-                        return@ExtendedFloatingActionButton
-                    }
-
-                    val request = DrinkCreateRequest(
-                        name = selectedDrink?.name ?: typedDrinkName,
-                        category = selectedCategory ?: DrinkCategory.OTHER,
-                        abv = selectedDrink?.alcoholContent ?: alcoholPercentage,
-                        volume = getFinalAmount(selectedDrinkUnit, selectedAmount.toDouble()),
-                        cost = cost,
-                        recipient = recipient,
-                        inputAmount = selectedAmount.toDouble(),
-                        drinkUnit = selectedDrinkUnit,
-                        dateTime = getLocalDateTime(selectedDate, selectedTime),
-                        logId = drinkToEdit?.logId,
-                        isFavorite = drinkToEdit?.isFavorite ?: false,
-                        imgURI = drinkToEdit?.imgURI,
-                        notes = notes,
-                        locationName = locationName,
-                        longitude = drinkToEdit?.longitude,
-                        latitude = drinkToEdit?.latitude
-                    )
-                    onSaveDrink(request)
-                },
+                onClick = { events.onSaveDrink() },
                 icon = { Icon(Icons.Filled.Add, "Add Button") },
-                text = {Text(if (isEdit) "Update Drink" else "Add Drink")}
+                text = {Text(if (state.isEdit) "Update Drink" else "Add Drink")}
 
             )
         },
@@ -207,58 +247,53 @@ fun DrinkFormContent(
         )
         {
             CategoryDropDown(
-                selected = selectedCategory,
-                onSelected = {
-                    tryOrNotify() {
-                        selectedCategory = it
-                    }
-                },
+                selected = state.selectedCategory,
+                onSelected = { events.onCategoryChange(it) },
+                categoryList = categoryOptions
             )
 
             DrinkAutoComplete(
-                drinkToEditName = typedDrinkName,
-                category = selectedCategory,
-                onTyped = { typedDrinkName = it },
-                onSelected = { selectedDrink = it },
+                drinkName = state.drinkName,
+                onTyped = { events.onDrinkNameChange(it) },
+                onSelected = { events.onDrinkChange(it) },
+                options = drinkOptions
             )
 
             AmountDropDown(
-                amount = selectedAmount,
-                selectedUnit = selectedDrinkUnit,
-                drinkCategory = selectedCategory ?: DrinkCategory.OTHER,
-                onSelected = { selectedDrinkUnit = it },
-                onTyped = { selectedAmount = it },
+                amount = state.inputAmount,
+                selectedUnit = state.selectedDrinkUnit,
+                onSelected = { events.onDrinkUnitChange(it) },
+                onTyped = { events.onAmountChange(it) },
+                options = amountOptions
             )
 
             ABVAndPriceTextFields(
-                abv = selectedDrink?.alcoholContent ?: alcoholPercentage,
-                price = cost,
-                defaultABV = selectedDrink?.alcoholContent ?: 0.0,
-                onABVChange = { alcoholPercentage = it },
-                onPriceChange = { cost = it }
+                abv = state.alcoholPercentage,
+                price = state.cost,
+                onABVChange = { events.onABVChange(it) },
+                onPriceChange = { events.onPriceChange(it) }
             )
 
 
             RecipientAutoComplete(
-                drinkToEditRecipient = drinkToEdit?.recipient,
-                onAction = { recipient = it },
+                recipient = state.recipient,
+                onRecipientChange = { events.onRecipientChange(it) },
+                recipientOptions = recipientOptions
             )
 
             DateAndTimePicker(
-                currentDate = selectedDate,
-                currentTime = selectedTime,
-                onTimeSelected = { selectedTime = it },
-                onDateSelected = {
-                    selectedDate = it
-                },
+                currentDate = state.selectedDate,
+                currentTime = state.selectedTime,
+                onTimeSelected = { events.onTimeChange(it) },
+                onDateSelected = { events.onDateChange(it) },
             )
             LocationTextField(
-                location = locationName,
-                onLocationChange = { locationName = it }
+                location = state.locationName,
+                onLocationChange = { events.onLocationChange(it) }
             )
             NotesTextField(
-                notes = notes,
-                onNotesChange = { notes = it }
+                notes = state.notes,
+                onNotesChange = { events.onNotesChange(it) }
             )
             Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
@@ -266,15 +301,3 @@ fun DrinkFormContent(
     }
 }
 
-@Composable
-fun AddDrinkScreen(){
-
-}
-
-inline fun tryOrNotify(block: () -> Unit) {
-    try {
-        block()
-    } catch (e: NotImplementedError) {
-        notImplemented()
-    }
-}

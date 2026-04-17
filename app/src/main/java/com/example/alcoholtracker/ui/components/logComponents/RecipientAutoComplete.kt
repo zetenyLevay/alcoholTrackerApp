@@ -29,18 +29,12 @@ import com.example.alcoholtracker.ui.viewmodel.UserAndUserDrinkLogViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipientAutoComplete(
-    drinkToEditRecipient: String? = null,
-    onAction: (String) -> Unit,
-    userAndUserDrinkLogViewModel: UserAndUserDrinkLogViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
+    recipientOptions: List<String>,
+    recipient: String,
+    onRecipientChange: (String) -> Unit,
 ) {
 
-    val userId = authViewModel.getUserID().value
-    val options =
-        userAndUserDrinkLogViewModel.getRecipients(userId!!).collectAsState(emptyList()).value
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf(drinkToEditRecipient ?: "Me") }
-
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -58,10 +52,9 @@ fun RecipientAutoComplete(
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = selected,
+                value = recipient,
                 onValueChange = {
-                    selected = it
-                    onAction(selected)
+                    onRecipientChange(it)
                 },
                 label = null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -76,17 +69,13 @@ fun RecipientAutoComplete(
                 shape = RoundedCornerShape(24.dp),
                 placeholder = { Text("Select a recipient") }
             )
-
-            val filteringOptions =
-                options.filter { it.contains(selected, ignoreCase = true) }
-            if (filteringOptions.isNotEmpty()) {
+            if (recipientOptions.isNotEmpty()) {
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    filteringOptions.forEach { selectionOption ->
+                    recipientOptions.forEach { selectionOption ->
                         DropdownMenuItem(
                             onClick = {
-                                selected = selectionOption
                                 expanded = false
-                                onAction(selectionOption)
+                                onRecipientChange(selectionOption)
                             },
                             text = { Text(text = selectionOption) }
                         )

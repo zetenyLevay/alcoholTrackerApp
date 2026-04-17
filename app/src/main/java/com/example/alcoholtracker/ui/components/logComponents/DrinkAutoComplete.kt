@@ -35,26 +35,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkAutoComplete(
-    drinkToEditName: String,
-    category: DrinkCategory?,
+    drinkName: String,
+    options: List<Drink>,
     onTyped: (String) -> Unit,
     onSelected: (Drink) -> Unit,
-    drinkViewModel: DrinkViewModel = hiltViewModel()
 ) {
-    val uiState by drinkViewModel.uiState.collectAsState()
+
     var expanded by remember { mutableStateOf(false) }
-    val options = uiState.suggestions
 
-    LaunchedEffect(drinkToEditName, category) {
-        if (category == null) return@LaunchedEffect
-
-        snapshotFlow { drinkToEditName }
-            .debounce(300)
-            .distinctUntilChanged()
-            .collect { query ->
-                drinkViewModel.searchDrinks(query, category)
-            }
-    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -72,7 +60,7 @@ fun DrinkAutoComplete(
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = drinkToEditName,
+                value = drinkName,
                 onValueChange = {
                     onTyped(it)
                 },
@@ -90,16 +78,14 @@ fun DrinkAutoComplete(
                 placeholder = { Text("Select a drink...") }
             )
 
-            val filteringOptions =
-                options.filter { it.name.contains(drinkToEditName, ignoreCase = true) }
-            if (filteringOptions.isNotEmpty()) {
+            if (options.isNotEmpty()) {
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    filteringOptions.forEach { selectionOption ->
+                    options.forEach { selectionOption ->
                         DropdownMenuItem(
                             onClick = {
                                 onTyped(selectionOption.name)
-                                expanded = false
                                 onSelected(selectionOption)
+                                expanded = false
                             },
                             text = { SuggestionText(selectionOption) }
                         )

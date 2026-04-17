@@ -37,10 +37,10 @@ data class Category(
 fun CategoryDropDown(
     selected: DrinkCategory?,
     onSelected: (DrinkCategory) -> Unit,
+    categoryList: List<DrinkCategory>
 ) {
 
     var expanded by remember { mutableStateOf(false) }
-    val categories = DrinkCategory.entries.toList()
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -90,14 +90,13 @@ fun CategoryDropDown(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
             ) {
-                categories.forEach { option ->
+                categoryList.forEach { option ->
                     DropdownMenuItem(
                         text = { Text(option.nameString) },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = option.icon),
                                 contentDescription = "Category Icon"
-
                             )
                         },
                         onClick = {

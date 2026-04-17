@@ -177,21 +177,7 @@ fun MainScreen() {
                     }
                 )
             }
-            composable<AddDrink>(
-                enterTransition =  {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideIntoContainer(
-                        animationSpec = tween(300, easing = EaseIn),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Up
-                    )
-                                   },
-                exitTransition = {
-                    fadeOut(animationSpec = tween(1000))
-                },
-            ) {
+            composable<AddDrink>() {
 
                 AddDrinkScreen(
                     onAddDrink = {

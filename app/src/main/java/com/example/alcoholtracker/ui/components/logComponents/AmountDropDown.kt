@@ -42,12 +42,11 @@ import com.example.alcoholtracker.ui.viewmodel.DrinkViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountDropDown(
-    amount: Int,
+    amount: Double,
     selectedUnit: DrinkUnit? = null,
-    drinkCategory: DrinkCategory?,
     onSelected: (DrinkUnit) -> Unit,
-    onTyped: (Int) -> Unit,
-    viewModel: DrinkViewModel = hiltViewModel(),
+    onTyped: (Double) -> Unit,
+    options: List<DrinkUnit>,
 ) {
 
     Row(
@@ -56,30 +55,6 @@ fun AmountDropDown(
     )
     {
         var expanded by remember { mutableStateOf(false) }
-        val options = viewModel.getDrinkUnitsForCategory(drinkCategory ?: DrinkCategory.OTHER)
-        var previousUnit by remember { mutableStateOf<DrinkUnit?>(DrinkUnit("milliliters", 1)) }
-
-        LaunchedEffect(selectedUnit) {
-            val isCurrentUnitMilliliters = selectedUnit?.name == "milliliters"
-            val wasPreviousUnitMilliliters = previousUnit?.name == "milliliters"
-
-            when {
-                !isCurrentUnitMilliliters && wasPreviousUnitMilliliters -> {
-                    onTyped(1)
-                }
-
-                !wasPreviousUnitMilliliters && isCurrentUnitMilliliters -> {
-                    onTyped(100)
-                }
-
-                else -> {
-
-                }
-            }
-            previousUnit = selectedUnit
-
-        }
-
 
         Column() {
             Row(  ) {
@@ -105,10 +80,10 @@ fun AmountDropDown(
             ) {
 
                 OutlinedTextField(
-                    value = amount.toString(),
+                    value = if (selectedUnit?.name == "milliliters") amount.toInt().toString() else amount.toString(),
                     onValueChange = {
-                        val newValue = it.toIntOrNull() ?: 0.0
-                        onTyped(newValue.toInt())
+                        val newValue = it.toDoubleOrNull() ?: 0.0
+                        onTyped(newValue)
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number

@@ -31,7 +31,6 @@ import kotlin.math.round
 fun ABVAndPriceTextFields(
     abv: Double,
     price: Double,
-    defaultABV: Double,
     onABVChange: (Double) -> Unit,
     onPriceChange: (Double) -> Unit
 ) {

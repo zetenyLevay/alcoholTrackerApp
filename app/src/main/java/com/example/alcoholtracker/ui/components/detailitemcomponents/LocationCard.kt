@@ -71,7 +71,7 @@ fun LocationCard(
                     fontWeight = if(location.isNotEmpty()){
                         FontWeight.Bold}
                     else{
-                        FontWeight.Thin
+                        FontWeight.Normal
                         },
                     fontStyle = if (location.isEmpty()) {
                         FontStyle.Italic
