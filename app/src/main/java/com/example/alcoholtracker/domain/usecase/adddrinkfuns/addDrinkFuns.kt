@@ -3,7 +3,7 @@ package com.example.alcoholtracker.domain.usecase.adddrinkfuns
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.domain.usecase.DrinkCreateRequest
-import com.example.alcoholtracker.ui.viewmodel.DrinkFormUiState
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormUiState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -19,7 +19,7 @@ fun getLocalDateTime(date: LocalDate, time: LocalTime): LocalDateTime {
     return LocalDateTime.of(date, time)
 }
 
-fun createNewRequest(drink: DrinkFormUiState): DrinkCreateRequest{
+fun createNewRequest(drink: DrinkLogFormUiState): DrinkCreateRequest{
     val request = DrinkCreateRequest(
         name = drink.drinkName,
         category = drink.selectedCategory,

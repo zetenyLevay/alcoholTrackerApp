@@ -39,7 +39,7 @@ import com.example.alcoholtracker.ui.components.progressbar.ProgressBarEditDialo
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarInterface
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
 import com.example.alcoholtracker.ui.viewmodel.ProgressBarViewModel
-import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 
 @Composable
 fun HomeScreen(
@@ -47,10 +47,10 @@ fun HomeScreen(
     onItemClick: (Int) -> Unit,
     progressBarViewModel: ProgressBarViewModel = hiltViewModel(),
 
-    userDrinkFormViewModel: DrinkFormViewModel = hiltViewModel(),
+    userDrinkLogFormViewModel: DrinkLogFormViewModel = hiltViewModel(),
 ) {
 
-    val twoDayDrinkLogs by userDrinkFormViewModel.twoDaySummary.collectAsState()
+    val twoDayDrinkLogs by userDrinkLogFormViewModel.twoDaySummary.collectAsState()
     val currentType by progressBarViewModel.currentType.collectAsState()
 
 
@@ -92,7 +92,7 @@ fun HomeScreen(
             { selectedType, selectedTarget ->
                 progressBarViewModel.updateTarget(selectedTarget, selectedType)
             },
-            { userDrinkFormViewModel.deleteDrink(it) }
+            { userDrinkLogFormViewModel.deleteDrink(it) }
         )
     }
 

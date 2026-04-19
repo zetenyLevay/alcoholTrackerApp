@@ -38,14 +38,14 @@ import com.example.alcoholtracker.ui.components.detailitemcomponents.CardGrid
 import com.example.alcoholtracker.ui.components.detailitemcomponents.DetailRow
 import com.example.alcoholtracker.ui.components.detailitemcomponents.ImageCard
 import com.example.alcoholtracker.ui.components.detailitemcomponents.LocationCard
-import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 
 @Composable
 fun DetailedItemScreen(
     logId: Int,
     onBackClick: () -> Unit,
     onEditClick: (UserDrinkLog) -> Unit,
-    viewModel: DrinkFormViewModel = hiltViewModel()
+    viewModel: DrinkLogFormViewModel = hiltViewModel()
 ) {
     LaunchedEffect(logId) {
         viewModel.getDrinkById(logId)

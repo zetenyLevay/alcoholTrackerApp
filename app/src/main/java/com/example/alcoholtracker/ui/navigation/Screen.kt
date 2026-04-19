@@ -17,11 +17,9 @@ object SignIn
 @Serializable
 object SignUp
 
-@Serializable
-data class EditDrink(val logId: Int)
 
 @Serializable
-object AddDrink
+data class AddDrink(val logId: Int = -1)
 
 
 @Serializable

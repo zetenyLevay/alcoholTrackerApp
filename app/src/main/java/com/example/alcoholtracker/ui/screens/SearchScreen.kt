@@ -26,13 +26,13 @@ import com.example.alcoholtracker.ui.components.logComponents.tabs.FrequentList
 import com.example.alcoholtracker.ui.components.logComponents.tabs.RecentList
 import com.example.alcoholtracker.ui.components.logComponents.tabs.SearchComponent
 import com.example.alcoholtracker.ui.navigation.SearchTabs
-import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(
     onBackClick: () -> Unit,
-    viewModel: DrinkFormViewModel = hiltViewModel(),
+    viewModel: DrinkLogFormViewModel = hiltViewModel(),
 
     ) {
 

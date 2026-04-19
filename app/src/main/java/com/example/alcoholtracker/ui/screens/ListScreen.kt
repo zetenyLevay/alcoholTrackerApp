@@ -13,7 +13,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListFull
-import com.example.alcoholtracker.ui.viewmodel.DrinkFormViewModel
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 import java.time.LocalDate
 
 @Composable
@@ -21,7 +21,7 @@ fun ListScreen(
     onFABClick: () -> Unit,
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
-    viewModel: DrinkFormViewModel = hiltViewModel()
+    viewModel: DrinkLogFormViewModel = hiltViewModel()
 ) {
     val drinkLogs by viewModel.mappedDrinkLogs.collectAsState()
 

@@ -6,7 +6,9 @@ import com.example.alcoholtracker.data.model.Drink
 import com.example.alcoholtracker.domain.logic.handlers.DrinkHandlerRegistry
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DrinkRepository @Inject constructor(
     private val drinkDao: DrinkDao,
     private val handlerRegistry: DrinkHandlerRegistry
