@@ -17,9 +17,7 @@ import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 fun ProfileScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
 ){
-    ProfileScreen(
-        onLogout = { authViewModel.logout() }
-    )
+
 }
 
 @Composable

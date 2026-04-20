@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -38,71 +39,59 @@ import com.example.alcoholtracker.ui.components.detailitemcomponents.CardGrid
 import com.example.alcoholtracker.ui.components.detailitemcomponents.DetailRow
 import com.example.alcoholtracker.ui.components.detailitemcomponents.ImageCard
 import com.example.alcoholtracker.ui.components.detailitemcomponents.LocationCard
+import com.example.alcoholtracker.ui.viewmodel.DetailedLogEffect
+import com.example.alcoholtracker.ui.viewmodel.DetailedLogEvent
+import com.example.alcoholtracker.ui.viewmodel.DetailedLogUiState
+import com.example.alcoholtracker.ui.viewmodel.DetailedLogViewModel
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 
 @Composable
-fun DetailedItemScreen(
+fun DetailedLogScreen(
     logId: Int,
     onBackClick: () -> Unit,
-    onEditClick: (UserDrinkLog) -> Unit,
-    viewModel: DrinkLogFormViewModel = hiltViewModel()
+    onEditClick: (Int) -> Unit,
+    viewModel: DetailedLogViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(logId) {
-        viewModel.getDrinkById(logId)
-    }
 
+    val state by viewModel.detailedLogUiState.collectAsState()
 
-    val userDrink by viewModel.drinkById.collectAsState()
-
-    Crossfade(userDrink, animationSpec = tween(1000)) { userDrinkState ->
-        if (userDrinkState == null) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
+    LaunchedEffect(state.effect) {
+        when (val effect = state.effect) {
+            is DetailedLogEffect.ShowError -> {
+                viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
             }
-        }else {
-
-            val src = when (userDrink?.category) {
-                BEER -> R.drawable.beer_icon
-                WINE -> 1
-                SPIRIT -> 2
-                COCKTAIL -> 3
-                OTHER -> 4
-                else -> R.drawable.beer_icon
+            is DetailedLogEffect.ShowItemRemoved -> {
+                viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
             }
-            DetailedItemScreen(
-                src = src,
-                userDrink = userDrink!!,
-                onBackClick = { onBackClick() },
-                onDeleteClick = { viewModel.deleteDrink(it) },
-                onEditClick = { onEditClick(it) },
-                onFavoriteClick = {
-                    viewModel.updateDrink(
-                        it.logId,
-                        createNewRequest(it.copy(isFavorite = !it.isFavorite))
-                    )
-                }
-            )
+            is DetailedLogEffect.NavigateToDrinkForm -> {
+                onEditClick(effect.logId)
+            }
+            null -> {
+                // No effect
+            }
         }
     }
+
+    DetailedLogScreen(
+        src = R.drawable.beer_icon,
+        onBackClick = onBackClick,
+        onEvent = viewModel::processEvent,
+        state = state
+    )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailedItemScreen(
+fun DetailedLogScreen(
     src: Int,
-    userDrink: UserDrinkLog,
     onBackClick: () -> Unit,
-    onDeleteClick: (UserDrinkLog) -> Unit,
-    onEditClick: (UserDrinkLog) -> Unit,
-    onFavoriteClick: (UserDrinkLog) -> Unit,
+    onEvent: (DetailedLogEvent) -> Unit,
+    state: DetailedLogUiState,
 ){
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val drinkLog = state.drinkLog ?: return
 
 
     Scaffold(
@@ -114,14 +103,14 @@ fun DetailedItemScreen(
         topBar = {
             DetailTopBar(
                 onEditClick = {
-                    onEditClick(userDrink)
+                    onEvent(DetailedLogEvent.OnEditClick(drinkLog.logId))
                 },
                 onDeleteClick = {
-                    onDeleteClick(userDrink)
+                    onEvent(DetailedLogEvent.OnRemoveClick(drinkLog))
                 },
                 onBackClick = { onBackClick() },
-                onFavoriteClick = { onFavoriteClick(userDrink) },
-                isFavorite = userDrink.isFavorite,
+                onFavoriteClick = { onEvent(DetailedLogEvent.OnFavoriteClick(drinkLog)) },
+                isFavorite = drinkLog.isFavorite,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -135,22 +124,22 @@ fun DetailedItemScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
             ImageCard(
-                src = userDrink.imgURI?.toInt() ?: src,
-                name = userDrink.name,
-                description = "A glass of ${userDrink.category.name }",
-                abv = userDrink.alcoholPercentage ?: 0.0,
-                category = userDrink.category.name
+                src = drinkLog.imgURI?.toInt() ?: src,
+                name = drinkLog.name,
+                description = "A glass of ${drinkLog.category.name }",
+                abv = drinkLog.alcoholPercentage ?: 0.0,
+                category = drinkLog.category.name
             )
             CardGrid(
-                cost = userDrink.cost ?: 0.0,
-                amount = userDrink.amount  ,
-                dateTime = userDrink.date
+                cost = drinkLog.cost ?: 0.0,
+                amount = drinkLog.amount  ,
+                dateTime = drinkLog.date
             )
             DetailRow()
             LocationCard(
-                location = userDrink.locationName ?: "No Location",
-                notes = userDrink.notes ?: "No Notes",
-                recipient = userDrink.recipient ?: "No Recipient"
+                location = drinkLog.locationName ?: "No Location",
+                notes = drinkLog.notes ?: "No Notes",
+                recipient = drinkLog.recipient ?: "No Recipient"
             )
             Spacer(modifier = Modifier.height(12.dp))
 

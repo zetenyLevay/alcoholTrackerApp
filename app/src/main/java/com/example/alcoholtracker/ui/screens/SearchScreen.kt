@@ -37,17 +37,17 @@ fun SearchScreen(
     ) {
 
 
-    val recentLogs = viewModel.recentDrinks.collectAsState().value
-    val frequentLogs = viewModel.frequentLogs.collectAsState().value
-    val favoriteLogs = viewModel.favoriteLogs.collectAsState().value
-
-    SearchScreen(
-        recentLogs = recentLogs,
-        frequentLogs = frequentLogs,
-        favoriteLogs = favoriteLogs,
-        onBackClick = onBackClick,
-        onTyped = { viewModel.updateSearchQuery(it) }
-    )
+//    val recentLogs = viewModel.recentDrinks.collectAsState().value
+//    val frequentLogs = viewModel.frequentLogs.collectAsState().value
+//    val favoriteLogs = viewModel.favoriteLogs.collectAsState().value
+//
+//    SearchScreen(
+//        recentLogs = recentLogs,
+//        frequentLogs = frequentLogs,
+//        favoriteLogs = favoriteLogs,
+//        onBackClick = onBackClick,
+//        onTyped = { viewModel.updateSearchQuery(it) }
+//    )
 
 }
 

@@ -8,11 +8,11 @@ import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +36,6 @@ sealed interface HomeEffect{
 data class HomeUiState(
     val drinkCount: Int = 0,
     val progressBarType: ProgressBarType = ProgressBarType.MONEY,
-    val currentDrinkCount: Int = 0,
     val currentMoneySpent: Double = 0.0,
     val currentAmountMl: Int = 0,
     val targets: Map<ProgressBarType, Double> = emptyMap(),
@@ -45,18 +44,71 @@ data class HomeUiState(
     val effect: HomeEffect? = null,
 )
 
+private data class ProgressTargets(
+    val type: ProgressBarType,
+    val money: Double,
+    val amount: Double,
+    val count: Double
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository,
     private val preferences: ProgressBarPreferences
 ) : ViewModel() {
 
-    private val _homeUiState = MutableStateFlow(HomeUiState())
-    val homeUiState: StateFlow<HomeUiState> = _homeUiState
-
-    init {
-        getInitialData()
+    private val prefFlow = combine(
+        preferences.activeProgressBarType,
+        preferences.moneyTarget,
+        preferences.amountTarget,
+        preferences.countTarget
+    ) { type, money, amount, count ->
+        ProgressTargets(type, money, amount, count)
     }
+    private val _localState = MutableStateFlow(HomeUiState())
+    val homeUiState: StateFlow<HomeUiState> = combine(
+        _localState,
+        prefFlow,
+        drinkLogRepo.getTonightLogs()
+    ) { state, prefs, logs ->
+        var currentMoneySpent = 0.0
+        var currentAmountMl = 0
+
+
+        for (log in logs) {
+            currentMoneySpent += log.cost ?: 0.0
+            currentAmountMl += log.amount
+        }
+
+        val targetMap = mapOf(
+            ProgressBarType.MONEY to prefs.money,
+            ProgressBarType.AMOUNT to prefs.amount,
+            ProgressBarType.COUNT to prefs.count
+        )
+
+        state.copy(
+            drinkCount = logs.size,
+            currentMoneySpent = currentMoneySpent,
+            currentAmountMl = currentAmountMl,
+            tonightDrinkLogs = logs,
+            progressBarType = prefs.type,
+            targets = targetMap,
+
+        )
+
+    }.catch{
+        _localState.update {
+            it.copy(
+                effect = HomeEffect.ShowError("Error loading data"),
+                isLoading = false
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState(isLoading = true)
+    )
+
 
     fun processEvent(event: HomeEvent) {
         when (event) {
@@ -69,70 +121,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getInitialData(){
-
-            _homeUiState.update { it.copy(isLoading = true) }
-
-                combine(
-                    drinkLogRepo.getTonightLogs(),
-                    preferences.activeProgressBarType,
-                    preferences.moneyTarget,
-                    preferences.amountTarget,
-                    preferences.countTarget
-                ) { logs, progressBarType, moneyTarget, amountTarget, countTarget ->
-                    var currentMoneySpent = 0.0
-                    var currentAmountMl = 0
-                    var currentDrinkCount = 0
-
-                    for (log in logs) {
-                        currentMoneySpent += log.cost ?: 0.0
-                        currentAmountMl += log.amount
-                        currentDrinkCount++
-                    }
-
-                    val targetMap = mapOf(
-                        ProgressBarType.MONEY to moneyTarget,
-                        ProgressBarType.AMOUNT to amountTarget,
-                        ProgressBarType.COUNT to countTarget
-                    )
-
-                    _homeUiState.update {
-                        it.copy(
-                            drinkCount = currentDrinkCount,
-                            currentMoneySpent = currentMoneySpent,
-                            currentAmountMl = currentAmountMl,
-                            tonightDrinkLogs = logs,
-                            progressBarType = progressBarType,
-                            targets = targetMap,
-                            isLoading = false
-                        )
-                    }
-
-                }.catch {
-                    _homeUiState.update {
-                        it.copy(
-                            effect = HomeEffect.ShowError("Error loading data"),
-                            isLoading = false
-                        )
-                    }
-
-                }.launchIn(viewModelScope)
-    }
-
     private fun undoItemRemove(log: UserDrinkLog) {
         viewModelScope.launch {
-            _homeUiState.update { it.copy(isLoading = true) }
+            _localState.update { it.copy(isLoading = true) }
             try {
                 drinkLogRepo.insertDrinkLog(log)
-                _homeUiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
             }catch (
                 e: Exception
             ) {
-                _homeUiState.update {
+                _localState.update {
                     it.copy(
                         effect = HomeEffect.ShowError("Error restoring drink"),
                         isLoading = false
@@ -143,12 +140,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun onFABClick() {
-        _homeUiState.update {
+        _localState.update {
             it.copy(effect = HomeEffect.NavigateToDrinkForm)
         }
     }
     private fun onItemClick(logId: Int) {
-        _homeUiState.update {
+        _localState.update {
             it.copy(effect = HomeEffect.NavigateToDetailedItem(logId))
         }
     }
@@ -158,7 +155,6 @@ class HomeViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             preferences.updateType(type)
-
             when (type) {
                 ProgressBarType.MONEY -> preferences.updateMoneyTarget(target)
                 ProgressBarType.COUNT -> preferences.updateCountTarget(target)
@@ -168,18 +164,17 @@ class HomeViewModel @Inject constructor(
     }
     private fun onItemRemove(log: UserDrinkLog) {
         viewModelScope.launch {
-            _homeUiState.update { it.copy(isLoading = true) }
+            _localState.update { it.copy(isLoading = true) }
             try {
                 drinkLogRepo.deleteDrinkLog(log)
-                _homeUiState.update {
+                _localState.update {
                     it.copy(
                         effect = HomeEffect.ShowItemRemoved,
-                        isLoading = false
                     )
                 }
             }
             catch (e: Exception){
-                _homeUiState.update {
+                _localState.update {
                     it.copy(
                         effect = HomeEffect.ShowError("Error deleting drink"),
                         isLoading = false
@@ -189,7 +184,7 @@ class HomeViewModel @Inject constructor(
         }
     }
     private fun consumeEffect() {
-        _homeUiState.update { it.copy(effect = null) }
+        _localState.update { it.copy(effect = null) }
     }
 
 

@@ -42,6 +42,22 @@ class DrinkLogRepository @Inject constructor(
     suspend fun getDrinkById(logId: Int): UserDrinkLog? {
         return userAndUserDrinkLogDao.getDrinkById(logId)
     }
+
+    fun getDrinkByIdFlow(logId: Int): Flow<UserDrinkLog?> {
+        return userAndUserDrinkLogDao.getDrinkByIdFlow(logId)
+    }
+
+    fun getAllLogs(): Flow<List<UserDrinkLog>> {
+        return userRepo.currentUser.flatMapLatest { userId ->
+            if (userId == null) {
+                flowOf(emptyList())
+            }
+            else{
+                userAndUserDrinkLogDao.getDrinkLogsByUserId(userId)
+            }
+        }
+    }
+
     fun getRecipients(): Flow<List<String>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
@@ -52,20 +68,6 @@ class DrinkLogRepository @Inject constructor(
             }
         }
     }
-
-
-    fun getTwoDayLogs(): Flow<List<UserDrinkLog>> {
-        return userRepo.currentUser.flatMapLatest { userId ->
-            if (userId == null) {
-                flowOf(emptyList())
-            }
-            else{
-                userAndUserDrinkLogDao.getTwoDayLogs(userId)
-            }
-        }
-    }
-
-
 
     fun getRecentLogs(): Flow<List<UserDrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->

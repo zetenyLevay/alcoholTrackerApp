@@ -19,27 +19,6 @@ fun getLocalDateTime(date: LocalDate, time: LocalTime): LocalDateTime {
     return LocalDateTime.of(date, time)
 }
 
-fun createNewRequest(drink: DrinkLogFormUiState): DrinkCreateRequest{
-    val request = DrinkCreateRequest(
-        name = drink.drinkName,
-        category = drink.selectedCategory,
-        abv = drink.alcoholPercentage,
-        volume = getFinalAmount(drink.selectedDrinkUnit, drink.inputAmount),
-        cost = drink.cost,
-        recipient = drink.recipient,
-        inputAmount = drink.inputAmount,
-        drinkUnit = drink.selectedDrinkUnit,
-        dateTime = getLocalDateTime(drink.selectedDate, drink.selectedTime),
-        logId = drink.logId,
-        isFavorite = drink.isFavorite,
-        imgURI = null,
-        notes = drink.notes,
-        locationName = drink.locationName,
-        longitude = drink.longitude,
-        latitude = drink.latitude
-    )
-    return request
-}
 
 fun createNewRequest(drink: UserDrinkLog): DrinkCreateRequest {
     val request = DrinkCreateRequest(

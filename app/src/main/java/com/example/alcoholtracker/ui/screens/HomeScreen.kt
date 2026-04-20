@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.DrinkBanner
 import com.example.alcoholtracker.ui.components.HomeTopBar
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListHome
@@ -54,19 +55,21 @@ fun HomeScreen(
     LaunchedEffect(state.value.effect) {
         when (val effect = state.value.effect) {
             is HomeEffect.ShowError -> {
-                //TODO
+                viewModel.processEvent(ConsumeEffect)
             }
 
             is HomeEffect.NavigateToDetailedItem -> {
                 onItemClick(effect.logId)
+                viewModel.processEvent(ConsumeEffect)
             }
 
             HomeEffect.NavigateToDrinkForm -> {
                 onFABClick()
+                viewModel.processEvent(ConsumeEffect)
             }
 
             HomeEffect.ShowItemRemoved -> {
-
+                viewModel.processEvent(ConsumeEffect)
             }
             null -> {
 
@@ -94,7 +97,7 @@ fun HomeScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { HomeTopBar() {} },
-        floatingActionButton = { onEvent(OnFABClick) },
+        floatingActionButton = { AddButton( onClick = { onEvent(OnFABClick) }) },
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
@@ -142,17 +145,17 @@ fun HomeScreen(
                 val (primaryText, secondaryText, progress) = when (activeType) {
                     ProgressBarType.MONEY -> Triple(
                         "${state.currentMoneySpent}/$target$",
-                        "${state.currentDrinkCount} drinks, ${state.currentAmountMl}ml",
+                        "${state.drinkCount} drinks, ${state.currentAmountMl}ml",
                         (state.currentMoneySpent / target).toFloat()
                     )
                     ProgressBarType.COUNT -> Triple(
-                        "${state.currentDrinkCount}/${target.toInt()} drinks",
+                        "${state.drinkCount}/${target.toInt()} drinks",
                         "${state.currentAmountMl}ml, ${state.currentMoneySpent}$",
-                        (state.currentDrinkCount / target).toFloat()
+                        (state.drinkCount / target).toFloat()
                     )
                     ProgressBarType.AMOUNT -> Triple(
                         "${state.currentAmountMl}/${target.toInt()}ml",
-                        "${state.currentMoneySpent}$ , ${state.currentDrinkCount} drinks",
+                        "${state.currentMoneySpent}$ , ${state.drinkCount} drinks",
                         (state.currentAmountMl / target).toFloat()
                     )
                 }

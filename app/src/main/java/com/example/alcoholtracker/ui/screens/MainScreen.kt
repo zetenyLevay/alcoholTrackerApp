@@ -21,7 +21,7 @@ import androidx.navigation.toRoute
 import com.example.alcoholtracker.ui.components.BottomNavigationBar
 import com.example.alcoholtracker.ui.components.logComponents.LogNavBar
 import com.example.alcoholtracker.ui.navigation.AddDrink
-import com.example.alcoholtracker.ui.navigation.DetailedItem
+import com.example.alcoholtracker.ui.navigation.DetailedLog
 import com.example.alcoholtracker.ui.navigation.Details
 import com.example.alcoholtracker.ui.navigation.Home
 import com.example.alcoholtracker.ui.navigation.List
@@ -82,24 +82,24 @@ fun MainScreen() {
             composable<Home> {
                 HomeScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink)
+                        navController.navigate(AddDrink())
                     },
                     onItemClick = {
-                        navController.navigate(DetailedItem(it))
+                        navController.navigate(DetailedLog(it))
                     }
                 )
             }
             composable<List> {
                 ListScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink)
+                        navController.navigate(AddDrink())
                     },
                     onEditClick = {
 
                         navController.navigate(AddDrink(it))
                     },
                     onItemClick = {
-                        navController.navigate(DetailedItem(it))
+                        navController.navigate(DetailedLog(it))
                     }
                 )
             }
@@ -128,13 +128,13 @@ fun MainScreen() {
                     onBackClick = { navController.popBackStack() },
                 )
             }
-            composable<DetailedItem> { backStackEntry ->
-                val item: DetailedItem = backStackEntry.toRoute()
-                DetailedItemScreen(
+            composable<DetailedLog> { backStackEntry ->
+                val item: DetailedLog = backStackEntry.toRoute()
+                DetailedLogScreen(
                     item.logId,
                     onBackClick = { navController.popBackStack() },
                     onEditClick = {
-                        navController.navigate(AddDrink(it.logId))
+                        navController.navigate(AddDrink(it))
                     },
                 )
             }

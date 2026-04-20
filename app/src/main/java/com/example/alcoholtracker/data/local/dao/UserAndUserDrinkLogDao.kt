@@ -37,6 +37,8 @@ interface UserAndUserDrinkLogDao {
 
     @Query("SELECT * FROM log WHERE logId = :logId")
     suspend fun getDrinkById(logId: Int): UserDrinkLog?
+    @Query("SELECT * FROM log WHERE logId = :logId")
+    fun getDrinkByIdFlow(logId: Int): Flow<UserDrinkLog?>
 
     @Query("SELECT * FROM log WHERE userId = :userId ORDER BY date DESC")
     fun getRecentLogs(userId: String): Flow<List<UserDrinkLog>>

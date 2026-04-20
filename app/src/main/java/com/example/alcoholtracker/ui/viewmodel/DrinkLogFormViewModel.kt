@@ -17,9 +17,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -39,7 +42,6 @@ sealed interface DrinkLogFormEvent{
     data class OnTimeChange(val time: LocalTime) : DrinkLogFormEvent
     data class OnNotesChange(val notes: String) : DrinkLogFormEvent
     data class OnLocationChange(val location: String) : DrinkLogFormEvent
-    data class GetAmountOptions(val category: DrinkCategory) : DrinkLogFormEvent
     data object OnSaveDrinkLog : DrinkLogFormEvent
     data object ConsumeEffect : DrinkLogFormEvent
 }
@@ -86,6 +88,12 @@ data class DrinkLogFormOptions(
     val recipientOptions: List<String> = emptyList(),
 )
 
+data class DrinkLogLocalState(
+    val isEdit: Boolean = false,
+    val isLoading: Boolean = false,
+    val effect: DrinkLogFormEffect? = null,
+)
+
 @HiltViewModel
 class DrinkLogFormViewModel @Inject constructor(
     private val logRepo: DrinkLogRepository,
@@ -93,25 +101,58 @@ class DrinkLogFormViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private var recipientOptionsMaster = listOf<String>()
     private var searchJob: Job? = null
-    private val _formUiState = MutableStateFlow(DrinkLogFormUiState(inputs = DrinkLogFormInput()))
-    val formUiState = _formUiState.asStateFlow()
-
-    init {
-
-        try {
-             logRepo.getRecipients().onEach {
-                recipientOptionsMaster = it
-                filterRecipients(_formUiState.value.inputs.recipient)
-            }.launchIn(viewModelScope)
-        }catch (e: Exception){
-            _formUiState.update {
-                it.copy(
-                    effect = DrinkLogFormEffect.ShowError("Error fetching recipients"),
-                )
+    private val _localState = MutableStateFlow(DrinkLogLocalState())
+    private val _inputs = MutableStateFlow(DrinkLogFormInput())
+    private val _drinkOptions = MutableStateFlow<List<Drink>>(emptyList())
+    private val _filteredRecipients = combine(
+        logRepo.getRecipients(),
+        _inputs.map { it.recipient }
+    ){ recipients, query ->
+        if (query.isBlank()){
+            recipients
+        } else {
+            recipients.filter {
+                it.contains(query, ignoreCase = true)
             }
         }
+    }.catch { emit(emptyList()) }
+    private val _amountOptions = _inputs.map { it.selectedCategory }.map{
+        when(it) {
+            BEER -> handlerRegistry.beerHandler.getUnitOptions()
+            WINE -> handlerRegistry.wineHandler.getUnitOptions()
+            SPIRIT -> handlerRegistry.spiritHandler.getUnitOptions()
+            COCKTAIL -> handlerRegistry.cocktailHandler.getUnitOptions()
+            OTHER -> handlerRegistry.otherHandler.getUnitOptions()
+        }
+
+    }
+    val formUiState: StateFlow<DrinkLogFormUiState> = combine(
+        _inputs,
+        _localState,
+        _drinkOptions,
+        _filteredRecipients,
+        _amountOptions
+    ) { inputs, localState, drinks, recipients, amounts ->
+        DrinkLogFormUiState(
+            isEdit = localState.isEdit,
+            isLoading = localState.isLoading,
+            inputs = inputs,
+            effect = localState.effect,
+            options = DrinkLogFormOptions(
+                categoryOptions = DrinkCategory.entries,
+                amountOptions = amounts,
+                drinkOptions = drinks,
+                recipientOptions = recipients
+            )
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DrinkLogFormUiState(isLoading = true)
+    )
+
+    init {
 
         val route = savedStateHandle.toRoute<AddDrink>()
 
@@ -137,7 +178,6 @@ class DrinkLogFormViewModel @Inject constructor(
             is DrinkLogFormEvent.OnPriceChange -> onPriceChange(event.price)
             is DrinkLogFormEvent.OnRecipientChange -> onRecipientChange(event.recipient)
             is DrinkLogFormEvent.OnTimeChange -> onTimeChange(event.time)
-            is DrinkLogFormEvent.GetAmountOptions -> getAmountOptions(event.category)
             DrinkLogFormEvent.OnSaveDrinkLog -> saveDrinkLog()
             DrinkLogFormEvent.ConsumeEffect -> consumeEffect()
         }
@@ -145,44 +185,44 @@ class DrinkLogFormViewModel @Inject constructor(
 
     private fun loadLogForEdit(logId: Int){
         viewModelScope.launch {
-            _formUiState.update { it.copy(isLoading = true) }
+            _localState.update { it.copy(isLoading = true) }
             try {
                 val logToEdit =logRepo.getDrinkById(logId)
 
                 if (logToEdit != null){
-                    _formUiState.update {
+                   _inputs.update {
                         it.copy(
-                            isEdit = true,
-                            isLoading = false,
-                            inputs = it.inputs.copy(
-                                logId = logId,
-                                drinkName = logToEdit.name,
-                                selectedCategory = logToEdit.category,
-                                selectedDrink = null,
-                                selectedDrinkUnit = logToEdit.drinkUnit ?: DrinkUnit("milliliters", 1),
-                                selectedAmount = logToEdit.amount,
-                                inputAmount = logToEdit.inputAmount ?: 100.0,
-                                alcoholPercentage = logToEdit.alcoholPercentage ?: 0.0,
-                                cost = logToEdit.cost ?: 0.0,
-                                recipient = logToEdit.recipient ?: "Me",
-                                selectedDate = logToEdit.date.toLocalDate() ?: LocalDate.now(),
-                                selectedTime = logToEdit.date.toLocalTime() ?: LocalTime.now(),
-                                notes = logToEdit.notes ?: "",
-                                locationName = logToEdit.locationName ?: "",
-                                isFavorite = logToEdit.isFavorite,
-                                longitude = logToEdit.longitude,
-                                latitude = logToEdit.latitude,
-                                imgURI = logToEdit.imgURI,
-                                userId = logToEdit.userId,
-
-                            )
+                            logId = logId,
+                            drinkName = logToEdit.name,
+                            selectedCategory = logToEdit.category,
+                            selectedDrink = null,
+                            selectedDrinkUnit = logToEdit.drinkUnit ?: DrinkUnit("milliliters", 1),
+                            selectedAmount = logToEdit.amount,
+                            inputAmount = logToEdit.inputAmount ?: 100.0,
+                            alcoholPercentage = logToEdit.alcoholPercentage ?: 0.0,
+                            cost = logToEdit.cost ?: 0.0,
+                            recipient = logToEdit.recipient ?: "Me",
+                            selectedDate = logToEdit.date.toLocalDate() ?: LocalDate.now(),
+                            selectedTime = logToEdit.date.toLocalTime() ?: LocalTime.now(),
+                            notes = logToEdit.notes ?: "",
+                            locationName = logToEdit.locationName ?: "",
+                            isFavorite = logToEdit.isFavorite,
+                            longitude = logToEdit.longitude,
+                            latitude = logToEdit.latitude,
+                            imgURI = logToEdit.imgURI,
+                            userId = logToEdit.userId,
                         )
                     }
-                    getAmountOptions(logToEdit.category)
-                    filterRecipients(logToEdit.recipient ?: "")
+                    _localState.update {
+                        it.copy(
+                            isEdit = true,
+                            isLoading = false
+                        )
+                    }
+
                 }
             } catch (e: Exception) {
-                _formUiState.update {
+                _localState.update {
                     it.copy(
                         effect = DrinkLogFormEffect.ShowError("Error loading drink log"),
                         isLoading = false
@@ -194,7 +234,7 @@ class DrinkLogFormViewModel @Inject constructor(
 
     private fun saveDrinkLog() {
 
-        val inputs = _formUiState.value.inputs
+        val inputs = _inputs.value
 
         val newLog = UserDrinkLog(
             drinkId = inputs.selectedDrink?.drinkId,
@@ -218,16 +258,16 @@ class DrinkLogFormViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            _formUiState.update { it.copy(isLoading = true) }
+            _localState.update { it.copy(isLoading = true) }
             try {
 
-                if (_formUiState.value.isEdit){
+                if (_localState.value.isEdit){
                     logRepo.updateDrinkLog(newLog)
                 }
                 else{
                     logRepo.insertDrinkLog(newLog)
                 }
-                _formUiState.update {
+                _localState.update {
                     it.copy(
                         effect = DrinkLogFormEffect.SaveDrinkLog,
                         isLoading = false
@@ -236,7 +276,7 @@ class DrinkLogFormViewModel @Inject constructor(
             }catch (
                 e: Exception
             ) {
-                _formUiState.update {
+                _localState.update {
                     it.copy(
                         effect = DrinkLogFormEffect.ShowError("Error saving drink log"),
                         isLoading = false
@@ -247,211 +287,118 @@ class DrinkLogFormViewModel @Inject constructor(
 
     }
     private fun onTimeChange(time: LocalTime) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    selectedTime = time
-                ),
+                selectedTime = time
             )
         }
     }
     private fun onDateChange(date: LocalDate) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    selectedDate = date
-                ),
+                selectedDate = date
             )
         }
     }
     private fun onNotesChange(notes: String) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    notes = notes
-                ),
+                notes = notes
             )
         }
     }
     private fun onLocationChange(location: String) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    locationName = location
-                ),
+                locationName = location
             )
         }
     }
     private fun onRecipientChange(recipient: String) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    recipient = recipient
-                ),
+                recipient = recipient
             )
         }
-        filterRecipients(recipient)
     }
     private fun onPriceChange(price: Double) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    cost = price
-                ),
+                cost = price
             )
         }
     }
     private fun onABVChange(abv: Double) {
-        _formUiState.update {
+       _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    alcoholPercentage = abv
-                ),
+                alcoholPercentage = abv
             )
         }
     }
     private fun onAmountChange(amount: Double) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    inputAmount = amount
-                ),
-                isLoading = false
+                inputAmount = amount
             )
         }
     }
     private fun onDrinkUnitChange(drinkUnit: DrinkUnit) {
-        _formUiState.update {
-                it.copy(
-                    inputs = it.inputs.copy(
-                        selectedDrinkUnit = drinkUnit
-                    ),
-                )
-            }
+        _inputs.update {
+            it.copy(
+                selectedDrinkUnit = drinkUnit
+            )
         }
+    }
 
     private fun onDrinkChange(drink: Drink) {
-
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    selectedDrink = drink
-                )
+                selectedDrink = drink
             )
         }
     }
     private fun onCategoryChange(category: DrinkCategory) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    selectedCategory = category
-                ),
+                selectedCategory = category
             )
         }
-        getAmountOptions(category)
-        viewModelScope.launch {
-            getDrinkOptions(_formUiState.value.inputs.drinkName,category)
-        }
-
-
+        onDrinkNameChange(_inputs.value.drinkName)
     }
     private fun onDrinkNameChange(name: String) {
-        _formUiState.update {
+        _inputs.update {
             it.copy(
-                inputs = it.inputs.copy(
-                    drinkName = name
-                ),
+                drinkName = name
             )
         }
 
         searchJob?.cancel()
-
         searchJob = viewModelScope.launch {
             delay(500)
 
             if (name.isBlank()){
-                _formUiState.update { it.copy(options = it.options.copy(drinkOptions = emptyList())) }
+                _drinkOptions.value = emptyList()
                 return@launch
             }
-            getDrinkOptions(name,_formUiState.value.inputs.selectedCategory)
-        }
-    }
-    private fun getAmountOptions(category: DrinkCategory) {
-
-            _formUiState.update { it.copy(isLoading = true) }
+            _localState.update { it.copy(isLoading = true) }
             try {
+                val category = _inputs.value.selectedCategory
                 val options = when (category) {
-                    BEER -> handlerRegistry.beerHandler.getUnitOptions()
-                    WINE -> handlerRegistry.wineHandler.getUnitOptions()
-                    SPIRIT -> handlerRegistry.spiritHandler.getUnitOptions()
-                    COCKTAIL -> handlerRegistry.cocktailHandler.getUnitOptions()
-                    OTHER -> handlerRegistry.otherHandler.getUnitOptions()
+                    BEER -> handlerRegistry.beerHandler.fetchSuggestions(name)
+                    WINE -> handlerRegistry.wineHandler.fetchSuggestions(name)
+                    SPIRIT -> handlerRegistry.spiritHandler.fetchSuggestions(name)
+                    COCKTAIL -> handlerRegistry.cocktailHandler.fetchSuggestions(name)
+                    OTHER -> handlerRegistry.otherHandler.fetchSuggestions(name)
                 }
-
-                _formUiState.update {
-                    it.copy(
-                        options = it.options.copy(
-                            amountOptions = options
-                        ),
-                        isLoading = false
-                    )
-                }
+                _drinkOptions.value = options
+                _localState.update { it.copy(isLoading = false) }
             } catch (e: Exception) {
-                 _formUiState.update {
-                    it.copy(
-                        effect = DrinkLogFormEffect.ShowError("Error fetching drink units"),
-                        isLoading = false
-                    )
-                }
-            }
-    }
-    private suspend fun getDrinkOptions(query: String,category: DrinkCategory) {
-
-            _formUiState.update { it.copy(isLoading = true) }
-            try {
-
-
-                val options = when (category) {
-                    BEER -> handlerRegistry.beerHandler.fetchSuggestions(query)
-                    WINE -> handlerRegistry.wineHandler.fetchSuggestions(query)
-                    SPIRIT -> handlerRegistry.spiritHandler.fetchSuggestions(query)
-                    COCKTAIL -> handlerRegistry.cocktailHandler.fetchSuggestions(query)
-                    OTHER -> handlerRegistry.otherHandler.fetchSuggestions(query)
-                }
-
-                _formUiState.update {
-                    it.copy(
-                        options = it.options.copy(
-                            drinkOptions = options
-                        ),
-                        isLoading = false
-                    )
-                }
-            }
-            catch (e: Exception) {
-                 _formUiState.update {
-                it.copy(
-                    effect = DrinkLogFormEffect.ShowError("Error fetching drinks"),
-                    isLoading = false
-                )
-            }
-            }
-    }
-
-    private fun filterRecipients(query: String) {
-        val filteredList = if (query.isBlank()) {
-            recipientOptionsMaster
-        } else {
-            recipientOptionsMaster.filter {
-                it.contains(query, ignoreCase = true)
+                _localState.update { it.copy(effect = DrinkLogFormEffect.ShowError("Error fetching drinks"), isLoading = false) }
             }
         }
-
-        _formUiState.update { it.copy(options = it.options.copy(recipientOptions = filteredList)) }
     }
-
     private fun consumeEffect() {
-        _formUiState.update { it.copy(effect = null) }
+        _localState.update { it.copy(effect = null) }
     }
 }
 
