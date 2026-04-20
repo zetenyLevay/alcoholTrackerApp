@@ -16,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,100 +29,72 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.alcoholtracker.data.model.UserDrinkLog
-import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.DrinkBanner
 import com.example.alcoholtracker.ui.components.HomeTopBar
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListHome
-import com.example.alcoholtracker.ui.components.progressbar.AmountProgressBar
-import com.example.alcoholtracker.ui.components.progressbar.CountProgressBar
-import com.example.alcoholtracker.ui.components.progressbar.MoneyProgressBar
+import com.example.alcoholtracker.ui.components.progressbar.ProgressBar
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarEditDialog
-import com.example.alcoholtracker.ui.components.progressbar.ProgressBarInterface
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
-import com.example.alcoholtracker.ui.viewmodel.ProgressBarViewModel
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
+import com.example.alcoholtracker.ui.viewmodel.HomeEffect
+import com.example.alcoholtracker.ui.viewmodel.HomeEvent
+import com.example.alcoholtracker.ui.viewmodel.HomeEvent.*
+import com.example.alcoholtracker.ui.viewmodel.HomeUiState
+import com.example.alcoholtracker.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     onFABClick: () -> Unit,
     onItemClick: (Int) -> Unit,
-    progressBarViewModel: ProgressBarViewModel = hiltViewModel(),
-
-    userDrinkLogFormViewModel: DrinkLogFormViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val twoDayDrinkLogs by userDrinkLogFormViewModel.twoDaySummary.collectAsState()
-    val currentType by progressBarViewModel.currentType.collectAsState()
+    val state = viewModel.homeUiState.collectAsState()
 
+    LaunchedEffect(state.value.effect) {
+        when (val effect = state.value.effect) {
+            is HomeEffect.ShowError -> {
+                //TODO
+            }
 
-    val moneyTarget by progressBarViewModel.moneyTarget.collectAsState()
-    val countTarget by progressBarViewModel.countTarget.collectAsState()
-    val amountTarget by progressBarViewModel.amountTarget.collectAsState()
-    val currentTargets =
-        mapOf(
-            ProgressBarType.MONEY to moneyTarget,
-            ProgressBarType.COUNT to countTarget,
-            ProgressBarType.AMOUNT to amountTarget
-        )
+            is HomeEffect.NavigateToDetailedItem -> {
+                onItemClick(effect.logId)
+            }
 
-    val currentTarget = currentTargets[currentType]
+            HomeEffect.NavigateToDrinkForm -> {
+                onFABClick()
+            }
 
-    val progressBar: ProgressBarInterface = when (currentType) {
-        ProgressBarType.MONEY -> MoneyProgressBar()
-        ProgressBarType.COUNT -> CountProgressBar()
-        ProgressBarType.AMOUNT -> AmountProgressBar()
-    }
-    if (twoDayDrinkLogs == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            HomeEffect.ShowItemRemoved -> {
+
+            }
+            null -> {
+
+            }
         }
-    } else {
-        val drinkCount = twoDayDrinkLogs!!.size
-        HomeScreen(
-            twoDayDrinkLogs!!,
-            drinkCount,
-            currentType,
-            currentTargets,
-            currentTarget!!,
-            progressBar,
-            onFABClick,
-            onItemClick,
-            { selectedType, selectedTarget ->
-                progressBarViewModel.updateTarget(selectedTarget, selectedType)
-            },
-            { userDrinkLogFormViewModel.deleteDrink(it) }
-        )
     }
+
+    HomeScreen(
+        onEvent = viewModel::processEvent,
+        state = state.value
+    )
 
 
 }
 
 @Composable
 fun HomeScreen(
-    twoDayDrinkLogs: List<UserDrinkLog>,
-    drinkCount: Int,
-    currentType: ProgressBarType,
-    currentTargets: Map<ProgressBarType, Double>,
-    currentTarget: Double,
-    progressBar: ProgressBarInterface,
-    onFABClick: () -> Unit,
-    onItemClick: (Int) -> Unit,
-    onTypeUpdated: (ProgressBarType, Double) -> Unit,
-    onRemove: (UserDrinkLog) -> Unit
+    onEvent: (HomeEvent) -> Unit,
+    state: HomeUiState,
 
     ){
 
     var showDialog by remember { mutableStateOf(false) }
 
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { HomeTopBar() {} },
-        floatingActionButton = { AddButton(onFABClick) },
+        floatingActionButton = { onEvent(OnFABClick) },
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
@@ -140,32 +114,58 @@ fun HomeScreen(
                         disabledContentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    DrinkBanner(drinkCount)
+                    DrinkBanner(state.drinkCount)
                     HorizontalDivider()
                     AlcoholListHome(
                         onEditClick = {},
-                        onItemClick ={ onItemClick(it) },
-                        onRemove = {onRemove(it)},
-                        drinkLogs = twoDayDrinkLogs
+                        onItemClick ={ onEvent(OnItemClick(it)) },
+                        onRemove = { onEvent(OnItemRemove(it)) },
+                        drinkLogs = listOf()
                     )
                 }
 
                 if (showDialog) {
                     ProgressBarEditDialog(
-                        currentType,
-                        currentTargets,
+                        currentType = state.progressBarType,
+                        currentTargets = state.targets,
                         onDismiss = { showDialog = false },
-                        onConfirm = {  selectedType, selectedTarget ->
-                            onTypeUpdated(selectedType, selectedTarget)
+                        onEvent = { type, target ->
+                            onEvent(OnProgressBarUpdate(type, target))
                             showDialog = false
-                         })
+                        }
+                    )
                 }
 
-                progressBar.ProgressBarCard(
-                    twoDayDrinkLogs,
-                    target = currentTarget,
-                    onEditClick = { showDialog = true }
-                )
+                val activeType = state.progressBarType
+                val target = state.targets[activeType] ?: 1.0
+
+                val (primaryText, secondaryText, progress) = when (activeType) {
+                    ProgressBarType.MONEY -> Triple(
+                        "${state.currentMoneySpent}/$target$",
+                        "${state.currentDrinkCount} drinks, ${state.currentAmountMl}ml",
+                        (state.currentMoneySpent / target).toFloat()
+                    )
+                    ProgressBarType.COUNT -> Triple(
+                        "${state.currentDrinkCount}/${target.toInt()} drinks",
+                        "${state.currentAmountMl}ml, ${state.currentMoneySpent}$",
+                        (state.currentDrinkCount / target).toFloat()
+                    )
+                    ProgressBarType.AMOUNT -> Triple(
+                        "${state.currentAmountMl}/${target.toInt()}ml",
+                        "${state.currentMoneySpent}$ , ${state.currentDrinkCount} drinks",
+                        (state.currentAmountMl / target).toFloat()
+                    )
+                }
+
+
+                Card() {
+                    ProgressBar(
+                        progress = progress,
+                        primaryText = primaryText,
+                        secondaryText = secondaryText,
+                        onEditClick = { showDialog = true }
+                    )
+                }
             }
         }
     }

@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.alcoholtracker.data.repository.UserRepository
 import com.example.alcoholtracker.ui.components.BottomNavigationBar
 import com.example.alcoholtracker.ui.components.logComponents.LogNavBar
 import com.example.alcoholtracker.ui.navigation.AddDrink
@@ -43,6 +44,7 @@ import com.example.alcoholtracker.ui.screens.ProfileScreen
 import com.example.alcoholtracker.ui.screens.SearchScreen
 import com.example.alcoholtracker.ui.screens.SignInScreen
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
+import com.example.alcoholtracker.ui.viewmodel.UserViewModel
 import com.example.compose.AlcoholTrackerTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -54,25 +56,23 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             SnapNotifyProvider {
                 AlcoholTrackerTheme {
 
-
-
+                    val auth = FirebaseAuth.getInstance()
+                    val userId = auth.currentUser?.uid
 
                     if (userId != null) {
                         MainScreen()
                     } else {
                         SignInScreen(
-
-                            onGuestLogin = { })
+                        )
                     }
                 }
             }

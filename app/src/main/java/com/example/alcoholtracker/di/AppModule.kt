@@ -40,18 +40,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDrinksDatabase(@ApplicationContext context: Context): DrinksDatabase {
-        return Room.databaseBuilder(
-            context,
-            DrinksDatabase::class.java,
-            "drinks_db"
-        ).addCallback(object : RoomDatabase.Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                CoroutineScope(Dispatchers.IO).launch {
-                    val drinkDao = provideDrinksDatabase(context).drinkDao()
-                }
-            }
-        }).build()
+        return DrinksDatabase.getDatabase(context)
     }
     @Provides
     @Singleton

@@ -37,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import com.example.alcoholtracker.ui.viewmodel.HomeEvent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +48,7 @@ fun ProgressBarEditDialog(
     currentType: ProgressBarType,
     currentTargets: Map<ProgressBarType, Double>,
     onDismiss: () -> Unit,
-    onConfirm: (ProgressBarType, Double) -> Unit ){
+    onEvent: (ProgressBarType,Double) -> Unit ){
 
 
     val types by remember { mutableStateOf(ProgressBarType.entries.map{it.name}) }
@@ -57,6 +59,7 @@ fun ProgressBarEditDialog(
 
 
     Dialog(onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     )
     {
         Card(modifier = Modifier
@@ -141,12 +144,10 @@ fun ProgressBarEditDialog(
 
                 Button(onClick = {
                     val selectedType = ProgressBarType.valueOf(selectedGoal.uppercase())
-                    val selectedTarget = when(selectedType) {
-                        ProgressBarType.MONEY -> newTarget.toDoubleOrNull() ?: currentTargets[selectedType]
-                        ProgressBarType.COUNT -> newTarget.toDoubleOrNull() ?: currentTargets[selectedType]
-                        ProgressBarType.AMOUNT -> newTarget.toDoubleOrNull() ?: currentTargets[selectedType]
-                    }
-                    onConfirm(selectedType, selectedTarget!!)
+
+                    val safeTarget = newTarget.toDoubleOrNull() ?: currentTargets[selectedType] ?: 0.0
+
+                    onEvent(selectedType, safeTarget)
                     onDismiss()
                 }) {
                     Text("Save")

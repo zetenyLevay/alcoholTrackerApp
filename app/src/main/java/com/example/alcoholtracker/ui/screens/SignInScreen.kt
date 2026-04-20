@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,12 +35,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.ui.components.ArcBackground
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
+import com.example.alcoholtracker.ui.viewmodel.UserEvents
 
 
 @Composable
 fun SignInScreen(
-    authViewModel: AuthViewModel = hiltViewModel(),
-    onGuestLogin: () -> Unit = { authViewModel.signInAnonymously() }
+    viewModel: AuthViewModel = hiltViewModel(),
+
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -47,70 +49,17 @@ fun SignInScreen(
     val isFormValid = email.isNotBlank() && password.length >= 6
     val context = LocalContext.current
 
-    ArcBackground()
+    Scaffold() { innerPadding ->
+        ArcBackground()
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp),
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-
-
-
-        Text(
-            text = "Login",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                    Icon(
-                        imageVector = if (isPasswordVisible) Icons.Rounded.Done else Icons.Default.Check,
-                        contentDescription = null
-                    )
-                }
-            },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                authViewModel.signIn(email, password) { success ->
-                    if (!success) Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
-                }},
-            modifier = Modifier.fillMaxWidth(),
-            enabled = isFormValid
         ) {
-            Text("Login")
-        }
-
-        Button(
-            onClick = onGuestLogin,
+            Button(
+            onClick = {viewModel.processEvent(UserEvents.AnonymousSignIn)},
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -119,12 +68,11 @@ fun SignInScreen(
             Text("Continue as Guest")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(onClick = {}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text("Don't have an account? Register")
         }
-
-
     }
+
+
+
+
+
 }

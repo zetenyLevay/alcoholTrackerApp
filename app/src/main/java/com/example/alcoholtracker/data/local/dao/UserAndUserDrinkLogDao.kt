@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.example.alcoholtracker.data.model.User
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 @Dao
 interface UserAndUserDrinkLogDao {
@@ -62,5 +63,9 @@ interface UserAndUserDrinkLogDao {
 """
     )
     fun getTwoDayLogs(userId: String): Flow<List<UserDrinkLog>>
+
+    @Query("SELECT * FROM log WHERE date BETWEEN :start AND :end AND userId = :userId")
+    fun getTonightLogs(userId: String, start: LocalDateTime, end: LocalDateTime): Flow<List<UserDrinkLog>>
+
 
 }

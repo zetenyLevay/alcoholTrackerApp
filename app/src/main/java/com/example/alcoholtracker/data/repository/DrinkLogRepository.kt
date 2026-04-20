@@ -8,9 +8,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.emptyList
+import kotlin.math.log
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
@@ -28,9 +30,6 @@ class DrinkLogRepository @Inject constructor(
             val completeLog = log.copy(userId = user)
             userAndUserDrinkLogDao.insertDrinkLog(completeLog)
         }
-
-
-
     }
 
     suspend fun updateDrinkLog(log: UserDrinkLog) {
@@ -99,6 +98,32 @@ class DrinkLogRepository @Inject constructor(
                 userAndUserDrinkLogDao.getFavoritesLogs(userId)
             }
         }
+    }
+
+    fun getTonightLogs(): Flow<List<UserDrinkLog>> {
+        return userRepo.currentUser.flatMapLatest { userId ->
+            if (userId == null) {
+                flowOf(emptyList())
+            } else {
+                val (start, end) = getCurrentSessionWindow()
+                userAndUserDrinkLogDao.getTonightLogs(userId, start, end)
+            }
+        }
+    }
+
+    fun getCurrentSessionWindow(): Pair<LocalDateTime, LocalDateTime> {
+        val now = LocalDateTime.now()
+
+
+        val sessionStart = if (now.hour < 6) {
+            now.minusDays(1).withHour(6).withMinute(0)
+        } else {
+            now.withHour(6).withMinute(0)
+        }
+
+        val sessionEnd = sessionStart.plusDays(1).minusNanos(1)
+
+        return Pair(sessionStart, sessionEnd)
     }
 
 }
