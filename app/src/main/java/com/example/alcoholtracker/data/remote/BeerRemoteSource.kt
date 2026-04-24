@@ -10,18 +10,18 @@ class BeerRemoteSource @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
-     fun getBeers() : List<Drink>{
+    fun getBeers(query: String): List<Drink> {
 
-         val beerList = mutableListOf(Beer("Mock", 0.0))
-         val drinkList: MutableList<Drink>  = mutableListOf()
+        val beerList = mutableListOf(Beer("Mock", 0.0))
+        val drinkList: MutableList<Drink> = mutableListOf()
 
-         val jsonString = context.assets.open("beerSearchTest.json")
+        val jsonString = context.assets.open("beerSearchTest.json")
             .bufferedReader()
             .use { it.readText() }
-         val gson = Gson()
-         val result = gson.fromJson(jsonString, BeerSearchResult::class.java)
+        val gson = Gson()
+        val result = gson.fromJson(jsonString, BeerSearchResult::class.java)
 
-         for (beerItem in result.beers.items) {
+        for (beerItem in result.beers.items) {
             beerList.add(beerItem.beer)
             val newDrink = Drink(
                 name = beerItem.beer.name,
@@ -29,7 +29,11 @@ class BeerRemoteSource @Inject constructor(
                 category = "Beer",
             )
             drinkList.add(newDrink)
-         }
-         return drinkList
-     }
+        }
+        if (query.isBlank()) return drinkList
+
+        return drinkList.filter { drink ->
+            drink.name.contains(query, ignoreCase = true)
+        }
+    }
 }

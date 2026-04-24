@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.alcoholtracker.SnackBarEvent
+import com.example.alcoholtracker.SnackbarController
 import com.example.alcoholtracker.ui.components.LogDrinkTopBar
 import com.example.alcoholtracker.ui.components.logComponents.ABVAndPriceTextFields
 import com.example.alcoholtracker.ui.components.logComponents.AmountDropDown
@@ -49,7 +51,6 @@ import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnSaveDrinkLog
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnTimeChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormUiState
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
-import com.vamsi.snapnotify.SnapNotify
 
 @Composable
 fun DrinkFormScreen(
@@ -64,13 +65,21 @@ fun DrinkFormScreen(
     LaunchedEffect(formState.value.effect) {
         when (val effect = formState.value.effect) {
             is DrinkLogFormEffect.SaveDrinkLog -> {
+
                 onAddDrink()
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(
+                        message = "Drink Log Saved",
+                    )
+                )
                 viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
             }
+
             is DrinkLogFormEffect.ShowError -> {
-                SnapNotify.show(effect.message)
+
                 viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
             }
+
             null -> {
             }
         }
@@ -82,7 +91,7 @@ fun DrinkFormScreen(
         onEvent = viewModel::processEvent,
         state = formState.value,
 
-    )
+        )
 }
 
 @Composable
@@ -90,7 +99,7 @@ fun DrinkFormContent(
     onBackClick: () -> Unit,
     onEvent: (DrinkLogFormEvent) -> Unit,
     state: DrinkLogFormUiState,
-    ) {
+) {
 
     val scrollState = rememberScrollState()
 
@@ -108,11 +117,11 @@ fun DrinkFormContent(
             ExtendedFloatingActionButton(
                 onClick = { onEvent(OnSaveDrinkLog) },
                 icon = { Icon(Icons.Filled.Add, "Add Button") },
-                text = {Text(if (state.isEdit) "Update Drink" else "Add Drink")}
+                text = { Text(if (state.isEdit) "Update Drink" else "Add Drink") }
 
             )
         },
-        ) { innerPadding ->
+    ) { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),

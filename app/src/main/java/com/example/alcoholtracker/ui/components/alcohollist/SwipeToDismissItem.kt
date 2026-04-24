@@ -13,6 +13,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.DrinkItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun SwipeToDismissItem(
@@ -35,20 +34,29 @@ fun SwipeToDismissItem(
     modifier: Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+
     val swipeToDismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { state ->
-            if (state == SwipeToDismissBoxValue.EndToStart) {
-                coroutineScope.launch {
-                    delay(500)
-                    onRemove(item)
-                }
-                true
-            } else false
+        initialValue = SwipeToDismissBoxValue.Settled,
+        positionalThreshold = { distance: Float ->
+            distance * 0.75f
+        })
+
+    LaunchedEffect(item) {
+        if (swipeToDismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+            swipeToDismissState.snapTo(SwipeToDismissBoxValue.Settled)
         }
-    )
+    }
+
     SwipeToDismissBox(
         state = swipeToDismissState,
         enableDismissFromStartToEnd = false,
+        onDismiss = { dismissValue ->
+            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                onRemove(item)
+            }
+
+
+        },
         backgroundContent = {
             val progress = swipeToDismissState.progress
 

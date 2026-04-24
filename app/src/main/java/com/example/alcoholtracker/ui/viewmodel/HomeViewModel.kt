@@ -17,20 +17,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface HomeEvent{
+sealed interface HomeEvent {
     data object OnFABClick : HomeEvent
     data class OnItemClick(val logId: Int) : HomeEvent
     data class OnProgressBarUpdate(val type: ProgressBarType, val target: Double) : HomeEvent
     data class OnItemRemove(val log: UserDrinkLog) : HomeEvent
-    data class UndoItemRemove(val log: UserDrinkLog) : HomeEvent
+    data class OnUndoItemRemove(val log: UserDrinkLog) : HomeEvent
     data object ConsumeEffect : HomeEvent
 }
 
-sealed interface HomeEffect{
+sealed interface HomeEffect {
     data class ShowError(val message: String) : HomeEffect
-    data object ShowItemRemoved : HomeEffect
-    data object NavigateToDrinkForm: HomeEffect
-    data class NavigateToDetailedItem(val logId: Int): HomeEffect
+    data class ShowItemRemoved(val log: UserDrinkLog) : HomeEffect
+    data object NavigateToDrinkForm : HomeEffect
+    data class NavigateToDetailedItem(val logId: Int) : HomeEffect
 }
 
 data class HomeUiState(
@@ -94,9 +94,9 @@ class HomeViewModel @Inject constructor(
             progressBarType = prefs.type,
             targets = targetMap,
 
-        )
+            )
 
-    }.catch{
+    }.catch {
         _localState.update {
             it.copy(
                 effect = HomeEffect.ShowError("Error loading data"),
@@ -116,7 +116,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.OnItemClick -> onItemClick(event.logId)
             is HomeEvent.OnProgressBarUpdate -> onProgressBarUpdate(event.type, event.target)
             is HomeEvent.OnItemRemove -> onItemRemove(event.log)
-            is HomeEvent.UndoItemRemove -> undoItemRemove(event.log)
+            is HomeEvent.OnUndoItemRemove -> undoItemRemove(event.log)
             HomeEvent.ConsumeEffect -> consumeEffect()
         }
     }
@@ -126,7 +126,7 @@ class HomeViewModel @Inject constructor(
             _localState.update { it.copy(isLoading = true) }
             try {
                 drinkLogRepo.insertDrinkLog(log)
-            }catch (
+            } catch (
                 e: Exception
             ) {
                 _localState.update {
@@ -144,11 +144,13 @@ class HomeViewModel @Inject constructor(
             it.copy(effect = HomeEffect.NavigateToDrinkForm)
         }
     }
+
     private fun onItemClick(logId: Int) {
         _localState.update {
             it.copy(effect = HomeEffect.NavigateToDetailedItem(logId))
         }
     }
+
     private fun onProgressBarUpdate(
         type: ProgressBarType,
         target: Double
@@ -162,6 +164,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     private fun onItemRemove(log: UserDrinkLog) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
@@ -169,11 +172,10 @@ class HomeViewModel @Inject constructor(
                 drinkLogRepo.deleteDrinkLog(log)
                 _localState.update {
                     it.copy(
-                        effect = HomeEffect.ShowItemRemoved,
+                        effect = HomeEffect.ShowItemRemoved(log),
                     )
                 }
-            }
-            catch (e: Exception){
+            } catch (e: Exception) {
                 _localState.update {
                     it.copy(
                         effect = HomeEffect.ShowError("Error deleting drink"),
@@ -183,10 +185,10 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     private fun consumeEffect() {
         _localState.update { it.copy(effect = null) }
     }
-
 
 
 }

@@ -8,10 +8,9 @@ import javax.inject.Inject
 
 class BeerHandler @Inject constructor(
     private val source: BeerRemoteSource
-) : DrinkCategoryHandler
-{
+) : DrinkCategoryHandler {
     override suspend fun fetchSuggestions(query: String): List<Drink> {
-       return source.getBeers()
+        return source.getBeers(query)
     }
 
     override fun getUnitOptions(): List<DrinkUnit> {

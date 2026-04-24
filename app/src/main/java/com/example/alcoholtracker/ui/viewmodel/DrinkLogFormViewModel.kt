@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,11 @@ import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.example.alcoholtracker.domain.logic.handlers.DrinkHandlerRegistry
 import com.example.alcoholtracker.domain.model.DrinkCategory
-import com.example.alcoholtracker.domain.model.DrinkCategory.*
+import com.example.alcoholtracker.domain.model.DrinkCategory.BEER
+import com.example.alcoholtracker.domain.model.DrinkCategory.COCKTAIL
+import com.example.alcoholtracker.domain.model.DrinkCategory.OTHER
+import com.example.alcoholtracker.domain.model.DrinkCategory.SPIRIT
+import com.example.alcoholtracker.domain.model.DrinkCategory.WINE
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getLocalDateTime
 import com.example.alcoholtracker.ui.navigation.AddDrink
@@ -29,7 +34,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
 
-sealed interface DrinkLogFormEvent{
+sealed interface DrinkLogFormEvent {
     data class OnDrinkLogNameChange(val name: String) : DrinkLogFormEvent
     data class OnCategoryChange(val category: DrinkCategory) : DrinkLogFormEvent
     data class OnDrinkLogChange(val drink: Drink) : DrinkLogFormEvent
@@ -46,7 +51,7 @@ sealed interface DrinkLogFormEvent{
     data object ConsumeEffect : DrinkLogFormEvent
 }
 
-sealed interface DrinkLogFormEffect{
+sealed interface DrinkLogFormEffect {
     data class ShowError(val message: String) : DrinkLogFormEffect
     data object SaveDrinkLog : DrinkLogFormEffect
 }
@@ -108,8 +113,8 @@ class DrinkLogFormViewModel @Inject constructor(
     private val _filteredRecipients = combine(
         logRepo.getRecipients(),
         _inputs.map { it.recipient }
-    ){ recipients, query ->
-        if (query.isBlank()){
+    ) { recipients, query ->
+        if (query.isBlank()) {
             recipients
         } else {
             recipients.filter {
@@ -117,8 +122,8 @@ class DrinkLogFormViewModel @Inject constructor(
             }
         }
     }.catch { emit(emptyList()) }
-    private val _amountOptions = _inputs.map { it.selectedCategory }.map{
-        when(it) {
+    private val _amountOptions = _inputs.map { it.selectedCategory }.map {
+        when (it) {
             BEER -> handlerRegistry.beerHandler.getUnitOptions()
             WINE -> handlerRegistry.wineHandler.getUnitOptions()
             SPIRIT -> handlerRegistry.spiritHandler.getUnitOptions()
@@ -164,8 +169,8 @@ class DrinkLogFormViewModel @Inject constructor(
     }
 
 
-    fun processEvent(event: DrinkLogFormEvent){
-        when (event){
+    fun processEvent(event: DrinkLogFormEvent) {
+        when (event) {
             is DrinkLogFormEvent.OnABVChange -> onABVChange(event.abv)
             is DrinkLogFormEvent.OnAmountChange -> onAmountChange(event.amount)
             is DrinkLogFormEvent.OnCategoryChange -> onCategoryChange(event.category)
@@ -183,14 +188,14 @@ class DrinkLogFormViewModel @Inject constructor(
         }
     }
 
-    private fun loadLogForEdit(logId: Int){
+    private fun loadLogForEdit(logId: Int) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
             try {
-                val logToEdit =logRepo.getDrinkById(logId)
+                val logToEdit = logRepo.getDrinkById(logId)
 
-                if (logToEdit != null){
-                   _inputs.update {
+                if (logToEdit != null) {
+                    _inputs.update {
                         it.copy(
                             logId = logId,
                             drinkName = logToEdit.name,
@@ -238,7 +243,7 @@ class DrinkLogFormViewModel @Inject constructor(
 
         val newLog = UserDrinkLog(
             drinkId = inputs.selectedDrink?.drinkId,
-            userId = inputs.userId?: "",
+            userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,
             name = inputs.drinkName,
             cost = inputs.cost,
@@ -261,19 +266,19 @@ class DrinkLogFormViewModel @Inject constructor(
             _localState.update { it.copy(isLoading = true) }
             try {
 
-                if (_localState.value.isEdit){
+                if (_localState.value.isEdit) {
                     logRepo.updateDrinkLog(newLog)
-                }
-                else{
+                } else {
                     logRepo.insertDrinkLog(newLog)
                 }
                 _localState.update {
                     it.copy(
                         effect = DrinkLogFormEffect.SaveDrinkLog,
                         isLoading = false
-                    )}
+                    )
+                }
 
-            }catch (
+            } catch (
                 e: Exception
             ) {
                 _localState.update {
@@ -286,6 +291,7 @@ class DrinkLogFormViewModel @Inject constructor(
         }
 
     }
+
     private fun onTimeChange(time: LocalTime) {
         _inputs.update {
             it.copy(
@@ -293,6 +299,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onDateChange(date: LocalDate) {
         _inputs.update {
             it.copy(
@@ -300,6 +307,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onNotesChange(notes: String) {
         _inputs.update {
             it.copy(
@@ -307,6 +315,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onLocationChange(location: String) {
         _inputs.update {
             it.copy(
@@ -314,6 +323,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onRecipientChange(recipient: String) {
         _inputs.update {
             it.copy(
@@ -321,6 +331,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onPriceChange(price: Double) {
         _inputs.update {
             it.copy(
@@ -328,13 +339,15 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onABVChange(abv: Double) {
-       _inputs.update {
+        _inputs.update {
             it.copy(
                 alcoholPercentage = abv
             )
         }
     }
+
     private fun onAmountChange(amount: Double) {
         _inputs.update {
             it.copy(
@@ -342,6 +355,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
+
     private fun onDrinkUnitChange(drinkUnit: DrinkUnit) {
         _inputs.update {
             it.copy(
@@ -353,10 +367,12 @@ class DrinkLogFormViewModel @Inject constructor(
     private fun onDrinkChange(drink: Drink) {
         _inputs.update {
             it.copy(
-                selectedDrink = drink
+                selectedDrink = drink,
+                alcoholPercentage = drink.alcoholContent
             )
         }
     }
+
     private fun onCategoryChange(category: DrinkCategory) {
         _inputs.update {
             it.copy(
@@ -365,6 +381,7 @@ class DrinkLogFormViewModel @Inject constructor(
         }
         onDrinkNameChange(_inputs.value.drinkName)
     }
+
     private fun onDrinkNameChange(name: String) {
         _inputs.update {
             it.copy(
@@ -376,13 +393,11 @@ class DrinkLogFormViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             delay(500)
 
-            if (name.isBlank()){
-                _drinkOptions.value = emptyList()
-                return@launch
-            }
+
             _localState.update { it.copy(isLoading = true) }
             try {
                 val category = _inputs.value.selectedCategory
+                Log.d("Beer", "name: $name")
                 val options = when (category) {
                     BEER -> handlerRegistry.beerHandler.fetchSuggestions(name)
                     WINE -> handlerRegistry.wineHandler.fetchSuggestions(name)
@@ -393,10 +408,16 @@ class DrinkLogFormViewModel @Inject constructor(
                 _drinkOptions.value = options
                 _localState.update { it.copy(isLoading = false) }
             } catch (e: Exception) {
-                _localState.update { it.copy(effect = DrinkLogFormEffect.ShowError("Error fetching drinks"), isLoading = false) }
+                _localState.update {
+                    it.copy(
+                        effect = DrinkLogFormEffect.ShowError("Error fetching drinks"),
+                        isLoading = false
+                    )
+                }
             }
         }
     }
+
     private fun consumeEffect() {
         _localState.update { it.copy(effect = null) }
     }
