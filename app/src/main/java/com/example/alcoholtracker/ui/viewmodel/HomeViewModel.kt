@@ -57,6 +57,8 @@ class HomeViewModel @Inject constructor(
     private val preferences: ProgressBarPreferences
 ) : ViewModel() {
 
+
+
     private val prefFlow = combine(
         preferences.activeProgressBarType,
         preferences.moneyTarget,
@@ -140,9 +142,9 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun onFABClick() {
-        _localState.update {
-            it.copy(effect = HomeEffect.NavigateToDrinkForm)
-        }
+            _localState.update {
+                it.copy(effect = HomeEffect.NavigateToDrinkForm)
+            }
     }
 
     private fun onItemClick(logId: Int) {

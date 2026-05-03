@@ -25,6 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.alcoholtracker.SnackBarEvent
 import com.example.alcoholtracker.SnackbarAction
 import com.example.alcoholtracker.SnackbarController
@@ -61,16 +63,18 @@ fun HomeScreen(
             }
 
             is HomeEffect.NavigateToDetailedItem -> {
-                onItemClick(effect.logId)
                 viewModel.processEvent(ConsumeEffect)
+                onItemClick(effect.logId)
+
             }
 
             HomeEffect.NavigateToDrinkForm -> {
-                onFABClick()
                 viewModel.processEvent(ConsumeEffect)
+                onFABClick()
             }
 
             is HomeEffect.ShowItemRemoved -> {
+                viewModel.processEvent(ConsumeEffect)
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
                         message = "Item Removed",
@@ -81,7 +85,6 @@ fun HomeScreen(
                         )
                     )
                 )
-                viewModel.processEvent(ConsumeEffect)
             }
 
             null -> {
@@ -105,11 +108,16 @@ fun HomeScreen(
     ) {
 
     var showDialog by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { HomeTopBar() {} },
-        floatingActionButton = { AddButton(onClick = { onEvent(OnFABClick) }) },
+        floatingActionButton = {
+            AddButton(onClick = {
+                if(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)){
+                onEvent(OnFABClick)
+                }})},
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {

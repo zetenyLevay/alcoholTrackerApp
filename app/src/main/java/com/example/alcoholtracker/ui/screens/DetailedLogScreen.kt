@@ -64,10 +64,11 @@ fun DetailedLogScreen(
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
             }
             is DetailedLogEffect.NavigateToDrinkForm -> {
+                viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
                 onEditClick(effect.logId)
             }
             null -> {
-                // No effect
+
             }
         }
     }

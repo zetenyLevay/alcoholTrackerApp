@@ -106,6 +106,7 @@ class DrinkLogFormViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+
     private var searchJob: Job? = null
     private val _localState = MutableStateFlow(DrinkLogLocalState())
     private val _inputs = MutableStateFlow(DrinkLogFormInput())
@@ -239,7 +240,16 @@ class DrinkLogFormViewModel @Inject constructor(
 
     private fun saveDrinkLog() {
 
+
         val inputs = _inputs.value
+
+        if (inputs.drinkName.isBlank() ){
+            _localState.update { it.copy(
+                effect = DrinkLogFormEffect.ShowError("Please fill in the drink name")
+            )
+            }
+            return
+        }
 
         val newLog = UserDrinkLog(
             drinkId = inputs.selectedDrink?.drinkId,

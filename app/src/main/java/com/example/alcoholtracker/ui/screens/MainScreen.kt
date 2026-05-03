@@ -137,24 +137,36 @@ fun MainScreen(
             composable<Home> {
                 HomeScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink())
+                        navController.navigate(AddDrink()){
+                            launchSingleTop = true
+                        }
                     },
                     onItemClick = {
-                        navController.navigate(DetailedLog(it))
+                        navController.navigate(DetailedLog(it)){
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
             composable<List> {
                 ListScreen(
                     onFABClick = {
-                        navController.navigate(AddDrink())
+                        navController.navigate(AddDrink()){
+                            launchSingleTop = true
+                        }
                     },
                     onEditClick = {
 
-                        navController.navigate(AddDrink(it))
+
+                        navController.navigate(AddDrink(it)){
+
+                            launchSingleTop = true
+                        }
                     },
                     onItemClick = {
-                        navController.navigate(DetailedLog(it))
+                        navController.navigate(DetailedLog(it)){
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -178,6 +190,9 @@ fun MainScreen(
             composable<Details> {
 
             }
+            composable<SignIn>{
+                SignInScreen()
+            }
             composable<Search> {
                 SearchScreen(
                     onBackClick = { navController.popBackStack() },
@@ -189,7 +204,9 @@ fun MainScreen(
                     item.logId,
                     onBackClick = { navController.popBackStack() },
                     onEditClick = {
-                        navController.navigate(AddDrink(it))
+                        navController.navigate(AddDrink(it)){
+                            launchSingleTop = true
+                        }
                     },
                 )
             }

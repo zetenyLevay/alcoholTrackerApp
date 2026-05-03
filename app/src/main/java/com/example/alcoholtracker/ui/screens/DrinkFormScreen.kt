@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.alcoholtracker.SnackBarEvent
 import com.example.alcoholtracker.SnackbarController
 import com.example.alcoholtracker.ui.components.LogDrinkTopBar
@@ -64,20 +66,26 @@ fun DrinkFormScreen(
 
     LaunchedEffect(formState.value.effect) {
         when (val effect = formState.value.effect) {
-            is DrinkLogFormEffect.SaveDrinkLog -> {
 
+            is DrinkLogFormEffect.SaveDrinkLog -> {
+                viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
                 onAddDrink()
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
                         message = "Drink Log Saved",
                     )
                 )
-                viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
+
             }
 
             is DrinkLogFormEffect.ShowError -> {
-
                 viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(
+                        effect.message
+                    )
+                )
+
             }
 
             null -> {
@@ -102,6 +110,7 @@ fun DrinkFormContent(
 ) {
 
     val scrollState = rememberScrollState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     Scaffold(
         topBar = {
@@ -115,7 +124,11 @@ fun DrinkFormContent(
             .fillMaxSize(),
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { onEvent(OnSaveDrinkLog) },
+                onClick = {
+                    if(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
+                    {
+                        onEvent(OnSaveDrinkLog)
+                    }},
                 icon = { Icon(Icons.Filled.Add, "Add Button") },
                 text = { Text(if (state.isEdit) "Update Drink" else "Add Drink") }
 

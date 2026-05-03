@@ -11,6 +11,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.alcoholtracker.data.model.UserDrinkLog
 import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListFull
@@ -34,16 +36,17 @@ fun ListScreen(
     LaunchedEffect(state.value.effect){
         when(val effect = state.value.effect){
             is ListEffect.NavigateToDetailedItem -> {
-                onItemClick(effect.logId)
                 viewModel.processEvent(ListEvent.ConsumeEffect)
+                onItemClick(effect.logId)
             }
             is ListEffect.NavigateToDrinkForm -> {
+                viewModel.processEvent(ListEvent.ConsumeEffect)
                 if (effect.logId != -1) {
                     onEditClick(effect.logId)
                 }else {
                     onFABClick()
                 }
-                viewModel.processEvent(ListEvent.ConsumeEffect)
+
             }
             is ListEffect.ShowError -> {
                 viewModel.processEvent(ListEvent.ConsumeEffect)
@@ -68,9 +71,14 @@ fun ListScreen(
     onEvent: (ListEvent) -> Unit,
     state: ListUiState,
 ){
+
+    val lifecycleOwner = LocalLifecycleOwner.current
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        floatingActionButton = { AddButton { onEvent(ListEvent.OnFABClick) } },
+        floatingActionButton = { AddButton {
+            if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
+            onEvent(ListEvent.OnFABClick)
+        } },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
 
