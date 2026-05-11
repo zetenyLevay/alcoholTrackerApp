@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.viewmodel
 
 import android.util.Log
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,19 +67,19 @@ data class DrinkLogFormUiState(
 
 data class DrinkLogFormInput(
     val logId: Int? = null,
-    val drinkName: String = "",
+    val drinkName: TextFieldState = TextFieldState(),
     val selectedCategory: DrinkCategory = DrinkCategory.OTHER,
     val selectedDrink: Drink? = null,
     val selectedDrinkUnit: DrinkUnit = DrinkUnit("milliliters", 1),
     val selectedAmount: Int = 100,
-    val inputAmount: Double = 100.0,
-    val alcoholPercentage: Double = 0.0,
-    val cost: Double = 0.0,
-    val recipient: String = "Me",
+    val inputAmount: TextFieldState = TextFieldState("0"),
+    val alcoholPercentage: TextFieldState = TextFieldState("0.0"),
+    val cost: TextFieldState = TextFieldState("0.0"),
+    val recipient: TextFieldState = TextFieldState("Me"),
     val selectedDate: LocalDate = LocalDate.now(),
     val selectedTime: LocalTime = LocalTime.now(),
-    val notes: String = "",
-    val locationName: String = "",
+    val notes: TextFieldState = TextFieldState(),
+    val locationName: TextFieldState = TextFieldState(),
     val isFavorite: Boolean = false,
     val longitude: Double? = null,
     val latitude: Double? = null,
@@ -115,11 +116,11 @@ class DrinkLogFormViewModel @Inject constructor(
         logRepo.getRecipients(),
         _inputs.map { it.recipient }
     ) { recipients, query ->
-        if (query.isBlank()) {
+        if (query.text.isBlank()) {
             recipients
         } else {
             recipients.filter {
-                it.contains(query, ignoreCase = true)
+                it.contains(query.text, ignoreCase = true)
             }
         }
     }.catch { emit(emptyList()) }
@@ -199,19 +200,19 @@ class DrinkLogFormViewModel @Inject constructor(
                     _inputs.update {
                         it.copy(
                             logId = logId,
-                            drinkName = logToEdit.name,
+                            drinkName = TextFieldState(logToEdit.name),
                             selectedCategory = logToEdit.category,
                             selectedDrink = null,
                             selectedDrinkUnit = logToEdit.drinkUnit ?: DrinkUnit("milliliters", 1),
                             selectedAmount = logToEdit.amount,
-                            inputAmount = logToEdit.inputAmount ?: 100.0,
-                            alcoholPercentage = logToEdit.alcoholPercentage ?: 0.0,
-                            cost = logToEdit.cost ?: 0.0,
-                            recipient = logToEdit.recipient ?: "Me",
+                            inputAmount = TextFieldState(logToEdit.inputAmount?.toString() ?: "100.0"),
+                            alcoholPercentage = TextFieldState(logToEdit.alcoholPercentage?.toString() ?: "0.0"),
+                            cost = TextFieldState(logToEdit.cost?.toString() ?: "0.0"),
+                            recipient = TextFieldState(logToEdit.recipient ?: "Me"),
                             selectedDate = logToEdit.date.toLocalDate() ?: LocalDate.now(),
                             selectedTime = logToEdit.date.toLocalTime() ?: LocalTime.now(),
-                            notes = logToEdit.notes ?: "",
-                            locationName = logToEdit.locationName ?: "",
+                            notes = TextFieldState(logToEdit.notes ?: ""),
+                            locationName = TextFieldState(logToEdit.locationName ?: ""),
                             isFavorite = logToEdit.isFavorite,
                             longitude = logToEdit.longitude,
                             latitude = logToEdit.latitude,
@@ -243,7 +244,7 @@ class DrinkLogFormViewModel @Inject constructor(
 
         val inputs = _inputs.value
 
-        if (inputs.drinkName.isBlank() ){
+        if (inputs.drinkName.text.isBlank() ){
             _localState.update { it.copy(
                 effect = DrinkLogFormEffect.ShowError("Please fill in the drink name")
             )
@@ -255,17 +256,17 @@ class DrinkLogFormViewModel @Inject constructor(
             drinkId = inputs.selectedDrink?.drinkId,
             userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,
-            name = inputs.drinkName,
-            cost = inputs.cost,
-            alcoholPercentage = inputs.alcoholPercentage,
+            name = inputs.drinkName.toString(),
+            cost = inputs.cost.toString().toDouble(),
+            alcoholPercentage = inputs.alcoholPercentage.toString().toDouble(),
             amount = inputs.selectedAmount,
             category = inputs.selectedCategory,
-            recipient = inputs.recipient,
-            inputAmount = inputs.inputAmount,
+            recipient = inputs.recipient.toString(),
+            inputAmount = inputs.inputAmount.toString().toDouble(),
             isFavorite = inputs.isFavorite,
             imgURI = inputs.imgURI,
-            notes = inputs.notes,
-            locationName = inputs.locationName,
+            notes = inputs.notes.toString(),
+            locationName = inputs.locationName.toString(),
             longitude = inputs.longitude,
             latitude = inputs.latitude,
             drinkUnit = inputs.selectedDrinkUnit,
@@ -319,51 +320,51 @@ class DrinkLogFormViewModel @Inject constructor(
     }
 
     private fun onNotesChange(notes: String) {
-        _inputs.update {
-            it.copy(
-                notes = notes
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                notes = notes
+//            )
+//        }
     }
 
     private fun onLocationChange(location: String) {
-        _inputs.update {
-            it.copy(
-                locationName = location
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                locationName = location
+//            )
+//        }
     }
-
+//
     private fun onRecipientChange(recipient: String) {
-        _inputs.update {
-            it.copy(
-                recipient = recipient
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                recipient = recipient
+//            )
+//        }
     }
 
     private fun onPriceChange(price: Double) {
-        _inputs.update {
-            it.copy(
-                cost = price
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                cost = price
+//            )
+//        }
     }
-
+//
     private fun onABVChange(abv: Double) {
-        _inputs.update {
-            it.copy(
-                alcoholPercentage = abv
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                alcoholPercentage = abv
+//            )
+//        }
     }
 
     private fun onAmountChange(amount: Double) {
-        _inputs.update {
-            it.copy(
-                inputAmount = amount
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                inputAmount = amount
+//            )
+//        }
     }
 
     private fun onDrinkUnitChange(drinkUnit: DrinkUnit) {
@@ -378,30 +379,32 @@ class DrinkLogFormViewModel @Inject constructor(
         _inputs.update {
             it.copy(
                 selectedDrink = drink,
-                alcoholPercentage = drink.alcoholContent
+                alcoholPercentage = TextFieldState(drink.alcoholContent.toString())
             )
         }
     }
-
+//
     private fun onCategoryChange(category: DrinkCategory) {
         _inputs.update {
             it.copy(
                 selectedCategory = category
             )
         }
-        onDrinkNameChange(_inputs.value.drinkName)
+        onDrinkNameChange(_inputs.value.drinkName.toString())
     }
 
     private fun onDrinkNameChange(name: String) {
-        _inputs.update {
-            it.copy(
-                drinkName = name
-            )
-        }
+//        _inputs.update {
+//            it.copy(
+//                drinkName = name
+//            )
+//        }
 
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(500)
+
+
 
 
             _localState.update { it.copy(isLoading = true) }
@@ -432,4 +435,5 @@ class DrinkLogFormViewModel @Inject constructor(
         _localState.update { it.copy(effect = null) }
     }
 }
+
 

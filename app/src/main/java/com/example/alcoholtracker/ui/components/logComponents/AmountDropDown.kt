@@ -10,6 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.text.input.then
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -42,7 +48,7 @@ import com.example.alcoholtracker.ui.viewmodel.DrinkViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountDropDown(
-    amount: Double,
+    amount: TextFieldState,
     selectedUnit: DrinkUnit? = null,
     onSelected: (DrinkUnit) -> Unit,
     onTyped: (Double) -> Unit,
@@ -80,18 +86,17 @@ fun AmountDropDown(
             ) {
 
                 OutlinedTextField(
-                    value = if (selectedUnit?.name == "milliliters") amount.toInt().toString() else amount.toString(),
-                    onValueChange = {
-                        val newValue = it.toDoubleOrNull() ?: 0.0
-                        onTyped(newValue)
-                    },
+                    state = amount,
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Decimal
                     ),
                     modifier = Modifier
                         .weight(0.5f),
                     shape = RoundedCornerShape(24.dp),
-                    singleLine = true,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    inputTransformation = InputTransformation.maxLength(5).then {
+
+                    },
                     trailingIcon = {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +104,8 @@ fun AmountDropDown(
                         ) {
                             IconButton(
                                 onClick = {
-                                    onTyped(amount + 1)
+                                    val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0)+1
+                                    amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
                                 },
                                 modifier = Modifier.size(24.dp)
                             ) {
@@ -107,8 +113,9 @@ fun AmountDropDown(
                             }
                             IconButton(
                                 onClick = {
-                                    if (amount > 0) {
-                                        onTyped(amount - 1)
+                                    if (amount.text.toString().toDouble() > 0.0) {
+                                        val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0)-1
+                                        amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
                                     }
                                 },
                                 modifier = Modifier.size(24.dp)

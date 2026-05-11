@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RecipientAutoComplete(
     recipientOptions: List<String>,
-    recipient: String,
+    recipient: TextFieldState,
     onRecipientChange: (String) -> Unit,
 ) {
 
@@ -48,10 +49,7 @@ fun RecipientAutoComplete(
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = recipient,
-                onValueChange = {
-                    onRecipientChange(it)
-                },
+                state = recipient,
                 label = null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = OutlinedTextFieldDefaults.colors(

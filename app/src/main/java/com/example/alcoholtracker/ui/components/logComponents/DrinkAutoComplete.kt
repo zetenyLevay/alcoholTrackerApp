@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -35,7 +36,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkAutoComplete(
-    drinkName: String,
+    drinkName: TextFieldState,
     options: List<Drink>,
     onTyped: (String) -> Unit,
     onSelected: (Drink) -> Unit,
@@ -60,11 +61,7 @@ fun DrinkAutoComplete(
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = drinkName,
-                onValueChange = {
-                    onTyped(it)
-                },
-                label = null,
+                state = drinkName,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,

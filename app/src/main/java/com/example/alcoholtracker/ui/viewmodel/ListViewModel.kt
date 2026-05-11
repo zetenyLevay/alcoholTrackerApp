@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.viewmodel
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alcoholtracker.data.model.UserDrinkLog
@@ -33,6 +34,7 @@ sealed interface ListEffect{
 
 data class ListUiState(
     val drinkLogs: Map<LocalDate,List<UserDrinkLog>> = emptyMap(),
+    val query: TextFieldState = TextFieldState(),
     val isLoading: Boolean = false,
     val effect: ListEffect? = null
 )

@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.components.alcohollist
 
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,8 +19,9 @@ fun AlcoholListHome(
     onItemClick: (Int) -> Unit,
     onRemove:(UserDrinkLog) -> Unit,
     drinkLogs: List<UserDrinkLog>,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn {
             items(
                 items = drinkLogs,
@@ -38,17 +40,19 @@ fun AlcoholListHome(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AlcoholListFull(
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
     onRemove:(UserDrinkLog) -> Unit,
     drinkLogs: Map<LocalDate,List<UserDrinkLog>>,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn {
             drinkLogs.forEach { (date, logs) ->
-                stickyHeader { it ->
+                stickyHeader {
                     DateHeader(date,logs)
                 }
                 items(
@@ -76,8 +80,9 @@ fun AlcoholListLog(
     onItemClick: (Int) -> Unit,
     onRemove:(UserDrinkLog) -> Unit,
     drinkLogs: List<UserDrinkLog>,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn {
             items(
                 items = drinkLogs,

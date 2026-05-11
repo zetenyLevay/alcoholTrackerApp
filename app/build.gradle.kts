@@ -87,8 +87,6 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.09.01"))
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material3:material3-android:1.4.0")
-    implementation("com.google.android.material:material:1.13.0")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")

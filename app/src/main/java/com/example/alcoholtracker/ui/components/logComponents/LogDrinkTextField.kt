@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -29,8 +31,8 @@ import kotlin.math.round
 
 @Composable
 fun ABVAndPriceTextFields(
-    abv: Double,
-    price: Double,
+    abv: TextFieldState,
+    price: TextFieldState,
     onABVChange: (Double) -> Unit,
     onPriceChange: (Double) -> Unit
 ) {
@@ -52,14 +54,10 @@ fun ABVAndPriceTextFields(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
-                value = "$abv",
-                onValueChange = { newValue ->
-                    val filtered = newValue.filter { it.isDigit() || it == '.' }
-                    val parsed = filtered.toDoubleOrNull() ?: 0.0
-                    if (parsed in 0.0..100.0 && filtered.length <= 5) {
-                        onABVChange(parsed)
-                    }
-                },
+                state = abv,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Decimal
+                ),
                 suffix = { Text("%") },
                 trailingIcon = {
                     Column(
@@ -68,8 +66,9 @@ fun ABVAndPriceTextFields(
                     ) {
                         IconButton(
                             onClick = {
-                                val newAbv = round((abv + 0.1) * 10.0) / 10.0
-                                onABVChange(newAbv)
+                                val currentAbv = abv.text.toString().toDoubleOrNull() ?: 0.0
+                                val doubleAbv = round((currentAbv + 0.1)*10)/10
+                                abv.setTextAndPlaceCursorAtEnd(doubleAbv.toString())
                             },
                             modifier = Modifier.size(24.dp)
                         ) {
@@ -77,10 +76,10 @@ fun ABVAndPriceTextFields(
                         }
                         IconButton(
                             onClick = {
-
-                                if (abv > 0.0) {
-                                    val newAbv = round((abv - 0.1) * 10.0) / 10.0
-                                    onABVChange(newAbv)
+                                val currentAbv = abv.text.toString().toDoubleOrNull() ?: 0.0
+                                if (currentAbv > 0.0) {
+                                     val doubleAbv = round((currentAbv - 0.1)*10)/10
+                                    abv.setTextAndPlaceCursorAtEnd(doubleAbv.toString())
                                 }
                             },
                             modifier = Modifier.size(24.dp)
@@ -96,7 +95,7 @@ fun ABVAndPriceTextFields(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+
             )
         }
 
@@ -111,12 +110,10 @@ fun ABVAndPriceTextFields(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
-                value = "$price",
-                onValueChange = { newValue ->
-                    val filtered = newValue.filter { it.isDigit() || it == '.' }
-                    val parsed = filtered.toDoubleOrNull() ?: 0.0
-                    onPriceChange(parsed)
-                },
+                state = price,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Decimal
+                ),
                 suffix = { Text("€") },
                 trailingIcon = {
                     Column(
@@ -125,8 +122,9 @@ fun ABVAndPriceTextFields(
                     ) {
                         IconButton(
                             onClick = {
-                                val newPrice = round((price + 0.1) * 10.0) / 10.0
-                                onPriceChange(newPrice)
+                                val currentPrice = price.text.toString().toDoubleOrNull() ?: 0.0
+                                val doublePrice = round((currentPrice + 0.1)*10)/10
+                                price.setTextAndPlaceCursorAtEnd(doublePrice.toString())
                             },
                             modifier = Modifier.size(24.dp)
                         ) {
@@ -134,10 +132,10 @@ fun ABVAndPriceTextFields(
                         }
                         IconButton(
                             onClick = {
-
-                                if (price > 0.0) {
-                                    val newPrice = round((price - 0.1) * 10.0) / 10.0
-                                    onPriceChange(newPrice)
+                                val currentPrice = price.text.toString().toDoubleOrNull() ?: 0.0
+                                if (currentPrice > 0.0) {
+                                    val doublePrice = round((currentPrice - 0.1)*10)/10
+                                price.setTextAndPlaceCursorAtEnd(doublePrice.toString())
                                 }
                             },
                             modifier = Modifier.size(24.dp)
@@ -153,7 +151,7 @@ fun ABVAndPriceTextFields(
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+
             )
         }
     }
@@ -161,7 +159,7 @@ fun ABVAndPriceTextFields(
 
 @Composable
 fun LocationTextField(
-    location: String,
+    location: TextFieldState,
     onLocationChange: (String) -> Unit
 ){
     Column(
@@ -175,8 +173,7 @@ fun LocationTextField(
             )
 
         OutlinedTextField(
-            value = location,
-            onValueChange = {onLocationChange(it)},
+            state = location,
             colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -200,7 +197,7 @@ fun LocationTextField(
 
 @Composable
 fun NotesTextField(
-    notes: String,
+    notes: TextFieldState,
     onNotesChange: (String) -> Unit
 ){
     Column(
@@ -214,8 +211,7 @@ fun NotesTextField(
             )
 
         OutlinedTextField(
-            value = notes,
-            onValueChange = {onNotesChange(it)},
+            state = notes,
             colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -226,5 +222,3 @@ fun NotesTextField(
         )
     }
 }
-
-
