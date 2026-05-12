@@ -19,6 +19,7 @@ import com.example.alcoholtracker.domain.model.DrinkCategory.OTHER
 import com.example.alcoholtracker.domain.model.DrinkCategory.SPIRIT
 import com.example.alcoholtracker.domain.model.DrinkCategory.WINE
 import com.example.alcoholtracker.domain.model.DrinkUnit
+import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getFinalAmount
 import com.example.alcoholtracker.domain.usecase.adddrinkfuns.getLocalDateTime
 import com.example.alcoholtracker.ui.navigation.AddDrink
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -255,7 +256,7 @@ class DrinkLogFormViewModel @Inject constructor(
             name = inputs.drinkName.text.toString(),
             cost = inputs.cost.text.toString().toDouble(),
             alcoholPercentage = inputs.alcoholPercentage.text.toString().toDouble(),
-            amount = inputs.selectedAmount,
+            amount = getFinalAmount(inputs.selectedDrinkUnit,inputs.inputAmount.text.toString().toDouble()),
             category = inputs.selectedCategory,
             recipient = inputs.recipient.text.toString(),
             inputAmount = inputs.inputAmount.text.toString().toDouble(),

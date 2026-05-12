@@ -149,7 +149,7 @@ fun MainScreen(
                 )
             }
             composable<List> {
-                ListScreen(
+                HistoryScreen(
                     onFABClick = {
                         navController.navigate(AddDrink()){
                             launchSingleTop = true

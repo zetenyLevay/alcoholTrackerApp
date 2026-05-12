@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.HorizontalDivider
+
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -33,8 +34,6 @@ fun SwipeToDismissItem(
     onItemClick: (Int) -> Unit,
     modifier: Modifier
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val swipeToDismissState = rememberSwipeToDismissBoxState(
         initialValue = SwipeToDismissBoxValue.Settled,
         positionalThreshold = { distance: Float ->
@@ -67,7 +66,7 @@ fun SwipeToDismissItem(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                Color(0xFFD32F2F)
+                                MaterialTheme.colorScheme.error
                             ),
                             startX = 0f,
                             endX = 600f + (400f * progress)
@@ -77,7 +76,7 @@ fun SwipeToDismissItem(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onError,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(12.dp)
@@ -86,8 +85,7 @@ fun SwipeToDismissItem(
         },
         modifier = Modifier.clickable(onClick = { onItemClick(item.logId) }) then modifier
     ) {
-        DrinkItem(item, listType, { onEditClick(it) }, {})
+        DrinkItem(item, listType)
 
     }
-    HorizontalDivider()
 }

@@ -17,7 +17,7 @@ fun FrequentList(
     } else {
         LazyColumn() {
             items(drinks.size) { index ->
-                DrinkItem(drinks[index], AlcoholListType.LOG, {}, {})
+                DrinkItem(drinks[index], AlcoholListType.LOG)
             }
         }
     }

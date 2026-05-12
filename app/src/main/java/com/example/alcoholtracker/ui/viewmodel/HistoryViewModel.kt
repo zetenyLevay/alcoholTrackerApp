@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alcoholtracker.data.model.UserDrinkLog
@@ -16,79 +17,88 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-sealed interface ListEvent{
-    data object OnFABClick : ListEvent
-    data class OnItemClick(val logId: Int) : ListEvent
-    data class OnEditClick(val logId: Int) : ListEvent
-    data class OnRemoveItem(val log: UserDrinkLog) : ListEvent
-    data class UndoRemoveItem(val log: UserDrinkLog) : ListEvent
-    data object ConsumeEffect : ListEvent
+sealed interface HistoryEvent{
+    data object OnFABClick : HistoryEvent
+    data class OnItemClick(val logId: Int) : HistoryEvent
+    data class OnEditClick(val logId: Int) : HistoryEvent
+    data class OnRemoveItem(val log: UserDrinkLog) : HistoryEvent
+    data class OnUndoRemoveItem(val log: UserDrinkLog) : HistoryEvent
+    data object ConsumeEffect : HistoryEvent
 }
 
-sealed interface ListEffect{
-    data class ShowError(val message: String) : ListEffect
-    data object ShowItemRemoved : ListEffect
-    data class NavigateToDrinkForm(val logId: Int): ListEffect
-    data class NavigateToDetailedItem(val logId: Int): ListEffect
+sealed interface HistoryEffect{
+    data class ShowError(val message: String) : HistoryEffect
+    data class ShowItemRemoved(val log: UserDrinkLog) : HistoryEffect
+    data class NavigateToDrinkForm(val logId: Int): HistoryEffect
+    data class NavigateToDetailedItem(val logId: Int): HistoryEffect
 }
 
-data class ListUiState(
+data class HistoryUiState(
     val drinkLogs: Map<LocalDate,List<UserDrinkLog>> = emptyMap(),
     val query: TextFieldState = TextFieldState(),
     val isLoading: Boolean = false,
-    val effect: ListEffect? = null
+    val effect: HistoryEffect? = null
 )
 
 @HiltViewModel
-class ListViewModel @Inject constructor(
+class HistoryViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository
 ) : ViewModel() {
 
-    private val _localState = MutableStateFlow(ListUiState())
-    val listUiState = combine(
+    private val _localState = MutableStateFlow(HistoryUiState())
+    val historyUiState = combine(
         _localState,
-        drinkLogRepo.getAllLogs()
-    ) { state, logs ->
+        drinkLogRepo.getAllLogs(),
+                snapshotFlow { _localState.value.query.text }
+    ) { state, logs, query ->
+
+        val filteredLogs = if (query.isBlank()){
+            logs
+        } else {
+            logs.filter { it.name.contains(query,ignoreCase = true) || it.category.name.contains(query, ignoreCase = true)}
+        }
+
         state.copy(
-            drinkLogs = logs.groupBy { it.date.toLocalDate() },
+            drinkLogs = filteredLogs.groupBy { it.date.toLocalDate() }.toSortedMap(compareByDescending { it }),
+            isLoading = false
         )
     }.catch {
         _localState.update {
             it.copy(
-                effect = ListEffect.ShowError("Error loading data"),
+                effect = HistoryEffect.ShowError("Error loading data"),
                 isLoading = false
             )
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ListUiState(isLoading = true)
+        initialValue = HistoryUiState(isLoading = true)
     )
 
-    fun processEvent(event: ListEvent) {
+    fun processEvent(event: HistoryEvent) {
         when (event) {
-            ListEvent.ConsumeEffect -> consumeEffect()
-            is ListEvent.OnEditClick -> onEditClick(event.logId)
-            ListEvent.OnFABClick -> onFabClick()
-            is ListEvent.OnItemClick -> onItemClick(event.logId)
-            is ListEvent.OnRemoveItem -> onRemoveItem(event.log)
-            is ListEvent.UndoRemoveItem -> undoRemoveItem(event.log)
+            HistoryEvent.ConsumeEffect -> consumeEffect()
+            is HistoryEvent.OnEditClick -> onEditClick(event.logId)
+            HistoryEvent.OnFABClick -> onFabClick()
+            is HistoryEvent.OnItemClick -> onItemClick(event.logId)
+            is HistoryEvent.OnRemoveItem -> onRemoveItem(event.log)
+            is HistoryEvent.OnUndoRemoveItem -> undoRemoveItem(event.log)
         }
     }
 
     private fun onEditClick(logId: Int){
         _localState.update {
-            it.copy(effect = ListEffect.NavigateToDrinkForm(logId))
+            it.copy(effect = HistoryEffect.NavigateToDrinkForm(logId))
         }
     }
     private fun onFabClick(){
         _localState.update {
-            it.copy(effect = ListEffect.NavigateToDrinkForm(-1))
+            it.copy(effect = HistoryEffect.NavigateToDrinkForm(-1))
         }
     }
     private fun onItemClick(logId: Int){
         _localState.update {
-            it.copy(effect = ListEffect.NavigateToDetailedItem(logId))
+            it.copy(effect = HistoryEffect.NavigateToDetailedItem(logId))
         }
     }
     private fun onRemoveItem(log: UserDrinkLog) {
@@ -98,7 +108,7 @@ class ListViewModel @Inject constructor(
                 drinkLogRepo.deleteDrinkLog(log)
                 _localState.update {
                     it.copy(
-                        effect = ListEffect.ShowItemRemoved,
+                        effect = HistoryEffect.ShowItemRemoved(log),
                         isLoading = false
                     )
                 }
@@ -106,7 +116,7 @@ class ListViewModel @Inject constructor(
             catch (e: Exception){
                 _localState.update {
                     it.copy(
-                        effect = ListEffect.ShowError("Error deleting drink"),
+                        effect = HistoryEffect.ShowError("Error deleting drink"),
                         isLoading = false
                     )
                 }
@@ -128,7 +138,7 @@ class ListViewModel @Inject constructor(
             ) {
                 _localState.update {
                     it.copy(
-                        effect = ListEffect.ShowError("Error restoring drink"),
+                        effect = HistoryEffect.ShowError("Error restoring drink"),
                         isLoading = false
                     )
                 }

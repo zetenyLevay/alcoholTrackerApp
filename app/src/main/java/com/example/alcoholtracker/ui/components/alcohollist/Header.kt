@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.data.model.UserDrinkLog
@@ -24,7 +27,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Composable
-fun DateHeader(date: LocalDate, drinkLogs: List<UserDrinkLog>) {
+fun DateHeader(date: LocalDate, drinkLogs: List<UserDrinkLog>, modifier: Modifier = Modifier) {
 
     val formattedDate = if (date.dayOfMonth == LocalDate.now().dayOfMonth) {
         "Today"
@@ -40,36 +43,41 @@ fun DateHeader(date: LocalDate, drinkLogs: List<UserDrinkLog>) {
 
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ){
         Row(
-
+            verticalAlignment = Alignment.CenterVertically
         ){
             Text(formattedDate, modifier = Modifier
                 .weight(1f),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text("Total cost: ${totalCost}€",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface)
+            Text("Total: ${totalAmount}ml",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-                Text("Total amount: $totalAmount",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface)
 
-            }
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(4.dp)
+                    .background(color = MaterialTheme.colorScheme.onSurfaceVariant, shape = CircleShape)
+            )
+
+            Text("€${String.format("%.2f", totalCost)}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+
+
+
         }
     }
-    HorizontalDivider()
 
 }
 
