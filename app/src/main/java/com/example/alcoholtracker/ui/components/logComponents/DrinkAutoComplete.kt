@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.components.logComponents
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -43,7 +45,22 @@ fun DrinkAutoComplete(
 ) {
 
     var expanded by remember { mutableStateOf(false) }
+    var isSelection by remember { mutableStateOf(false) }
 
+    LaunchedEffect(drinkName) {
+        snapshotFlow { drinkName.text }
+            .distinctUntilChanged()
+            .collect { text ->
+                onTyped(text.toString())
+                expanded = if (isSelection){
+                    false
+                } else if(text.isNotBlank()){
+                    true
+                } else{
+                    false
+                }
+            }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -80,7 +97,8 @@ fun DrinkAutoComplete(
                     options.forEach { selectionOption ->
                         DropdownMenuItem(
                             onClick = {
-                                onTyped(selectionOption.name)
+                                isSelection = true
+                                drinkName.setTextAndPlaceCursorAtEnd(selectionOption.name)
                                 onSelected(selectionOption)
                                 expanded = false
                             },

@@ -33,8 +33,6 @@ import kotlin.math.round
 fun ABVAndPriceTextFields(
     abv: TextFieldState,
     price: TextFieldState,
-    onABVChange: (Double) -> Unit,
-    onPriceChange: (Double) -> Unit
 ) {
 
 
@@ -160,7 +158,6 @@ fun ABVAndPriceTextFields(
 @Composable
 fun LocationTextField(
     location: TextFieldState,
-    onLocationChange: (String) -> Unit
 ){
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -198,7 +195,6 @@ fun LocationTextField(
 @Composable
 fun NotesTextField(
     notes: TextFieldState,
-    onNotesChange: (String) -> Unit
 ){
     Column(
         modifier = Modifier.fillMaxWidth()

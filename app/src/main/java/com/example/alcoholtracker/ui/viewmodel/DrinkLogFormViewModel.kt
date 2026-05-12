@@ -2,6 +2,8 @@ package com.example.alcoholtracker.ui.viewmodel
 
 import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,20 +36,16 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface DrinkLogFormEvent {
     data class OnDrinkLogNameChange(val name: String) : DrinkLogFormEvent
     data class OnCategoryChange(val category: DrinkCategory) : DrinkLogFormEvent
     data class OnDrinkLogChange(val drink: Drink) : DrinkLogFormEvent
     data class OnDrinkLogUnitChange(val drinkUnit: DrinkUnit) : DrinkLogFormEvent
-    data class OnAmountChange(val amount: Double) : DrinkLogFormEvent
-    data class OnABVChange(val abv: Double) : DrinkLogFormEvent
-    data class OnPriceChange(val price: Double) : DrinkLogFormEvent
-    data class OnRecipientChange(val recipient: String) : DrinkLogFormEvent
+
     data class OnDateChange(val date: LocalDate) : DrinkLogFormEvent
     data class OnTimeChange(val time: LocalTime) : DrinkLogFormEvent
-    data class OnNotesChange(val notes: String) : DrinkLogFormEvent
-    data class OnLocationChange(val location: String) : DrinkLogFormEvent
     data object OnSaveDrinkLog : DrinkLogFormEvent
     data object ConsumeEffect : DrinkLogFormEvent
 }
@@ -72,7 +70,7 @@ data class DrinkLogFormInput(
     val selectedDrink: Drink? = null,
     val selectedDrinkUnit: DrinkUnit = DrinkUnit("milliliters", 1),
     val selectedAmount: Int = 100,
-    val inputAmount: TextFieldState = TextFieldState("0"),
+    val inputAmount: TextFieldState = TextFieldState("500"),
     val alcoholPercentage: TextFieldState = TextFieldState("0.0"),
     val cost: TextFieldState = TextFieldState("0.0"),
     val recipient: TextFieldState = TextFieldState("Me"),
@@ -112,15 +110,16 @@ class DrinkLogFormViewModel @Inject constructor(
     private val _localState = MutableStateFlow(DrinkLogLocalState())
     private val _inputs = MutableStateFlow(DrinkLogFormInput())
     private val _drinkOptions = MutableStateFlow<List<Drink>>(emptyList())
+    private val recipientTextFlow = snapshotFlow { _inputs.value.recipient.text }
     private val _filteredRecipients = combine(
         logRepo.getRecipients(),
-        _inputs.map { it.recipient }
+        recipientTextFlow
     ) { recipients, query ->
-        if (query.text.isBlank()) {
+        if (query.isBlank()) {
             recipients
         } else {
             recipients.filter {
-                it.contains(query.text, ignoreCase = true)
+                it.contains(query, ignoreCase = true)
             }
         }
     }.catch { emit(emptyList()) }
@@ -173,17 +172,11 @@ class DrinkLogFormViewModel @Inject constructor(
 
     fun processEvent(event: DrinkLogFormEvent) {
         when (event) {
-            is DrinkLogFormEvent.OnABVChange -> onABVChange(event.abv)
-            is DrinkLogFormEvent.OnAmountChange -> onAmountChange(event.amount)
             is DrinkLogFormEvent.OnCategoryChange -> onCategoryChange(event.category)
             is DrinkLogFormEvent.OnDateChange -> onDateChange(event.date)
             is DrinkLogFormEvent.OnDrinkLogChange -> onDrinkChange(event.drink)
             is DrinkLogFormEvent.OnDrinkLogNameChange -> onDrinkNameChange(event.name)
             is DrinkLogFormEvent.OnDrinkLogUnitChange -> onDrinkUnitChange(event.drinkUnit)
-            is DrinkLogFormEvent.OnLocationChange -> onLocationChange(event.location)
-            is DrinkLogFormEvent.OnNotesChange -> onNotesChange(event.notes)
-            is DrinkLogFormEvent.OnPriceChange -> onPriceChange(event.price)
-            is DrinkLogFormEvent.OnRecipientChange -> onRecipientChange(event.recipient)
             is DrinkLogFormEvent.OnTimeChange -> onTimeChange(event.time)
             DrinkLogFormEvent.OnSaveDrinkLog -> saveDrinkLog()
             DrinkLogFormEvent.ConsumeEffect -> consumeEffect()
@@ -197,22 +190,25 @@ class DrinkLogFormViewModel @Inject constructor(
                 val logToEdit = logRepo.getDrinkById(logId)
 
                 if (logToEdit != null) {
+
+                    val currentInputs = _inputs.value
+                    currentInputs.drinkName.setTextAndPlaceCursorAtEnd(logToEdit.name)
+                    currentInputs.inputAmount.setTextAndPlaceCursorAtEnd(logToEdit.inputAmount?.toString() ?: "100.0")
+                    currentInputs.alcoholPercentage.setTextAndPlaceCursorAtEnd(logToEdit.alcoholPercentage?.toString() ?: "0.0")
+                    currentInputs.cost.setTextAndPlaceCursorAtEnd(logToEdit.cost?.toString() ?: "0.0")
+                    currentInputs.recipient.setTextAndPlaceCursorAtEnd(logToEdit.recipient ?: "Me")
+                    currentInputs.notes.setTextAndPlaceCursorAtEnd(logToEdit.notes ?: "")
+                    currentInputs.locationName.setTextAndPlaceCursorAtEnd(logToEdit.locationName ?: "")
+
                     _inputs.update {
                         it.copy(
                             logId = logId,
-                            drinkName = TextFieldState(logToEdit.name),
                             selectedCategory = logToEdit.category,
                             selectedDrink = null,
                             selectedDrinkUnit = logToEdit.drinkUnit ?: DrinkUnit("milliliters", 1),
                             selectedAmount = logToEdit.amount,
-                            inputAmount = TextFieldState(logToEdit.inputAmount?.toString() ?: "100.0"),
-                            alcoholPercentage = TextFieldState(logToEdit.alcoholPercentage?.toString() ?: "0.0"),
-                            cost = TextFieldState(logToEdit.cost?.toString() ?: "0.0"),
-                            recipient = TextFieldState(logToEdit.recipient ?: "Me"),
                             selectedDate = logToEdit.date.toLocalDate() ?: LocalDate.now(),
                             selectedTime = logToEdit.date.toLocalTime() ?: LocalTime.now(),
-                            notes = TextFieldState(logToEdit.notes ?: ""),
-                            locationName = TextFieldState(logToEdit.locationName ?: ""),
                             isFavorite = logToEdit.isFavorite,
                             longitude = logToEdit.longitude,
                             latitude = logToEdit.latitude,
@@ -256,17 +252,17 @@ class DrinkLogFormViewModel @Inject constructor(
             drinkId = inputs.selectedDrink?.drinkId,
             userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,
-            name = inputs.drinkName.toString(),
-            cost = inputs.cost.toString().toDouble(),
-            alcoholPercentage = inputs.alcoholPercentage.toString().toDouble(),
+            name = inputs.drinkName.text.toString(),
+            cost = inputs.cost.text.toString().toDouble(),
+            alcoholPercentage = inputs.alcoholPercentage.text.toString().toDouble(),
             amount = inputs.selectedAmount,
             category = inputs.selectedCategory,
-            recipient = inputs.recipient.toString(),
-            inputAmount = inputs.inputAmount.toString().toDouble(),
+            recipient = inputs.recipient.text.toString(),
+            inputAmount = inputs.inputAmount.text.toString().toDouble(),
             isFavorite = inputs.isFavorite,
             imgURI = inputs.imgURI,
-            notes = inputs.notes.toString(),
-            locationName = inputs.locationName.toString(),
+            notes = inputs.notes.text.toString(),
+            locationName = inputs.locationName.text.toString(),
             longitude = inputs.longitude,
             latitude = inputs.latitude,
             drinkUnit = inputs.selectedDrinkUnit,
@@ -319,60 +315,29 @@ class DrinkLogFormViewModel @Inject constructor(
         }
     }
 
-    private fun onNotesChange(notes: String) {
-//        _inputs.update {
-//            it.copy(
-//                notes = notes
-//            )
-//        }
-    }
-
-    private fun onLocationChange(location: String) {
-//        _inputs.update {
-//            it.copy(
-//                locationName = location
-//            )
-//        }
-    }
-//
-    private fun onRecipientChange(recipient: String) {
-//        _inputs.update {
-//            it.copy(
-//                recipient = recipient
-//            )
-//        }
-    }
-
-    private fun onPriceChange(price: Double) {
-//        _inputs.update {
-//            it.copy(
-//                cost = price
-//            )
-//        }
-    }
-//
-    private fun onABVChange(abv: Double) {
-//        _inputs.update {
-//            it.copy(
-//                alcoholPercentage = abv
-//            )
-//        }
-    }
-
-    private fun onAmountChange(amount: Double) {
-//        _inputs.update {
-//            it.copy(
-//                inputAmount = amount
-//            )
-//        }
-    }
 
     private fun onDrinkUnitChange(drinkUnit: DrinkUnit) {
-        _inputs.update {
-            it.copy(
-                selectedDrinkUnit = drinkUnit
-            )
+        val oldUnit = _inputs.value.selectedDrinkUnit
+        val newUnit = drinkUnit
+
+        if (oldUnit.name == "milliliters" && newUnit.name != "milliliters"){
+            _inputs.value.inputAmount.setTextAndPlaceCursorAtEnd("1.0")
+            _inputs.update {
+                it.copy(
+                    selectedDrinkUnit = drinkUnit,
+                )
+            }
         }
+        else if (oldUnit.name != "milliliters" && newUnit.name == "milliliters"){
+            _inputs.value.inputAmount.setTextAndPlaceCursorAtEnd("500")
+            _inputs.update {
+                it.copy(
+                    selectedDrinkUnit = drinkUnit,
+                )
+            }
+        }
+
+
     }
 
     private fun onDrinkChange(drink: Drink) {
@@ -383,7 +348,7 @@ class DrinkLogFormViewModel @Inject constructor(
             )
         }
     }
-//
+
     private fun onCategoryChange(category: DrinkCategory) {
         _inputs.update {
             it.copy(
@@ -394,18 +359,10 @@ class DrinkLogFormViewModel @Inject constructor(
     }
 
     private fun onDrinkNameChange(name: String) {
-//        _inputs.update {
-//            it.copy(
-//                drinkName = name
-//            )
-//        }
 
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(500)
-
-
-
+            delay(500.milliseconds)
 
             _localState.update { it.copy(isLoading = true) }
             try {

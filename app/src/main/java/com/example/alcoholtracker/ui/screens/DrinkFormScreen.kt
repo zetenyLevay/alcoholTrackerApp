@@ -38,17 +38,13 @@ import com.example.alcoholtracker.ui.components.logComponents.NotesTextField
 import com.example.alcoholtracker.ui.components.logComponents.RecipientAutoComplete
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEffect
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnABVChange
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnAmountChange
+
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnCategoryChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnDateChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnDrinkLogChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnDrinkLogNameChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnDrinkLogUnitChange
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnLocationChange
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnNotesChange
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnPriceChange
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnRecipientChange
+
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnSaveDrinkLog
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnTimeChange
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormUiState
@@ -72,7 +68,7 @@ fun DrinkFormScreen(
                 onAddDrink()
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
-                        message = "Drink Log Saved",
+                        message = "Drink Saved",
                     )
                 )
 
@@ -94,7 +90,7 @@ fun DrinkFormScreen(
     }
 
 
-    DrinkFormContent(
+    DrinkFormScreen(
         onBackClick = onBackClick,
         onEvent = viewModel::processEvent,
         state = formState.value,
@@ -103,7 +99,7 @@ fun DrinkFormScreen(
 }
 
 @Composable
-fun DrinkFormContent(
+fun DrinkFormScreen(
     onBackClick: () -> Unit,
     onEvent: (DrinkLogFormEvent) -> Unit,
     state: DrinkLogFormUiState,
@@ -160,18 +156,15 @@ fun DrinkFormContent(
                 amount = state.inputs.inputAmount,
                 selectedUnit = state.inputs.selectedDrinkUnit,
                 onSelected = { onEvent(OnDrinkLogUnitChange(it)) },
-                onTyped = { onEvent(OnAmountChange(it)) },
                 options = state.options.amountOptions
             )
             ABVAndPriceTextFields(
                 abv = state.inputs.alcoholPercentage,
                 price = state.inputs.cost,
-                onABVChange = { onEvent(OnABVChange(it)) },
-                onPriceChange = { onEvent(OnPriceChange(it)) }
             )
             RecipientAutoComplete(
                 recipient = state.inputs.recipient,
-                onRecipientChange = { onEvent(OnRecipientChange(it)) },
+                onRecipientChange = { }, //onEvent(OnRecipientChange(it)) },
                 recipientOptions = state.options.recipientOptions
             )
             DateAndTimePicker(
@@ -182,11 +175,9 @@ fun DrinkFormContent(
             )
             LocationTextField(
                 location = state.inputs.locationName,
-                onLocationChange = { onEvent(OnLocationChange(it)) }
             )
             NotesTextField(
                 notes = state.inputs.notes,
-                onNotesChange = { onEvent(OnNotesChange(it)) }
             )
             Spacer(modifier = Modifier.padding(bottom = 16.dp))
 

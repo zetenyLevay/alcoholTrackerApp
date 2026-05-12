@@ -26,6 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
@@ -51,7 +53,6 @@ fun AmountDropDown(
     amount: TextFieldState,
     selectedUnit: DrinkUnit? = null,
     onSelected: (DrinkUnit) -> Unit,
-    onTyped: (Double) -> Unit,
     options: List<DrinkUnit>,
 ) {
 
@@ -104,7 +105,7 @@ fun AmountDropDown(
                         ) {
                             IconButton(
                                 onClick = {
-                                    val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0)+1
+                                    val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0) +1
                                     amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
                                 },
                                 modifier = Modifier.size(24.dp)
@@ -114,7 +115,7 @@ fun AmountDropDown(
                             IconButton(
                                 onClick = {
                                     if (amount.text.toString().toDouble() > 0.0) {
-                                        val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0)-1
+                                        val doubleAmount = (amount.text.toString().toDoubleOrNull()  ?: 0.0)-1
                                         amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
                                     }
                                 },
@@ -139,6 +140,7 @@ fun AmountDropDown(
                     OutlinedTextField(
                         value = selectedUnit?.name ?: "Select a unit",
                         onValueChange = { },
+                        maxLines = 1,
                         readOnly = true,
                         label = null,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -151,7 +153,10 @@ fun AmountDropDown(
                             .clickable {
                                 expanded = true
                             },
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(24.dp),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 14.sp
+                        )
 
                     )
 

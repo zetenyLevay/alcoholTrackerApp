@@ -116,24 +116,6 @@ fun LogDrinkTopBar(
     )
 }
 
-@Composable
-fun ListTopBar(
-
-){
-     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary ,
-            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-        title = {
-            Text("History")
-        },
-        modifier = Modifier.statusBarsPadding(),
-     )
-}
 
 @Composable
 fun DetailTopBar(
@@ -191,6 +173,24 @@ fun DetailTopBar(
 
             },
         scrollBehavior = scrollBehavior
+    )
+}
+
+@Composable
+fun HistoryTopBar(){
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("History")
+            }
+        },
     )
 }
 
