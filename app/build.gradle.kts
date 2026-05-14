@@ -47,6 +47,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     ksp("androidx.room:room-compiler:2.8.1")
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation("androidx.paging:paging-compose:3.5.0")
+    implementation("androidx.room:room-paging:2.8.4")
 
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("com.seanproctor:data-table-material3:0.11.4")

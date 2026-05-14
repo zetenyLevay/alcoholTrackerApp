@@ -21,7 +21,11 @@ import java.time.format.DateTimeFormatter
 
 
 @Composable
-fun DateHeader(date: LocalDate, drinkLogs: List<DrinkLog>, modifier: Modifier = Modifier) {
+fun DateHeader(
+    date: LocalDate,
+    totalAmount: Double,
+    totalCost: Double,
+    modifier: Modifier = Modifier) {
 
     val formattedDate = if (date.dayOfMonth == LocalDate.now().dayOfMonth) {
         "Today"
@@ -30,10 +34,6 @@ fun DateHeader(date: LocalDate, drinkLogs: List<DrinkLog>, modifier: Modifier = 
     } else {
         date.format(DateTimeFormatter.ofPattern("E, MMM d"))
     }
-
-    val totalAmount = drinkLogs.sumOf { it.amount }
-    val totalCost = drinkLogs.sumOf { it.cost ?: 0.0 }
-
 
 
     Box(
@@ -73,12 +73,4 @@ fun DateHeader(date: LocalDate, drinkLogs: List<DrinkLog>, modifier: Modifier = 
         }
     }
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewDateHeader() {
-    AlcoholTrackerTheme() {
-        DateHeader(LocalDate.now(), emptyList())
-    }
 }

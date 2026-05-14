@@ -35,6 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.alcoholtracker.SnackBarEvent
 import com.example.alcoholtracker.SnackbarAction
 import com.example.alcoholtracker.SnackbarController
@@ -49,6 +53,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import com.example.alcoholtracker.ui.viewmodel.HistoryEffect
 import com.example.alcoholtracker.ui.viewmodel.HistoryEvent
+import com.example.alcoholtracker.ui.viewmodel.HistoryFilterStates
+import com.example.alcoholtracker.ui.viewmodel.HistoryUiModel
 import com.example.alcoholtracker.ui.viewmodel.HistoryUiState
 import com.example.alcoholtracker.ui.viewmodel.HistoryViewModel
 
@@ -60,7 +66,8 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
 
-    val state = viewModel.historyUiState.collectAsState()
+    val state = viewModel.historyUiState.collectAsStateWithLifecycle()
+    val pagedLogs = viewModel.pagedLogs.collectAsLazyPagingItems()
 
     LaunchedEffect(state.value.effect){
         when(val effect = state.value.effect){
@@ -100,7 +107,10 @@ fun HistoryScreen(
     }
     HistoryScreen(
         viewModel::processEvent,
-        state.value
+        state.value,
+        viewModel.filterState,
+        pagedLogs
+
     )
 
 }
@@ -110,6 +120,8 @@ fun HistoryScreen(
 fun HistoryScreen(
     onEvent: (HistoryEvent) -> Unit,
     state: HistoryUiState,
+    filterState: HistoryFilterStates,
+    pagedLogs: LazyPagingItems<HistoryUiModel>
 ) {
 
 
@@ -135,7 +147,7 @@ fun HistoryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
-                        state = state.query,
+                        state = filterState.queryState,
                         modifier = Modifier.weight(1f).height(44.dp),
                         leadingIcon = {Icon(Icons.Default.Search, "Search")},
                         placeholder = {Text("Search history...")},
@@ -169,7 +181,7 @@ fun HistoryScreen(
                     onEditClick = { onEvent(HistoryEvent.OnEditClick(it)) },
                     onItemClick = { onEvent(HistoryEvent.OnItemClick(it)) },
                     onRemove = { onEvent(HistoryEvent.OnRemoveItem(it)) },
-                    drinkLogs = state.drinkLogs,
+                    drinkLogs = pagedLogs,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -177,101 +189,101 @@ fun HistoryScreen(
 
 }
 
-@Preview
-@Composable
-fun PreviewListScreen() {
-    AlcoholTrackerTheme() {
-        HistoryScreen(
-            onEvent = {},
-            state = HistoryUiState(
-                drinkLogs = mapOf(
-                    LocalDate.now() to listOf(
-                        DrinkLog(
-                            name = "Beer",
-                            category = DrinkCategory.BEER,
-                            cost = 6.2,
-                            amount = 500,
-                            alcoholPercentage = 10.2,
-                            date = LocalDateTime.now(),
-                            imgURI = "",
-                            locationName = "",
-                            notes = "",
-                            recipient = "",
-                            isFavorite = false,
-                            logId = 0,
-                            drinkId = 0,
-                            userId = "a",
-                            inputAmount = 500.0,
-                            longitude = null,
-                            latitude = null,
-                            drinkUnit = DrinkUnit("milliliters", 1),
-                        ),
-                                DrinkLog(
-                                name = "Beer",
-                        category = DrinkCategory.BEER,
-                        cost = 6.2,
-                        amount = 500,
-                        alcoholPercentage = 10.2,
-                        date = LocalDateTime.now(),
-                        imgURI = "",
-                        locationName = "",
-                        notes = "",
-                        recipient = "",
-                        isFavorite = false,
-                        logId = 1,
-                        drinkId = 0,
-                        userId = "a",
-                        inputAmount = 500.0,
-                        longitude = null,
-                        latitude = null,
-                        drinkUnit = DrinkUnit("milliliters", 1),
-                    )
-                    ),
-                    LocalDate.now().minusDays(2) to listOf(
-                        DrinkLog(
-                            name = "Beer",
-                            category = DrinkCategory.BEER,
-                            cost = 6.2,
-                            amount = 500,
-                            alcoholPercentage = 10.2,
-                            date = LocalDateTime.now(),
-                            imgURI = "",
-                            locationName = "",
-                            notes = "",
-                            recipient = "",
-                            isFavorite = false,
-                            logId = 4,
-                            drinkId = 0,
-                            userId = "a",
-                            inputAmount = 500.0,
-                            longitude = null,
-                            latitude = null,
-                            drinkUnit = DrinkUnit("milliliters", 1),
-                        ),
-                        DrinkLog(
-                            name = "Beer",
-                            category = DrinkCategory.BEER,
-                            cost = 6.2,
-                            amount = 500,
-                            alcoholPercentage = 10.2,
-                            date = LocalDateTime.now(),
-                            imgURI = "",
-                            locationName = "",
-                            notes = "",
-                            recipient = "",
-                            isFavorite = false,
-                            logId = 3,
-                            drinkId = 0,
-                            userId = "a",
-                            inputAmount = 500.0,
-                            longitude = null,
-                            latitude = null,
-                            drinkUnit = DrinkUnit("milliliters", 1),
-                        )
-                    )
-                )
-            )
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun PreviewListScreen() {
+//    AlcoholTrackerTheme() {
+//        HistoryScreen(
+//            onEvent = {},
+//            state = HistoryUiState(
+//                drinkLogs = mapOf(
+//                    LocalDate.now() to listOf(
+//                        DrinkLog(
+//                            name = "Beer",
+//                            category = DrinkCategory.BEER,
+//                            cost = 6.2,
+//                            amount = 500,
+//                            alcoholPercentage = 10.2,
+//                            date = LocalDateTime.now(),
+//                            imgURI = "",
+//                            locationName = "",
+//                            notes = "",
+//                            recipient = "",
+//                            isFavorite = false,
+//                            logId = 0,
+//                            drinkId = 0,
+//                            userId = "a",
+//                            inputAmount = 500.0,
+//                            longitude = null,
+//                            latitude = null,
+//                            drinkUnit = DrinkUnit("milliliters", 1),
+//                        ),
+//                                DrinkLog(
+//                                name = "Beer",
+//                        category = DrinkCategory.BEER,
+//                        cost = 6.2,
+//                        amount = 500,
+//                        alcoholPercentage = 10.2,
+//                        date = LocalDateTime.now(),
+//                        imgURI = "",
+//                        locationName = "",
+//                        notes = "",
+//                        recipient = "",
+//                        isFavorite = false,
+//                        logId = 1,
+//                        drinkId = 0,
+//                        userId = "a",
+//                        inputAmount = 500.0,
+//                        longitude = null,
+//                        latitude = null,
+//                        drinkUnit = DrinkUnit("milliliters", 1),
+//                    )
+//                    ),
+//                    LocalDate.now().minusDays(2) to listOf(
+//                        DrinkLog(
+//                            name = "Beer",
+//                            category = DrinkCategory.BEER,
+//                            cost = 6.2,
+//                            amount = 500,
+//                            alcoholPercentage = 10.2,
+//                            date = LocalDateTime.now(),
+//                            imgURI = "",
+//                            locationName = "",
+//                            notes = "",
+//                            recipient = "",
+//                            isFavorite = false,
+//                            logId = 4,
+//                            drinkId = 0,
+//                            userId = "a",
+//                            inputAmount = 500.0,
+//                            longitude = null,
+//                            latitude = null,
+//                            drinkUnit = DrinkUnit("milliliters", 1),
+//                        ),
+//                        DrinkLog(
+//                            name = "Beer",
+//                            category = DrinkCategory.BEER,
+//                            cost = 6.2,
+//                            amount = 500,
+//                            alcoholPercentage = 10.2,
+//                            date = LocalDateTime.now(),
+//                            imgURI = "",
+//                            locationName = "",
+//                            notes = "",
+//                            recipient = "",
+//                            isFavorite = false,
+//                            logId = 3,
+//                            drinkId = 0,
+//                            userId = "a",
+//                            inputAmount = 500.0,
+//                            longitude = null,
+//                            latitude = null,
+//                            drinkUnit = DrinkUnit("milliliters", 1),
+//                        )
+//                    )
+//                )
+//            )
+//        )
+//    }
+//}
 

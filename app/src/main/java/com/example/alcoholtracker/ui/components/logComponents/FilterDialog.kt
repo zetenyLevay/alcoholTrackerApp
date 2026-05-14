@@ -20,14 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.alcoholtracker.ui.viewmodel.FilterState
+
 import com.example.compose.AlcoholTrackerTheme
 import com.example.compose.primaryDark
 
 @Composable
 fun FilterDialog(
     onDismissRequest: () -> Unit,
-    state: FilterState
 ){
 
     val datePickerState = rememberDatePickerState()

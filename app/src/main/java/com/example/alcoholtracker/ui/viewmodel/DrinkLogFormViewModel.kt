@@ -86,15 +86,15 @@ data class DrinkLogFormOptions(
     val recipientOptions: List<String> = emptyList(),
 )
 
-data class DrinkLogFormTextStates (
-    val drinkName: TextFieldState = TextFieldState(),
-    val inputAmount: TextFieldState = TextFieldState("500"),
-    val alcoholPercentage: TextFieldState = TextFieldState("0.0"),
-    val cost: TextFieldState = TextFieldState("0.0"),
-    val recipient: TextFieldState = TextFieldState("Me"),
-    val notes: TextFieldState = TextFieldState(),
+class DrinkLogFormTextStates {
+    val drinkName: TextFieldState = TextFieldState()
+    val inputAmount: TextFieldState = TextFieldState("500")
+    val alcoholPercentage: TextFieldState = TextFieldState("0.0")
+    val cost: TextFieldState = TextFieldState("0.0")
+    val recipient: TextFieldState = TextFieldState("Me")
+    val notes: TextFieldState = TextFieldState()
     val locationName: TextFieldState = TextFieldState()
-)
+}
 
 
 @HiltViewModel
