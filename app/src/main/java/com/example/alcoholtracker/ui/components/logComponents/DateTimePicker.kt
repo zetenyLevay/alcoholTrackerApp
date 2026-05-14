@@ -35,6 +35,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +59,7 @@ fun DateAndTimePicker(
 
     LaunchedEffect(currentDate) {
         currentDate?.let { date ->
-            datePickerState.selectedDateMillis = date.atStartOfDay(java.time.ZoneOffset.UTC)
+            datePickerState.selectedDateMillis = date.atStartOfDay(ZoneOffset.UTC)
                 .toInstant()
                 .toEpochMilli()
         }
@@ -155,7 +156,7 @@ fun DateAndTimePicker(
                         TextButton(onClick = {
                             datePickerState.selectedDateMillis?.let { millis ->
                                 val localDate = Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.of("UTC")) // Match the timezone used in LaunchedEffect
+                                    .atZone(ZoneId.of("UTC"))
                                     .toLocalDate()
                                 onDateSelected(localDate)
                             }

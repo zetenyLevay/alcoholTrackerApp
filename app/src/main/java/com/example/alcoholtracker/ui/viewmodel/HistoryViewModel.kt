@@ -1,7 +1,13 @@
 package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.CalendarLocale
+import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.getSelectedEndDate
+import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alcoholtracker.data.model.UserDrinkLog
@@ -15,6 +21,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.Locale
+import java.util.Locale.getDefault
 import javax.inject.Inject
 
 sealed interface HistoryEvent{
@@ -40,22 +48,55 @@ data class HistoryUiState(
     val effect: HistoryEffect? = null
 )
 
+data class FilterState(
+    val dateRange: DateRangePickerState = DateRangePickerState(locale = getDefault()),
+    val category: String? = null,
+    val recipient: String? = null,
+    val isFavorite: Boolean? = null,
+    val priceFrom: Double? = null,
+    val priceTo: Double? = null,
+    val abvFrom: Double? = null,
+    val abvTo: Double? = null
+
+)
+
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(HistoryUiState())
+    private val _filterState = MutableStateFlow(FilterState())
+    val queryState: TextFieldState = TextFieldState()
+    val dateRangeState: DateRangePickerState = DateRangePickerState(locale = getDefault())
+    @OptIn(ExperimentalMaterial3Api::class)
     val historyUiState = combine(
         _localState,
+        _filterState,
         drinkLogRepo.getAllLogs(),
-                snapshotFlow { _localState.value.query.text }
-    ) { state, logs, query ->
+        snapshotFlow { _localState.value.query.text },
+        snapshotFlow { _filterState.value.dateRange }
+    ) { state, filterState,logs, query, date ->
 
-        val filteredLogs = if (query.isBlank()){
-            logs
-        } else {
-            logs.filter { it.name.contains(query,ignoreCase = true) || it.category.name.contains(query, ignoreCase = true)}
+        val predicates = mutableListOf<(UserDrinkLog) -> Boolean>()
+
+        if (query.isNotBlank()) {
+            predicates.add {
+                it.name.contains(query, ignoreCase = true)
+            }
+        }
+
+
+        filterState.dateRange.getSelectedStartDate()?.let { from -> predicates.add { it.date.toLocalDate() >= from } }
+        filterState.dateRange.getSelectedEndDate()?.let { to -> predicates.add { it.date.toLocalDate() <= to } }
+        filterState.priceFrom?.let { from -> predicates.add { it.cost!! >= from } }
+        filterState.priceTo?.let { to -> predicates.add { it.cost!! <= to } }
+        filterState.category?.let { cat -> predicates.add { it.category.name.equals(cat, ignoreCase = true) } }
+        filterState.recipient?.let { rec -> predicates.add { it.recipient.equals(rec, ignoreCase = true) } }
+        filterState.isFavorite?.let { fav -> predicates.add { it.isFavorite == fav }}
+
+        val filteredLogs = logs.filter { log ->
+            predicates.all { predicate -> predicate(log) }
         }
 
         state.copy(
@@ -148,6 +189,4 @@ class HistoryViewModel @Inject constructor(
     private fun consumeEffect() {
         _localState.update { it.copy(effect = null) }
     }
-
-
 }
