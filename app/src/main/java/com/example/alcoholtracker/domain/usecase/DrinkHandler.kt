@@ -1,6 +1,6 @@
 package com.example.alcoholtracker.domain.usecase
 
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDateTime
@@ -15,7 +15,7 @@ class DrinkHandler @Inject constructor(
         request: DrinkCreateRequest
     ) {
         val userId = auth.currentUser?.uid ?: return
-        val drink = UserDrinkLog(
+        val drink = DrinkLog(
             userId = userId,
             drinkId = 0,
             name = request.name,
@@ -46,7 +46,7 @@ class DrinkHandler @Inject constructor(
 
     ) {
         val userId = auth.currentUser?.uid ?: return
-        val drink = UserDrinkLog(
+        val drink = DrinkLog(
             logId = drinkToUpdate,
             userId = userId,
             drinkId = 0,
@@ -72,7 +72,7 @@ class DrinkHandler @Inject constructor(
     }
 
     suspend fun deleteDrink(
-        drinkToDelete: UserDrinkLog
+        drinkToDelete: DrinkLog
     ) {
         logRepo.deleteDrinkLog(drinkToDelete)
     }

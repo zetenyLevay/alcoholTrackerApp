@@ -11,7 +11,7 @@ import com.example.alcoholtracker.domain.model.DrinkUnit
 import java.time.LocalDateTime
 
 @Entity(tableName = "log")
-data class UserDrinkLog(
+data class DrinkLog(
     @ColumnInfo("logId")
     @PrimaryKey(autoGenerate = true) val logId: Int = 0,
 

@@ -15,20 +15,19 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.DrinkItem
 
 @Composable
 fun SwipeToDismissItem(
-    item: UserDrinkLog,
-    onRemove: (UserDrinkLog) -> Unit,
+    item: DrinkLog,
+    onRemove: (DrinkLog) -> Unit,
     listType: AlcoholListType,
     onEditClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,

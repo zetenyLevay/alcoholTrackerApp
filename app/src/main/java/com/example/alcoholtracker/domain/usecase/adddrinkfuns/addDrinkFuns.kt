@@ -1,9 +1,8 @@
 package com.example.alcoholtracker.domain.usecase.adddrinkfuns
 
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.domain.usecase.DrinkCreateRequest
-import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormUiState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -20,7 +19,7 @@ fun getLocalDateTime(date: LocalDate, time: LocalTime): LocalDateTime {
 }
 
 
-fun createNewRequest(drink: UserDrinkLog): DrinkCreateRequest {
+fun createNewRequest(drink: DrinkLog): DrinkCreateRequest {
     val request = DrinkCreateRequest(
         name = drink.name,
         category = drink.category,

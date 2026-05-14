@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.alcoholtracker.data.model.Drink
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.example.alcoholtracker.domain.logic.handlers.DrinkHandlerRegistry
 import com.example.alcoholtracker.domain.model.DrinkCategory
@@ -251,7 +251,7 @@ class DrinkLogFormViewModel @Inject constructor(
             return
         }
 
-        val newLog = UserDrinkLog(
+        val newLog = DrinkLog(
             drinkId = inputs.selectedDrink?.drinkId,
             userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,

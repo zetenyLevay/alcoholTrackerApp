@@ -2,7 +2,7 @@ package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.preferences.ProgressBarPreferences
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
@@ -21,14 +21,14 @@ sealed interface HomeEvent {
     data object OnFABClick : HomeEvent
     data class OnItemClick(val logId: Int) : HomeEvent
     data class OnProgressBarUpdate(val type: ProgressBarType, val target: Double) : HomeEvent
-    data class OnItemRemove(val log: UserDrinkLog) : HomeEvent
-    data class OnUndoItemRemove(val log: UserDrinkLog) : HomeEvent
+    data class OnItemRemove(val log: DrinkLog) : HomeEvent
+    data class OnUndoItemRemove(val log: DrinkLog) : HomeEvent
     data object ConsumeEffect : HomeEvent
 }
 
 sealed interface HomeEffect {
     data class ShowError(val message: String) : HomeEffect
-    data class ShowItemRemoved(val log: UserDrinkLog) : HomeEffect
+    data class ShowItemRemoved(val log: DrinkLog) : HomeEffect
     data object NavigateToDrinkForm : HomeEffect
     data class NavigateToDetailedItem(val logId: Int) : HomeEffect
 }
@@ -39,7 +39,7 @@ data class HomeUiState(
     val currentMoneySpent: Double = 0.0,
     val currentAmountMl: Int = 0,
     val targets: Map<ProgressBarType, Double> = emptyMap(),
-    val tonightDrinkLogs: List<UserDrinkLog> = emptyList(),
+    val tonightDrinkLogs: List<DrinkLog> = emptyList(),
     val isLoading: Boolean = false,
     val effect: HomeEffect? = null,
 )
@@ -123,7 +123,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun undoItemRemove(log: UserDrinkLog) {
+    private fun undoItemRemove(log: DrinkLog) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
             try {
@@ -167,7 +167,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun onItemRemove(log: UserDrinkLog) {
+    private fun onItemRemove(log: DrinkLog) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
             try {

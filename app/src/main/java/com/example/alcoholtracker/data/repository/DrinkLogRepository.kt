@@ -1,9 +1,7 @@
 package com.example.alcoholtracker.data.repository
 
-import android.util.Log
-import com.example.alcoholtracker.data.local.dao.UserAndUserDrinkLogDao
-import com.example.alcoholtracker.data.model.User
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.local.dao.DrinkLogDao
+import com.example.alcoholtracker.data.model.DrinkLog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -12,48 +10,47 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.emptyList
-import kotlin.math.log
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class DrinkLogRepository @Inject constructor(
-    private val userAndUserDrinkLogDao: UserAndUserDrinkLogDao,
+    private val drinkLogDao: DrinkLogDao,
     private val userRepo: UserRepository
 ) {
 
-    suspend fun insertDrinkLog(log: UserDrinkLog) {
+    suspend fun insertDrinkLog(log: DrinkLog) {
 
         val user = userRepo.getCurrentUser()
         if (user == null) {
             throw Exception("User not found")
         }else{
             val completeLog = log.copy(userId = user)
-            userAndUserDrinkLogDao.insertDrinkLog(completeLog)
+            drinkLogDao.insertDrinkLog(completeLog)
         }
     }
 
-    suspend fun updateDrinkLog(log: UserDrinkLog) {
-        userAndUserDrinkLogDao.updateDrinkLog(log)
+    suspend fun updateDrinkLog(log: DrinkLog) {
+        drinkLogDao.updateDrinkLog(log)
     }
 
-    suspend fun deleteDrinkLog(log: UserDrinkLog) {
-        userAndUserDrinkLogDao.deleteDrinkLog(log)
+    suspend fun deleteDrinkLog(log: DrinkLog) {
+        drinkLogDao.deleteDrinkLog(log)
     }
-    suspend fun getDrinkById(logId: Int): UserDrinkLog? {
-        return userAndUserDrinkLogDao.getDrinkById(logId)
-    }
-
-    fun getDrinkByIdFlow(logId: Int): Flow<UserDrinkLog?> {
-        return userAndUserDrinkLogDao.getDrinkByIdFlow(logId)
+    suspend fun getDrinkById(logId: Int): DrinkLog? {
+        return drinkLogDao.getDrinkById(logId)
     }
 
-    fun getAllLogs(): Flow<List<UserDrinkLog>> {
+    fun getDrinkByIdFlow(logId: Int): Flow<DrinkLog?> {
+        return drinkLogDao.getDrinkByIdFlow(logId)
+    }
+
+    fun getAllLogs(): Flow<List<DrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
                 flowOf(emptyList())
             }
             else{
-                userAndUserDrinkLogDao.getDrinkLogsByUserId(userId)
+                drinkLogDao.getDrinkLogsByUserId(userId)
             }
         }
     }
@@ -64,51 +61,51 @@ class DrinkLogRepository @Inject constructor(
                 flowOf(emptyList())
             }
             else{
-                userAndUserDrinkLogDao.getRecipients(userId)
+                drinkLogDao.getRecipients(userId)
             }
         }
     }
 
-    fun getRecentLogs(): Flow<List<UserDrinkLog>> {
+    fun getRecentLogs(): Flow<List<DrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
                 flowOf(emptyList())
             }
             else{
-                userAndUserDrinkLogDao.getRecentLogs(userId)
+                drinkLogDao.getRecentLogs(userId)
             }
         }
     }
 
-    fun getFrequentLogs(): Flow<List<UserDrinkLog>> {
+    fun getFrequentLogs(): Flow<List<DrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
                 flowOf(emptyList())
             }
             else{
-                userAndUserDrinkLogDao.getFrequentLogs(userId)
+                drinkLogDao.getFrequentLogs(userId)
             }
         }
     }
 
-    fun getFavoriteLogs(): Flow<List<UserDrinkLog>> {
+    fun getFavoriteLogs(): Flow<List<DrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
                 flowOf(emptyList())
             }
             else{
-                userAndUserDrinkLogDao.getFavoritesLogs(userId)
+                drinkLogDao.getFavoritesLogs(userId)
             }
         }
     }
 
-    fun getTonightLogs(): Flow<List<UserDrinkLog>> {
+    fun getTonightLogs(): Flow<List<DrinkLog>> {
         return userRepo.currentUser.flatMapLatest { userId ->
             if (userId == null) {
                 flowOf(emptyList())
             } else {
                 val (start, end) = getCurrentSessionWindow()
-                userAndUserDrinkLogDao.getTonightLogs(userId, start, end)
+                drinkLogDao.getTonightLogs(userId, start, end)
             }
         }
     }

@@ -1,11 +1,10 @@
 package com.example.alcoholtracker.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import com.example.alcoholtracker.ui.navigation.DetailedLog
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,21 +20,21 @@ import javax.inject.Inject
 
 sealed interface DetailedLogEvent {
     data class OnEditClick(val logId: Int) : DetailedLogEvent
-    data class OnRemoveClick(val log: UserDrinkLog) : DetailedLogEvent
-    data class OnUndoRemove(val log: UserDrinkLog) : DetailedLogEvent
-    data class OnFavoriteClick(val log: UserDrinkLog) : DetailedLogEvent
+    data class OnRemoveClick(val log: DrinkLog) : DetailedLogEvent
+    data class OnUndoRemove(val log: DrinkLog) : DetailedLogEvent
+    data class OnFavoriteClick(val log: DrinkLog) : DetailedLogEvent
     data object ConsumeEffect : DetailedLogEvent
 }
 
 sealed interface DetailedLogEffect{
     data class ShowError(val message: String) : DetailedLogEffect
-    data class ShowItemRemoved(val log: UserDrinkLog) : DetailedLogEffect
+    data class ShowItemRemoved(val log: DrinkLog) : DetailedLogEffect
     data class NavigateToDrinkForm(val logId: Int): DetailedLogEffect
 }
 
 
 data class DetailedLogUiState(
-    val drinkLog: UserDrinkLog? = null,
+    val drinkLog: DrinkLog? = null,
     val isLoading: Boolean = false,
     val effect: DetailedLogEffect? = null
 )
@@ -88,13 +87,13 @@ class DetailedLogViewModel @Inject constructor(
     private fun onEditClick(logId: Int) {
 
     }
-    private fun onRemoveClick(log: UserDrinkLog) {
+    private fun onRemoveClick(log: DrinkLog) {
 
     }
-    private fun onUndoRemove(log: UserDrinkLog) {
+    private fun onUndoRemove(log: DrinkLog) {
 
     }
-    private fun onFavoriteClick(log: UserDrinkLog) {
+    private fun onFavoriteClick(log: DrinkLog) {
 
         viewModelScope.launch {
             try {

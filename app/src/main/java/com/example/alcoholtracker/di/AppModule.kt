@@ -1,22 +1,16 @@
 package com.example.alcoholtracker.di
 
 import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.alcoholtracker.data.local.dao.DrinkDao
-import com.example.alcoholtracker.data.local.dao.UserAndUserDrinkLogDao
-import com.example.alcoholtracker.data.local.database.DrinksDatabase
-import com.example.alcoholtracker.data.local.database.UserAndUserDrinkLogDataBase
+import com.example.alcoholtracker.data.local.dao.DrinkLogDao
+import com.example.alcoholtracker.data.local.dao.UserDao
+import com.example.alcoholtracker.data.local.database.AlcoholTrackerDatabase
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
@@ -24,24 +18,24 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
-    fun provideDrinkDao(db: DrinksDatabase): DrinkDao = db.drinkDao()
-
-    @Provides
     @Singleton
-    fun provideUserDrinkLogDatabase(@ApplicationContext context: Context): UserAndUserDrinkLogDataBase {
-        return UserAndUserDrinkLogDataBase.getDatabase(context)
+    fun provideDatabase(@ApplicationContext context: Context): AlcoholTrackerDatabase {
+        return AlcoholTrackerDatabase.getDatabase(context)
     }
 
     @Provides
-    fun provideUserDrinkLogDao(db: UserAndUserDrinkLogDataBase): UserAndUserDrinkLogDao {
-        return db.userAndUserDrinkLogDao()
-    }
+    fun provideDrinkDao(db: AlcoholTrackerDatabase): DrinkDao = db.drinkDao()
 
     @Provides
-    @Singleton
-    fun provideDrinksDatabase(@ApplicationContext context: Context): DrinksDatabase {
-        return DrinksDatabase.getDatabase(context)
+    fun provideDrinkLogDao(db: AlcoholTrackerDatabase): DrinkLogDao {
+        return db.drinkLogDao()
     }
+
+    fun provideUserDao(db: AlcoholTrackerDatabase): UserDao {
+        return db.userDao()
+    }
+
+
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()

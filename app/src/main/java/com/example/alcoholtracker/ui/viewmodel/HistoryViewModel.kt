@@ -1,17 +1,15 @@
 package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SliderState
 import androidx.compose.material3.getSelectedEndDate
 import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.alcoholtracker.data.model.UserDrinkLog
+import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.util.Locale
 import java.util.Locale.getDefault
 import javax.inject.Inject
 
@@ -30,20 +27,20 @@ sealed interface HistoryEvent{
     data object OnFABClick : HistoryEvent
     data class OnItemClick(val logId: Int) : HistoryEvent
     data class OnEditClick(val logId: Int) : HistoryEvent
-    data class OnRemoveItem(val log: UserDrinkLog) : HistoryEvent
-    data class OnUndoRemoveItem(val log: UserDrinkLog) : HistoryEvent
+    data class OnRemoveItem(val log: DrinkLog) : HistoryEvent
+    data class OnUndoRemoveItem(val log: DrinkLog) : HistoryEvent
     data object ConsumeEffect : HistoryEvent
 }
 
 sealed interface HistoryEffect{
     data class ShowError(val message: String) : HistoryEffect
-    data class ShowItemRemoved(val log: UserDrinkLog) : HistoryEffect
+    data class ShowItemRemoved(val log: DrinkLog) : HistoryEffect
     data class NavigateToDrinkForm(val logId: Int): HistoryEffect
     data class NavigateToDetailedItem(val logId: Int): HistoryEffect
 }
 
 data class HistoryUiState(
-    val drinkLogs: Map<LocalDate,List<UserDrinkLog>> = emptyMap(),
+    val drinkLogs: Map<LocalDate,List<DrinkLog>> = emptyMap(),
     val query: TextFieldState = TextFieldState(),
     val isLoading: Boolean = false,
     val effect: HistoryEffect? = null
@@ -83,7 +80,7 @@ class HistoryViewModel @Inject constructor(
         snapshotFlow { _filterState.value.dateRange }
     ) { state, filterState,logs, query, date ->
 
-        val predicates = mutableListOf<(UserDrinkLog) -> Boolean>()
+        val predicates = mutableListOf<(DrinkLog) -> Boolean>()
 
         if (query.isNotBlank()) {
             predicates.add {
@@ -145,7 +142,7 @@ class HistoryViewModel @Inject constructor(
             it.copy(effect = HistoryEffect.NavigateToDetailedItem(logId))
         }
     }
-    private fun onRemoveItem(log: UserDrinkLog) {
+    private fun onRemoveItem(log: DrinkLog) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
             try {
@@ -167,7 +164,7 @@ class HistoryViewModel @Inject constructor(
             }
         }
     }
-    private fun undoRemoveItem(log: UserDrinkLog) {
+    private fun undoRemoveItem(log: DrinkLog) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true) }
             try {
