@@ -66,19 +66,12 @@ data class DrinkLogFormUiState(
 
 data class DrinkLogFormInput(
     val logId: Int? = null,
-    val drinkName: TextFieldState = TextFieldState(),
     val selectedCategory: DrinkCategory = DrinkCategory.OTHER,
     val selectedDrink: Drink? = null,
     val selectedDrinkUnit: DrinkUnit = DrinkUnit("milliliters", 1),
     val selectedAmount: Int = 100,
-    val inputAmount: TextFieldState = TextFieldState("500"),
-    val alcoholPercentage: TextFieldState = TextFieldState("0.0"),
-    val cost: TextFieldState = TextFieldState("0.0"),
-    val recipient: TextFieldState = TextFieldState("Me"),
     val selectedDate: LocalDate = LocalDate.now(),
     val selectedTime: LocalTime = LocalTime.now(),
-    val notes: TextFieldState = TextFieldState(),
-    val locationName: TextFieldState = TextFieldState(),
     val isFavorite: Boolean = false,
     val longitude: Double? = null,
     val latitude: Double? = null,
@@ -93,11 +86,16 @@ data class DrinkLogFormOptions(
     val recipientOptions: List<String> = emptyList(),
 )
 
-data class DrinkLogLocalState(
-    val isEdit: Boolean = false,
-    val isLoading: Boolean = false,
-    val effect: DrinkLogFormEffect? = null,
+data class DrinkLogFormTextStates (
+    val drinkName: TextFieldState = TextFieldState(),
+    val inputAmount: TextFieldState = TextFieldState("500"),
+    val alcoholPercentage: TextFieldState = TextFieldState("0.0"),
+    val cost: TextFieldState = TextFieldState("0.0"),
+    val recipient: TextFieldState = TextFieldState("Me"),
+    val notes: TextFieldState = TextFieldState(),
+    val locationName: TextFieldState = TextFieldState()
 )
+
 
 @HiltViewModel
 class DrinkLogFormViewModel @Inject constructor(
@@ -106,12 +104,13 @@ class DrinkLogFormViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    val textStates = DrinkLogFormTextStates()
 
     private var searchJob: Job? = null
-    private val _localState = MutableStateFlow(DrinkLogLocalState())
+    private val _localState = MutableStateFlow(DrinkLogFormUiState())
     private val _inputs = MutableStateFlow(DrinkLogFormInput())
     private val _drinkOptions = MutableStateFlow<List<Drink>>(emptyList())
-    private val recipientTextFlow = snapshotFlow { _inputs.value.recipient.text }
+    private val recipientTextFlow = snapshotFlow { textStates.recipient.text }
     private val _filteredRecipients = combine(
         logRepo.getRecipients(),
         recipientTextFlow
@@ -124,6 +123,7 @@ class DrinkLogFormViewModel @Inject constructor(
             }
         }
     }.catch { emit(emptyList()) }
+
     private val _amountOptions = _inputs.map { it.selectedCategory }.map {
         when (it) {
             BEER -> handlerRegistry.beerHandler.getUnitOptions()
@@ -134,6 +134,7 @@ class DrinkLogFormViewModel @Inject constructor(
         }
 
     }
+
     val formUiState: StateFlow<DrinkLogFormUiState> = combine(
         _inputs,
         _localState,
@@ -171,6 +172,7 @@ class DrinkLogFormViewModel @Inject constructor(
     }
 
 
+
     fun processEvent(event: DrinkLogFormEvent) {
         when (event) {
             is DrinkLogFormEvent.OnCategoryChange -> onCategoryChange(event.category)
@@ -192,14 +194,14 @@ class DrinkLogFormViewModel @Inject constructor(
 
                 if (logToEdit != null) {
 
-                    val currentInputs = _inputs.value
-                    currentInputs.drinkName.setTextAndPlaceCursorAtEnd(logToEdit.name)
-                    currentInputs.inputAmount.setTextAndPlaceCursorAtEnd(logToEdit.inputAmount?.toString() ?: "100.0")
-                    currentInputs.alcoholPercentage.setTextAndPlaceCursorAtEnd(logToEdit.alcoholPercentage?.toString() ?: "0.0")
-                    currentInputs.cost.setTextAndPlaceCursorAtEnd(logToEdit.cost?.toString() ?: "0.0")
-                    currentInputs.recipient.setTextAndPlaceCursorAtEnd(logToEdit.recipient ?: "Me")
-                    currentInputs.notes.setTextAndPlaceCursorAtEnd(logToEdit.notes ?: "")
-                    currentInputs.locationName.setTextAndPlaceCursorAtEnd(logToEdit.locationName ?: "")
+
+                    textStates.drinkName.setTextAndPlaceCursorAtEnd(logToEdit.name)
+                    textStates.inputAmount.setTextAndPlaceCursorAtEnd(logToEdit.inputAmount?.toString() ?: "100.0")
+                    textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(logToEdit.alcoholPercentage?.toString() ?: "0.0")
+                    textStates.cost.setTextAndPlaceCursorAtEnd(logToEdit.cost?.toString() ?: "0.0")
+                    textStates.recipient.setTextAndPlaceCursorAtEnd(logToEdit.recipient ?: "Me")
+                    textStates.notes.setTextAndPlaceCursorAtEnd(logToEdit.notes ?: "")
+                    textStates.locationName.setTextAndPlaceCursorAtEnd(logToEdit.locationName ?: "")
 
                     _inputs.update {
                         it.copy(
@@ -241,7 +243,7 @@ class DrinkLogFormViewModel @Inject constructor(
 
         val inputs = _inputs.value
 
-        if (inputs.drinkName.text.isBlank() ){
+        if (textStates.drinkName.text.isBlank() ){
             _localState.update { it.copy(
                 effect = DrinkLogFormEffect.ShowError("Please fill in the drink name")
             )
@@ -253,17 +255,17 @@ class DrinkLogFormViewModel @Inject constructor(
             drinkId = inputs.selectedDrink?.drinkId,
             userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,
-            name = inputs.drinkName.text.toString(),
-            cost = inputs.cost.text.toString().toDouble(),
-            alcoholPercentage = inputs.alcoholPercentage.text.toString().toDouble(),
-            amount = getFinalAmount(inputs.selectedDrinkUnit,inputs.inputAmount.text.toString().toDouble()),
+            name = textStates.drinkName.text.toString(),
+            cost = textStates.cost.text.toString().toDouble(),
+            alcoholPercentage = textStates.alcoholPercentage.text.toString().toDouble(),
+            amount = getFinalAmount(inputs.selectedDrinkUnit,textStates.inputAmount.text.toString().toDouble()),
             category = inputs.selectedCategory,
-            recipient = inputs.recipient.text.toString(),
-            inputAmount = inputs.inputAmount.text.toString().toDouble(),
+            recipient = textStates.recipient.text.toString(),
+            inputAmount = textStates.inputAmount.text.toString().toDouble(),
             isFavorite = inputs.isFavorite,
             imgURI = inputs.imgURI,
-            notes = inputs.notes.text.toString(),
-            locationName = inputs.locationName.text.toString(),
+            notes = textStates.notes.text.toString(),
+            locationName = textStates.locationName.text.toString(),
             longitude = inputs.longitude,
             latitude = inputs.latitude,
             drinkUnit = inputs.selectedDrinkUnit,
@@ -322,7 +324,7 @@ class DrinkLogFormViewModel @Inject constructor(
         val newUnit = drinkUnit
 
         if (oldUnit.name == "milliliters" && newUnit.name != "milliliters"){
-            _inputs.value.inputAmount.setTextAndPlaceCursorAtEnd("1.0")
+            textStates.inputAmount.setTextAndPlaceCursorAtEnd("1.0")
             _inputs.update {
                 it.copy(
                     selectedDrinkUnit = drinkUnit,
@@ -330,7 +332,7 @@ class DrinkLogFormViewModel @Inject constructor(
             }
         }
         else if (oldUnit.name != "milliliters" && newUnit.name == "milliliters"){
-            _inputs.value.inputAmount.setTextAndPlaceCursorAtEnd("500")
+            textStates.inputAmount.setTextAndPlaceCursorAtEnd("500")
             _inputs.update {
                 it.copy(
                     selectedDrinkUnit = drinkUnit,
@@ -342,10 +344,11 @@ class DrinkLogFormViewModel @Inject constructor(
     }
 
     private fun onDrinkChange(drink: Drink) {
+
+        textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(drink.alcoholContent.toString())
         _inputs.update {
             it.copy(
                 selectedDrink = drink,
-                alcoholPercentage = TextFieldState(drink.alcoholContent.toString())
             )
         }
     }
@@ -356,7 +359,7 @@ class DrinkLogFormViewModel @Inject constructor(
                 selectedCategory = category
             )
         }
-        onDrinkNameChange(_inputs.value.drinkName.toString())
+        onDrinkNameChange(textStates.drinkName.text.toString())
     }
 
     private fun onDrinkNameChange(name: String) {

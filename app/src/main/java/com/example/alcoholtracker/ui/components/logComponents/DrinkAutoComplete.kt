@@ -59,6 +59,7 @@ fun DrinkAutoComplete(
                 } else{
                     false
                 }
+                isSelection = false
             }
     }
 

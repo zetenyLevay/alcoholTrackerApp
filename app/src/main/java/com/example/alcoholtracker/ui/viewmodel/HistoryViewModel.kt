@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.getSelectedEndDate
 import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.runtime.snapshotFlow
@@ -60,6 +61,7 @@ data class FilterState(
 
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository
@@ -69,7 +71,10 @@ class HistoryViewModel @Inject constructor(
     private val _filterState = MutableStateFlow(FilterState())
     val queryState: TextFieldState = TextFieldState()
     val dateRangeState: DateRangePickerState = DateRangePickerState(locale = getDefault())
-    @OptIn(ExperimentalMaterial3Api::class)
+    val priceSliderState: SliderState = SliderState()
+    val abvSliderState: SliderState = SliderState()
+
+
     val historyUiState = combine(
         _localState,
         _filterState,
@@ -99,17 +104,15 @@ class HistoryViewModel @Inject constructor(
             predicates.all { predicate -> predicate(log) }
         }
 
-        state.copy(
+        HistoryUiState(
             drinkLogs = filteredLogs.groupBy { it.date.toLocalDate() }.toSortedMap(compareByDescending { it }),
             isLoading = false
         )
     }.catch {
-        _localState.update {
-            it.copy(
-                effect = HistoryEffect.ShowError("Error loading data"),
-                isLoading = false
-            )
-        }
+        HistoryUiState(
+            effect = HistoryEffect.ShowError("Error loading data"),
+            isLoading = false
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

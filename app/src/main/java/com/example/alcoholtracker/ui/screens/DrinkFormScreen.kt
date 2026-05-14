@@ -47,6 +47,7 @@ import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnDrinkLogUnitC
 
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnSaveDrinkLog
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormEvent.OnTimeChange
+import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormTextStates
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormUiState
 import com.example.alcoholtracker.ui.viewmodel.DrinkLogFormViewModel
 
@@ -94,6 +95,7 @@ fun DrinkFormScreen(
         onBackClick = onBackClick,
         onEvent = viewModel::processEvent,
         state = formState.value,
+        textState = viewModel.textStates
 
         )
 }
@@ -103,6 +105,7 @@ fun DrinkFormScreen(
     onBackClick: () -> Unit,
     onEvent: (DrinkLogFormEvent) -> Unit,
     state: DrinkLogFormUiState,
+    textState: DrinkLogFormTextStates,
 ) {
 
     val scrollState = rememberScrollState()
@@ -147,23 +150,23 @@ fun DrinkFormScreen(
                 categoryList = state.options.categoryOptions
             )
             DrinkAutoComplete(
-                drinkName = state.inputs.drinkName,
+                drinkName = textState.drinkName,
                 onTyped = { onEvent(OnDrinkLogNameChange(it)) },
                 onSelected = { onEvent(OnDrinkLogChange(it)) },
                 options = state.options.drinkOptions
             )
             AmountDropDown(
-                amount = state.inputs.inputAmount,
+                amount = textState.inputAmount,
                 selectedUnit = state.inputs.selectedDrinkUnit,
                 onSelected = { onEvent(OnDrinkLogUnitChange(it)) },
                 options = state.options.amountOptions
             )
             ABVAndPriceTextFields(
-                abv = state.inputs.alcoholPercentage,
-                price = state.inputs.cost,
+                abv = textState.alcoholPercentage,
+                price = textState.cost,
             )
             RecipientAutoComplete(
-                recipient = state.inputs.recipient,
+                recipient = textState.recipient,
                 onRecipientChange = { }, //onEvent(OnRecipientChange(it)) },
                 recipientOptions = state.options.recipientOptions
             )
@@ -174,10 +177,10 @@ fun DrinkFormScreen(
                 onDateSelected = { onEvent(OnDateChange(it)) },
             )
             LocationTextField(
-                location = state.inputs.locationName,
+                location = textState.locationName,
             )
             NotesTextField(
-                notes = state.inputs.notes,
+                notes = textState.notes,
             )
             Spacer(modifier = Modifier.padding(bottom = 16.dp))
 
