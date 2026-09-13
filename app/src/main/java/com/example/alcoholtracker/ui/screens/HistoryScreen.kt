@@ -25,35 +25,26 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.alcoholtracker.SnackBarEvent
 import com.example.alcoholtracker.SnackbarAction
 import com.example.alcoholtracker.SnackbarController
-import com.example.alcoholtracker.data.model.DrinkLog
-import com.example.alcoholtracker.domain.model.DrinkCategory
-import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.ui.components.AddButton
 import com.example.alcoholtracker.ui.components.HistoryTopBar
 import com.example.alcoholtracker.ui.components.alcohollist.AlcoholListFull
-import com.example.compose.AlcoholTrackerTheme
-import java.time.LocalDate
-import java.time.LocalDateTime
 import com.example.alcoholtracker.ui.viewmodel.HistoryEffect
 import com.example.alcoholtracker.ui.viewmodel.HistoryEvent
-import com.example.alcoholtracker.ui.viewmodel.HistoryFilterStates
+import com.example.alcoholtracker.ui.viewmodel.HistoryFilterState
 import com.example.alcoholtracker.ui.viewmodel.HistoryUiModel
 import com.example.alcoholtracker.ui.viewmodel.HistoryUiState
 import com.example.alcoholtracker.ui.viewmodel.HistoryViewModel
@@ -120,7 +111,7 @@ fun HistoryScreen(
 fun HistoryScreen(
     onEvent: (HistoryEvent) -> Unit,
     state: HistoryUiState,
-    filterState: HistoryFilterStates,
+    filterState: HistoryFilterState,
     pagedLogs: LazyPagingItems<HistoryUiModel>
 ) {
 

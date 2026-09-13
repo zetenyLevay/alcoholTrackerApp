@@ -6,7 +6,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RangeSliderState
-import androidx.compose.material3.SliderState
 import androidx.compose.material3.getSelectedEndDate
 import androidx.compose.material3.getSelectedStartDate
 import androidx.compose.runtime.getValue
@@ -37,9 +36,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Locale
-import java.util.Locale.getDefault
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -71,7 +68,7 @@ sealed class HistoryUiModel {
     data class DrinkItem(val log: DrinkLog) : HistoryUiModel()
 }
 
-class HistoryFilterStates {
+class HistoryFilterState {
     val queryState = TextFieldState()
     val categoryState = TextFieldState()
     val recipientState = TextFieldState()
@@ -93,7 +90,7 @@ class HistoryViewModel @Inject constructor(
 
     private val _historyUiState = MutableStateFlow(HistoryUiState())
     val historyUiState = _historyUiState.asStateFlow()
-    val filterState = HistoryFilterStates()
+    val filterState = HistoryFilterState()
 
     init {
 

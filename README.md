@@ -1,47 +1,37 @@
-# Alcohol Tracker App
+# Alcohol Tracker
 
-A side project for tracking alcohol consumption, expenses, and health-related metrics. This Android application allows users to log drinks, search for beer types, and visualize their habits through various analytical charts.
+A small android project to connect to my uni years. It tracks and shows your alcohol drinking and behaviors.
 
-## Features
+## What it does right now
 
-* **Drink Logging**: Easily record drinks with details such as category, amount, and date/time.
-* **Analytics Dashboard**: Visualize consumption patterns, spending habits, and health impacts through interactive charts (Area, Bar, Pie, Heatmaps, etc.).
-* **Alcohol Database**: Search for specific beers and drinks using an integrated search component and remote API.
-* **User Profiles**: Track personal statistics and manage user preferences.
-* **Secure Authentication**: Supports Firebase Authentication, including anonymous guest login and Google Sign-In.
-* **Favorites & History**: Quickly log frequently or recently consumed drinks.
+- Log a drink (category, amount, price, date/time) and see it in a filterable history list
+- Local search over a small bundled beer dataset
+- Favourite/recent drinks for quick re-logging
+- Anonymous sign-in, backed by a local Room database + Firebase
 
-## Tech Stack
+## What's still stubbed out
 
-* **Language**: Kotlin
-* **UI Framework**: Jetpack Compose
-* **Dependency Injection**: Hilt
-* **Navigation**: Jetpack Compose Navigation (Type-safe)
-* **Database**: Room for local data persistence
-* **Backend**: Firebase (Auth and Firestore)
+- API for each category needs doings
+- Analytics screens
 
-## Project Structure
+## Tech stack
 
-The application follows a clean architecture pattern:
-* **`data/`**: Contains local Room databases, DAOs, repositories, and remote API sources.
-* **`domain/`**: Includes business logic handlers for different drink categories (Beer, Wine, Spirits, etc.) and use cases.
-* **`ui/`**: 
-    * **`components/`**: Reusable UI elements like progress bars, navigation bars, and specialized graphs.
-    * **`screens/`**: Main UI screens (Home, Analytics, List, Add Drink, Search).
-    * **`viewmodel/`**: State management for UI components.
-* **`utils/`**: Helper classes for dates and other common tasks.
+- Kotlin + Jetpack Compose (Material 3)
+- Hilt for DI, type-safe Compose Navigation
+- Room for local persistence, Firebase (Auth + Firestore) for the rest
+- Paging 3 for the history list
 
-## Getting Started
+## Project layout
 
-### Prerequisites
-* Android Studio Ladybug or newer
-* JDK 11
-* Min SDK: 32 / Target SDK: 36
+- `data/` - Room DB, DAOs, repositories, remote sources
+- `domain/` - per-category logic (beer, wine, spirits, ...) and use cases
+- `ui/` - `components/`, `screens/`, `viewmodel/` (fairly standard MVVM/UDF split)
+- `utils/` - date helpers and misc
 
-### Installation
-1.  Clone the repository.
-2.  Set up a Firebase project and add your `google-services.json` to the `app/` directory.
-3.  Build and run the app on an emulator or physical device.
+## Running it
 
----
-*This is a "side project for funsies."*
+1. Clone the repo
+2. Create a Firebase project and drop your own `google-services.json` into `app/src/`
+3. Open in Android Studio (Ladybug+, JDK 11), min SDK 32 / target SDK 36, run
+
+

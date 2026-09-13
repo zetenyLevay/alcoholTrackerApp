@@ -5,17 +5,21 @@ package com.example.alcoholtracker.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -50,6 +54,45 @@ fun HomeTopBar(onCalendarClick: () -> Unit) {
                     contentDescription = "Select Date",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
+            }
+        }
+    )
+}
+
+@Composable
+fun FilterTopBar(
+    onDismissRequest: () -> Unit,
+    onResetClick: () -> Unit
+){
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            titleContentColor = MaterialTheme.colorScheme.primary
+        ),
+        navigationIcon = {
+            IconButton(onClick = { onDismissRequest() },
+                colors = IconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface,
+                )
+            ){
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Close",
+                )
+            }
+        },
+        title = {
+            Text("Filters")
+        },
+        actions = {
+            TextButton(
+                onClick = { onResetClick() },
+                modifier = Modifier.padding(8.dp),
+            ) {
+                Text("Reset",color = MaterialTheme.colorScheme.primary)
             }
         }
     )
