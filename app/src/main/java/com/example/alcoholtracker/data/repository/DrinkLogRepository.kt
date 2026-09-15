@@ -131,7 +131,6 @@ class DrinkLogRepository @Inject constructor(
             return null
         }
 
-        // 2. Pass everything directly to the DAO
         return drinkLogDao.getDailySummary(
             userId = userId,
             startDate = startDate,

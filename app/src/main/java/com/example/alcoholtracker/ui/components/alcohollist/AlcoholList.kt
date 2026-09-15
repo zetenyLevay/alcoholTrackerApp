@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -70,9 +71,26 @@ fun AlcoholListFull(
 ) {
 
     val count = drinkLogs.itemCount
+    val refresh = drinkLogs.loadState.refresh
 
     Box(modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {
+
+        when {
+            refresh is LoadState.Loading -> CircularProgressIndicator()
+
+            refresh is LoadState.Error -> Text(
+                text = refresh.error.message ?: "Failed to load drinks",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+
+            count == 0 -> Text(
+                text = "No drinks match your search",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()

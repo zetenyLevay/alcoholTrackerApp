@@ -18,7 +18,7 @@ A small android project to connect to my uni years. It tracks and shows your alc
 
 - Kotlin + Jetpack Compose (Material 3)
 - Hilt for DI, type-safe Compose Navigation
-- Room for local persistence, Firebase (Auth + Firestore) for the rest
+- Room for local persistence, Firebase for the rest
 - Paging 3 for the history list
 
 ## Project layout
