@@ -51,7 +51,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun signOut() {
         auth.signOut()
     }
 }

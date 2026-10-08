@@ -2,6 +2,7 @@ package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.alcoholtracker.data.model.User
 import com.example.alcoholtracker.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,9 @@ sealed interface UserEvents {
     data object SignUp : UserEvents
     data object ForgotPassword : UserEvents
     data object AnonymousSignIn : UserEvents
+    data object SignOut: UserEvents
     data object ConsumeEffect : UserEvents
+
 }
 
 sealed interface UserEffect {
@@ -49,6 +52,7 @@ class AuthViewModel @Inject constructor(
             UserEvents.AnonymousSignIn -> signInAnonymously()
             UserEvents.ConsumeEffect -> consumeEffect()
             UserEvents.ForgotPassword -> forgotPassword()
+            UserEvents.SignOut -> signOut();
         }
     }
 
@@ -57,6 +61,10 @@ class AuthViewModel @Inject constructor(
     }
     private fun signUp(email: String, password: String) {
 
+    }
+
+    private fun signOut(){
+        userRepo.signOut()
     }
 
     private fun signInAnonymously() {

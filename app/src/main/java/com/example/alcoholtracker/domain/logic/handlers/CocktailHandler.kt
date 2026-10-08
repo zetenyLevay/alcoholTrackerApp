@@ -10,7 +10,10 @@ class CocktailHandler @Inject constructor(
     private val source: BeerRemoteSource
 ) : DrinkCategoryHandler {
     override suspend fun fetchSuggestions(query: String): List<Drink> {
-        TODO("Not yet implemented")
+         return listOf(
+            Drink(4, "Espresso Martini", 13.0, "Cocktail"),
+            Drink(5, "Long Island Ice Tea", 14.0, "Cocktail")
+        )
     }
 
     override fun getUnitOptions(): List<DrinkUnit> {

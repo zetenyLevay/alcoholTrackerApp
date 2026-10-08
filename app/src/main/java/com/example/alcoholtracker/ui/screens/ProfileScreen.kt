@@ -11,12 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
+import com.example.alcoholtracker.ui.viewmodel.UserEvents
 
 @Composable
 fun ProfileScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
 ){
-
+    ProfileScreen(onLogout = { authViewModel.processEvent(UserEvents.SignOut) })
 }
 
 @Composable
