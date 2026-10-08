@@ -16,17 +16,17 @@ enum class AnalyticsTabs(
 ) {
     Overview(
         title = "Overview",
-        selectedIcon = Icons.Outlined.Analytics,
-        unSelectedIcon = Icons.Filled.Analytics,
+        selectedIcon = Icons.Filled.Analytics,
+        unSelectedIcon = Icons.Outlined.Analytics,
     ),
     Finance(
         title = "Finance",
-        selectedIcon = Icons.Outlined.Money,
-        unSelectedIcon = Icons.Filled.Money,
+        selectedIcon = Icons.Filled.Money,
+        unSelectedIcon = Icons.Outlined.Money,
     ),
     Health(
         title = "Health",
-        selectedIcon = Icons.Outlined.MonitorHeart,
-        unSelectedIcon = Icons.Filled.MonitorHeart,
+        selectedIcon = Icons.Filled.MonitorHeart,
+        unSelectedIcon = Icons.Outlined.MonitorHeart,
     )
 }

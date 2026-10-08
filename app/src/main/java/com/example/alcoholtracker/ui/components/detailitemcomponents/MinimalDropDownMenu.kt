@@ -3,12 +3,15 @@ package com.example.alcoholtracker.ui.components.detailitemcomponents
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +33,6 @@ fun MinimalDropdownMenu(
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = "More options",
-                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
         DropdownMenu(
@@ -38,12 +40,24 @@ fun MinimalDropdownMenu(
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Edit Drink") },
-                onClick = { onEditClick() }
+                text = { Text("Edit drink") },
+                leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onEditClick()
+                }
             )
             DropdownMenuItem(
-                text = { Text("Delete Drink") },
-                onClick = { onDeleteClick() }
+                text = { Text("Delete drink") },
+                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onDeleteClick()
+                },
+                colors = MenuDefaults.itemColors(
+                    textColor = MaterialTheme.colorScheme.error,
+                    leadingIconColor = MaterialTheme.colorScheme.error
+                )
             )
         }
     }

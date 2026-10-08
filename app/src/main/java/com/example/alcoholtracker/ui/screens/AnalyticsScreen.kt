@@ -50,6 +50,7 @@ fun AnalyticsScreen(
 
             PrimaryTabRow(
                 selectedTabIndex = selectedTabIndex.value,
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 AnalyticsTabs.entries.forEachIndexed { index, currentTab ->
@@ -65,7 +66,7 @@ fun AnalyticsScreen(
                             Icon(
                                 imageVector = if (selectedTabIndex.value == index)
                                     currentTab.selectedIcon else currentTab.unSelectedIcon,
-                                contentDescription = "Tab Icon"
+                                contentDescription = null
                             )
                         }
                     )

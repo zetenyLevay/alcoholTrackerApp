@@ -113,9 +113,9 @@ fun DetailedLogScreen(
             ImageCard(
                 src = drinkLog.imgURI?.toInt() ?: src,
                 name = drinkLog.name,
-                description = "A glass of ${drinkLog.category.name }",
+                description = "A glass of ${drinkLog.category.nameString.lowercase()}",
                 abv = drinkLog.alcoholPercentage ?: 0.0,
-                category = drinkLog.category.name
+                category = drinkLog.category.nameString
             )
             CardGrid(
                 cost = drinkLog.cost ?: 0.0,
@@ -124,9 +124,9 @@ fun DetailedLogScreen(
             )
             DetailRow()
             LocationCard(
-                location = drinkLog.locationName ?: "No Location",
-                notes = drinkLog.notes ?: "No Notes",
-                recipient = drinkLog.recipient ?: "No Recipient"
+                location = drinkLog.locationName.orEmpty(),
+                notes = drinkLog.notes.orEmpty(),
+                recipient = drinkLog.recipient.orEmpty()
             )
             Spacer(modifier = Modifier.height(12.dp))
 

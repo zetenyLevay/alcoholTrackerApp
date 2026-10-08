@@ -70,7 +70,7 @@ fun DrinkAutoComplete(
         Text(
             text = "Drink",
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
         ExposedDropdownMenuBox(
@@ -90,7 +90,7 @@ fun DrinkAutoComplete(
                     .clickable { expanded = true }
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                placeholder = { Text("Select a drink...") }
+                placeholder = { Text("Select a drink…") }
             )
 
             if (options.isNotEmpty()) {

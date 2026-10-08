@@ -13,7 +13,7 @@ fun EditButton(onClick: () -> Unit) {
     ) {
         Icon(
             Icons.Default.Edit,
-            "Edit Drink",
+            "Edit drink",
         )
     }
 }

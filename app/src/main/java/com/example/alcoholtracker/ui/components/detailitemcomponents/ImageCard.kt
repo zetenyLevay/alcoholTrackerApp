@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.R
+import com.example.alcoholtracker.utils.formatAbv
 import com.example.compose.AlcoholTrackerTheme
 
 @Composable
@@ -82,7 +83,7 @@ fun ImageCard(
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     TagLabel(
-                        text = "$abv% ABV",
+                        text = formatAbv(abv),
                         backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer)
                 }
@@ -91,9 +92,9 @@ fun ImageCard(
 
                     Text(
                         text = name,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = Color.White,
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

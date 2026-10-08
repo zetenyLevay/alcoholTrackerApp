@@ -3,7 +3,7 @@ package com.example.alcoholtracker.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -30,7 +30,7 @@ fun BottomNavigationBar(navController: NavController, currentDestination: NavDes
 
     val topLevelRoutes = listOf(
         TopLevelRoute("Home", Home, Icons.Default.Home),
-        TopLevelRoute("List", List, Icons.Default.FormatListNumbered),
+        TopLevelRoute("History", List, Icons.Default.History),
         TopLevelRoute("Analytics", Overview, Icons.Default.Analytics),
         TopLevelRoute("Profile", Profile, Icons.Default.Person)
 
@@ -55,7 +55,7 @@ fun BottomNavigationBar(navController: NavController, currentDestination: NavDes
                 icon = {
                     Icon(
                         destination.icon,
-                        contentDescription = "Icon"
+                        contentDescription = null
                     )
                 },
                 label = { Text(destination.name) }

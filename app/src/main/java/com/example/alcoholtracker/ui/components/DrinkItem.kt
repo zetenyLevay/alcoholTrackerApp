@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,13 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.alcoholtracker.R
 import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import com.example.alcoholtracker.ui.components.detailitemcomponents.TagLabel
+import com.example.alcoholtracker.utils.formatAbv
+import com.example.alcoholtracker.utils.formatCost
+import com.example.alcoholtracker.utils.formatVolume
 import com.example.compose.AlcoholTrackerTheme
 import java.time.LocalDateTime
 
@@ -36,16 +40,16 @@ fun DrinkItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .size(72.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .height(72.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Icon(
-            painterResource(R.drawable.beer),
-            "Category Icon",
-            modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(8.dp)).padding(8.dp),
+            painterResource(item.category.icon),
+            contentDescription = null,
+            modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surfaceContainerHighest, shape = RoundedCornerShape(8.dp)).padding(8.dp),
             tint = MaterialTheme.colorScheme.primary)
         Column(
             modifier = Modifier.weight(1f),
@@ -53,19 +57,21 @@ fun DrinkItem(
             horizontalAlignment = Alignment.Start
         ) {
             Text(item.name,
-                style = MaterialTheme.typography.titleMedium)
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TagLabel(
-                    text = item.category.name,
+                    text = item.category.nameString,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest
                 )
                 Text(
-                    "${item.alcoholPercentage} % ABV",
-                    style = MaterialTheme.typography.labelLarge,
+                    formatAbv(item.alcoholPercentage ?: 0.0),
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -74,13 +80,12 @@ fun DrinkItem(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.End
         ) {
-            Text("${item.amount}ml",
-                style = MaterialTheme.typography.labelLarge,
+            Text(formatVolume(item.amount),
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
-
                 )
-            Text("€${String.format("%.2f", item.cost)}",
-                style = MaterialTheme.typography.labelLarge,
+            Text(formatCost(item.cost ?: 0.0),
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

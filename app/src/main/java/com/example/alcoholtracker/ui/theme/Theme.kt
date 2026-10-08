@@ -1,6 +1,6 @@
 package com.example.compose
-import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -8,12 +8,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 import com.example.ui.theme.AppTypography
 
 private val lightScheme = lightColorScheme(
@@ -259,7 +255,7 @@ val unspecified_scheme = ColorFamily(
 
 @Composable
 fun AlcoholTrackerTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+,
     // And it is set to false for versions older than that.
     dynamicColor: Boolean = false,
@@ -274,15 +270,6 @@ fun AlcoholTrackerTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = Color.White.toArgb() // change color status bar here
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-        }
-    }
-
 
   MaterialTheme(
     colorScheme = colorScheme,

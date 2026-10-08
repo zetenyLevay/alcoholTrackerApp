@@ -82,7 +82,7 @@ fun FilterDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Category,
-                    "Category",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.padding(start = 16.dp))
@@ -96,11 +96,11 @@ fun FilterDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Percent,
-                    "Percentage",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.padding(start = 16.dp))
-                Text("ABV Strength",
+                Text("ABV strength",
                     style = MaterialTheme.typography.titleMedium)
             }
             Row(
@@ -110,11 +110,11 @@ fun FilterDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Money,
-                    "Price",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.padding(start = 16.dp))
-                Text("Price Range",
+                Text("Price range",
                     style = MaterialTheme.typography.titleMedium)
             }
             Row(
@@ -124,11 +124,11 @@ fun FilterDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.CalendarToday,
-                    "Set date",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.padding(start = 16.dp))
-                Text("Date Range",
+                Text("Date range",
                     style = MaterialTheme.typography.titleMedium)
             }
             Row(
@@ -138,7 +138,7 @@ fun FilterDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Person,
-                    "Set date",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.padding(start = 16.dp))
@@ -160,7 +160,7 @@ fun FilterDialog(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.Start,
                 ) {
-                    Icon(Icons.Filled.FavoriteBorder, "Heart",
+                    Icon(Icons.Filled.FavoriteBorder, contentDescription = null,
                         modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHighest).padding(4.dp))
                 }
             }

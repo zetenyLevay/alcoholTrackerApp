@@ -6,8 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -82,7 +82,7 @@ fun HistoryScreen(
                 viewModel.processEvent(HistoryEvent.ConsumeEffect)
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
-                        message = "Item Removed",
+                        message = "Drink removed",
                         action = SnackbarAction(
                             name = "Undo",
                             action = { viewModel.processEvent(HistoryEvent.OnUndoRemoveItem(effect.log)) }
@@ -122,7 +122,7 @@ fun HistoryScreen(
 
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             AddButton {
                 if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
@@ -139,9 +139,9 @@ fun HistoryScreen(
                 ) {
                     TextField(
                         state = filterState.queryState,
-                        modifier = Modifier.weight(1f).height(44.dp),
-                        leadingIcon = {Icon(Icons.Default.Search, "Search")},
-                        placeholder = {Text("Search history...")},
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        leadingIcon = {Icon(Icons.Default.Search, contentDescription = null)},
+                        placeholder = {Text("Search history…")},
                         lineLimits = TextFieldLineLimits.SingleLine,
                         shape = RoundedCornerShape(12.dp),
                         colors = TextFieldDefaults.colors(
@@ -150,14 +150,14 @@ fun HistoryScreen(
                             disabledIndicatorColor = Color.Transparent,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                         ),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
                     )
                     IconButton(
                         onClick = { /* TODO: Open filter sheet or dialog */ },
                         modifier = Modifier.padding(start = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
-                            .size(44.dp)
+                            .size(48.dp)
 
                     ) {
                         Icon(

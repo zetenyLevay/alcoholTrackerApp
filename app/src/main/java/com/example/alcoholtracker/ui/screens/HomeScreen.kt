@@ -46,6 +46,9 @@ import com.example.alcoholtracker.ui.viewmodel.HomeEvent.OnItemRemove
 import com.example.alcoholtracker.ui.viewmodel.HomeEvent.OnProgressBarUpdate
 import com.example.alcoholtracker.ui.viewmodel.HomeUiState
 import com.example.alcoholtracker.ui.viewmodel.HomeViewModel
+import com.example.alcoholtracker.utils.formatCost
+import com.example.alcoholtracker.utils.formatDrinkCount
+import com.example.alcoholtracker.utils.formatVolume
 
 @Composable
 fun HomeScreen(
@@ -77,7 +80,7 @@ fun HomeScreen(
                 viewModel.processEvent(ConsumeEffect)
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
-                        message = "Item Removed",
+                        message = "Drink removed",
                         action = SnackbarAction(
                             name = "Undo",
                             action = { viewModel.processEvent(HomeEvent.OnUndoItemRemove(effect.log)) }
@@ -112,7 +115,7 @@ fun HomeScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { HomeTopBar() {} },
+        topBar = { HomeTopBar() },
         floatingActionButton = {
             AddButton(onClick = {
                 if(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)){
@@ -164,20 +167,20 @@ fun HomeScreen(
 
                 val (primaryText, secondaryText, progress) = when (activeType) {
                     ProgressBarType.MONEY -> Triple(
-                        "${state.currentMoneySpent}/$target$",
-                        "${state.drinkCount} drinks, ${state.currentAmountMl}ml",
+                        "${formatCost(state.currentMoneySpent)} / ${formatCost(target)}",
+                        "${formatDrinkCount(state.drinkCount)} · ${formatVolume(state.currentAmountMl)}",
                         (state.currentMoneySpent / target).toFloat()
                     )
 
                     ProgressBarType.COUNT -> Triple(
-                        "${state.drinkCount}/${target.toInt()} drinks",
-                        "${state.currentAmountMl}ml, ${state.currentMoneySpent}$",
+                        "${state.drinkCount} / ${target.toInt()} drinks",
+                        "${formatVolume(state.currentAmountMl)} · ${formatCost(state.currentMoneySpent)}",
                         (state.drinkCount / target).toFloat()
                     )
 
                     ProgressBarType.AMOUNT -> Triple(
-                        "${state.currentAmountMl}/${target.toInt()}ml",
-                        "${state.currentMoneySpent}$ , ${state.drinkCount} drinks",
+                        "${formatVolume(state.currentAmountMl)} / ${formatVolume(target.toInt())}",
+                        "${formatCost(state.currentMoneySpent)} · ${formatDrinkCount(state.drinkCount)}",
                         (state.currentAmountMl / target).toFloat()
                     )
                 }

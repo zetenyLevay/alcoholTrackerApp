@@ -2,21 +2,15 @@
 
 package com.example.alcoholtracker.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,38 +18,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.ui.components.detailitemcomponents.MinimalDropdownMenu
-import com.example.alcoholtracker.utils.getFormattedDate
-import java.time.LocalDate
 
 
 @Composable
-fun HomeTopBar(onCalendarClick: () -> Unit) {
+fun HomeTopBar() {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CurrentDayText()
-            }
-        },
-        actions = {
-            IconButton(onClick = onCalendarClick) {
-                Icon(
-                    Icons.Default.DateRange,
-                    contentDescription = "Select Date",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+        title = { TopBarTitle("Tonight") },
+        colors = appTopBarColors(),
     )
 }
 
@@ -65,19 +38,9 @@ fun FilterTopBar(
     onResetClick: () -> Unit
 ){
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            titleContentColor = MaterialTheme.colorScheme.primary
-        ),
+        colors = appTopBarColors(),
         navigationIcon = {
-            IconButton(onClick = { onDismissRequest() },
-                colors = IconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                )
-            ){
+            IconButton(onClick = { onDismissRequest() }) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Close",
@@ -85,14 +48,14 @@ fun FilterTopBar(
             }
         },
         title = {
-            Text("Filters")
+            TopBarTitle("Filters")
         },
         actions = {
             TextButton(
                 onClick = { onResetClick() },
                 modifier = Modifier.padding(8.dp),
             ) {
-                Text("Reset",color = MaterialTheme.colorScheme.primary)
+                Text("Reset")
             }
         }
     )
@@ -101,26 +64,8 @@ fun FilterTopBar(
 @Composable
 fun AnalyticsTopBar() {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        title = {
-            Row {
-                Text("Analytics")
-            }
-        },
-        modifier = Modifier.statusBarsPadding()
-    )
-}
-
-@Composable
-fun CurrentDayText() {
-    val todayDate = getFormattedDate(LocalDate.now())
-    val yesterdayDate = getFormattedDate(LocalDate.now().plusDays(-1))
-    Text(
-        "$yesterdayDate - $todayDate",
-        style = MaterialTheme.typography.titleLarge,
+        title = { TopBarTitle("Analytics") },
+        colors = appTopBarColors(),
     )
 }
 
@@ -130,21 +75,10 @@ fun LogDrinkTopBar(
     isEdit: Boolean
 ) {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
+        colors = appTopBarColors(),
         title = {
-            Row {
-                if (isEdit) {
-                    Text("Edit Drink")
-                } else {
-                    Text("Log Drink")
-                }
-
-            }
+            TopBarTitle(if (isEdit) "Edit drink" else "Log drink")
         },
-        modifier = Modifier.statusBarsPadding(),
         navigationIcon = {
             IconButton(
                 onClick = { onBackClick() }
@@ -152,7 +86,6 @@ fun LogDrinkTopBar(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -170,17 +103,10 @@ fun DetailTopBar(
     scrollBehavior: TopAppBarScrollBehavior
 ) {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary ,
-            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
+        colors = appTopBarColors(),
         title = {
-            Text("Drink Details")
+            TopBarTitle("Drink details")
         },
-        modifier = Modifier.statusBarsPadding(),
         navigationIcon = {
             IconButton(
                 onClick = { onBackClick() }
@@ -199,13 +125,14 @@ fun DetailTopBar(
                     if (isFavorite) {
                         Icon(
                             Icons.Filled.Favorite,
-                            contentDescription = "Favorite",
+                            contentDescription = "Remove from favorites",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     else{
                         Icon(
                             Icons.Filled.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = "Add to favorites",
                         )
                     }
                 }
@@ -222,18 +149,18 @@ fun DetailTopBar(
 @Composable
 fun HistoryTopBar(){
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("History")
-            }
-        },
+        title = { TopBarTitle("History") },
+        colors = appTopBarColors(),
     )
 }
 
+@Composable
+private fun appTopBarColors() = TopAppBarDefaults.topAppBarColors(
+    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+)
+
+@Composable
+private fun TopBarTitle(text: String) {
+    Text(text, fontWeight = FontWeight.SemiBold)
+}

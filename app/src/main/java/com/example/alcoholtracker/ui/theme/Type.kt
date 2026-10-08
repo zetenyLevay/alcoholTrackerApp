@@ -16,19 +16,21 @@ val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
-val bodyFontFamily = FontFamily(
-    Font(
-        googleFont = GoogleFont("Plus Jakarta Sans"),
-        fontProvider = provider,
-    )
+private val fontWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold)
+
+private fun googleFontFamily(name: String) = FontFamily(
+    fontWeights.map { weight ->
+        Font(
+            googleFont = GoogleFont(name),
+            fontProvider = provider,
+            weight = weight,
+        )
+    }
 )
 
-val displayFontFamily = FontFamily(
-    Font(
-        googleFont = GoogleFont("Manrope"),
-        fontProvider = provider,
-    )
-)
+val bodyFontFamily = googleFontFamily("Plus Jakarta Sans")
+
+val displayFontFamily = googleFontFamily("Manrope")
 
 // Default Material 3 typography values
 val baseline = Typography()

@@ -48,7 +48,7 @@ fun ABVAndPriceTextFields(
             Text(
                 text = "ABV",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
@@ -104,7 +104,7 @@ fun ABVAndPriceTextFields(
             Text(
                 text = "Price",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
             OutlinedTextField(
@@ -165,7 +165,7 @@ fun LocationTextField(
         Text(
                 text = "Location",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
 
@@ -202,7 +202,7 @@ fun NotesTextField(
         Text(
                 text = "Notes",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
 

@@ -30,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.R
@@ -67,36 +66,27 @@ fun LocationCard(
                     modifier = Modifier
                         .size(iconSize))
                 Spacer(modifier = Modifier.size(iconIndent))
-                Text(text = location.ifEmpty { "No Location" },
-                    fontWeight = if(location.isNotEmpty()){
-                        FontWeight.Bold}
-                    else{
-                        FontWeight.Normal
-                        },
-                    fontStyle = if (location.isEmpty()) {
-                        FontStyle.Italic
-                    } else {
-                        MaterialTheme.typography.headlineSmall.fontStyle
-                    },
-                )
+                DetailText(text = location, emptyText = "No location")
             }
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
-                modifier = Modifier
-                    .padding(start = total)
-                    .fillMaxWidth()
-                    .height(200.dp)
-            ) {
-                Image(
-                painter = painterResource(R.drawable.map_placeholder),
-                contentDescription = "Map",
-                    contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            if (location.isNotEmpty()) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier
+                        .padding(start = total)
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.map_placeholder),
+                        contentDescription = "Map",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
             }
             Row(
             ) {
@@ -105,25 +95,7 @@ fun LocationCard(
                     modifier = Modifier
                         .size(iconSize))
                 Spacer(modifier = Modifier.size(iconIndent))
-
-                
-
-
-                    Text(recipient.ifEmpty { "None" },
-                    fontWeight = if(recipient.isNotEmpty()){
-                        FontWeight.Bold}
-                    else{
-                        FontWeight.Thin
-                        },
-                    fontStyle = if (recipient.isEmpty()) {
-                        FontStyle.Italic
-                    } else {
-                        MaterialTheme.typography.headlineSmall.fontStyle
-                    },
-                        fontSize = MaterialTheme.typography.labelLarge.fontSize
-                )
-
-
+                DetailText(text = recipient, emptyText = "No recipient")
             }
             HorizontalDivider(modifier = Modifier
                 .padding(start = total))
@@ -136,17 +108,26 @@ fun LocationCard(
                     modifier = Modifier
                         .size(iconSize))
                 Spacer(modifier = Modifier.size(iconIndent))
-
-                Text(
-                    text = notes.ifEmpty { "No notes" },
-                    fontStyle = if (notes.isEmpty()) {
-                        FontStyle.Italic
-                    } else {
-                        MaterialTheme.typography.bodyMedium.fontStyle
-                    },
-                )
+                DetailText(text = notes, emptyText = "No notes")
             }
         }
+    }
+}
+
+@Composable
+private fun DetailText(text: String, emptyText: String) {
+    if (text.isNotEmpty()) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+    } else {
+        Text(
+            text = emptyText,
+            style = MaterialTheme.typography.bodyLarge,
+            fontStyle = FontStyle.Italic,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

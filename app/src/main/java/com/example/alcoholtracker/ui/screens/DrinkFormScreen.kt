@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,7 +71,7 @@ fun DrinkFormScreen(
                 onAddDrink()
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
-                        message = "Drink Saved",
+                        message = "Drink saved",
                     )
                 )
 
@@ -130,8 +131,8 @@ fun DrinkFormScreen(
                     {
                         onEvent(OnSaveDrinkLog)
                     }},
-                icon = { Icon(Icons.Filled.Add, "Add Button") },
-                text = { Text(if (state.isEdit) "Update Drink" else "Add Drink") }
+                icon = { Icon(if (state.isEdit) Icons.Filled.Check else Icons.Filled.Add, contentDescription = null) },
+                text = { Text(if (state.isEdit) "Save changes" else "Add drink") }
 
             )
         },

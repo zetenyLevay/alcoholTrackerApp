@@ -48,7 +48,7 @@ fun CategoryDropDown(
         Text(
             text = "Category",
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 16.dp)
         )
         ExposedDropdownMenuBox(
@@ -96,7 +96,7 @@ fun CategoryDropDown(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = option.icon),
-                                contentDescription = "Category Icon"
+                                contentDescription = null
                             )
                         },
                         onClick = {

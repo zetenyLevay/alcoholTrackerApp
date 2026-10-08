@@ -1,7 +1,7 @@
 package com.example.alcoholtracker.ui.components.logComponents
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,7 +24,7 @@ fun LogNavBar(navController: NavController, currentDestination: NavDestination?)
 
     val topLevelRoutes = listOf(
         LogNavRoute("Search", Search, Icons.Default.Search),
-        LogNavRoute("Custom", AddDrink(), Icons.Default.Code),
+        LogNavRoute("Custom", AddDrink(), Icons.Default.Edit),
     )
 
 
@@ -49,7 +49,7 @@ fun LogNavBar(navController: NavController, currentDestination: NavDestination?)
                 icon = {
                     Icon(
                         destination.icon,
-                        contentDescription = "Icon"
+                        contentDescription = null
                     )
                 },
                 label = { Text(destination.name) }

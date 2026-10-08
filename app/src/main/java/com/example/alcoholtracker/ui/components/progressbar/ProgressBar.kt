@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,12 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.compose.AlcoholTrackerTheme
+import com.example.compose.goalGaugeColors
 
 @Composable
 fun ProgressBar(
@@ -37,43 +37,43 @@ fun ProgressBar(
     onEditClick: () -> Unit,
 ){
 
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ){
-        IconButton(
-            onClick = onEditClick
-        ){
-            Icon(
-                Icons.Default.Edit,
-                contentDescription = "Edit",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 text = primaryText,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 4.dp)
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(horizontal = 40.dp)
             )
-            Text(
-                text = secondaryText,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ProgressBarGradient(
-                progress = progress,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+            IconButton(
+                onClick = onEditClick,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .offset(x = 12.dp)
+            ){
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = "Edit goal",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
+        Text(
+            text = secondaryText,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ProgressBarGradient(progress = progress)
     }
 
 }
@@ -84,43 +84,28 @@ fun ProgressBarGradient(
     modifier: Modifier = Modifier
 ){
     val safeProgress = progress.coerceIn(0f, 1f)
+    val shape = RoundedCornerShape(50)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(32.dp)
-            .clip(RoundedCornerShape(50.dp))
-            .border(
-                width = 4.dp,
-                brush = Brush.linearGradient(
-                    listOf(
-                        Color(0xFFFFD54F),
-                        Color(0xFFF57C00),
-                        Color(0xFFB71C1C)
-                    )
-                ),
-                shape = RoundedCornerShape(50.dp)
-            )
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(safeProgress, 0f..1f) }
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFFFFD54F),
-                            Color(0xFFF57C00),
-                            Color(0xFFB71C1C)
-                        )
-                    )
-                )
+                .background(Brush.horizontalGradient(goalGaugeColors))
         )
         if (safeProgress < 1f) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(1f - safeProgress)
                     .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     .align(Alignment.CenterEnd)
             )
         }

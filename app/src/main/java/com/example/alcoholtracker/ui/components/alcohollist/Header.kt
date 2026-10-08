@@ -12,10 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.example.alcoholtracker.data.model.DrinkLog
-import com.example.compose.AlcoholTrackerTheme
+import com.example.alcoholtracker.utils.formatCost
+import com.example.alcoholtracker.utils.formatVolume
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -27,19 +28,17 @@ fun DateHeader(
     totalCost: Double,
     modifier: Modifier = Modifier) {
 
-    val formattedDate = if (date.dayOfMonth == LocalDate.now().dayOfMonth) {
-        "Today"
-    } else if (date.dayOfMonth == LocalDate.now().minusDays(1).dayOfMonth) {
-        "Yesterday"
-    } else {
-        date.format(DateTimeFormatter.ofPattern("E, MMM d"))
+    val today = LocalDate.now()
+    val formattedDate = when (date) {
+        today -> "Today"
+        today.minusDays(1) -> "Yesterday"
+        else -> date.format(DateTimeFormatter.ofPattern("E, MMM d"))
     }
 
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ){
@@ -47,12 +46,13 @@ fun DateHeader(
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(formattedDate, modifier = Modifier
-                .weight(1f),
+                .weight(1f)
+                .semantics { heading() },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text("Total: ${totalAmount}ml",
-                style = MaterialTheme.typography.titleMedium,
+            Text("Total: ${formatVolume(totalAmount)}",
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
 
 
@@ -63,13 +63,9 @@ fun DateHeader(
                     .background(color = MaterialTheme.colorScheme.onSurfaceVariant, shape = CircleShape)
             )
 
-            Text("€${String.format("%.2f", totalCost)}",
-                style = MaterialTheme.typography.titleMedium,
+            Text(formatCost(totalCost),
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-
-
-
         }
     }
 

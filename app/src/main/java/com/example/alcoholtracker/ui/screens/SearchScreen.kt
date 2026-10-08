@@ -88,6 +88,7 @@ fun SearchScreen(
 
             PrimaryTabRow(
                 selectedTabIndex = selectedTabIndex.value,
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 modifier = Modifier.fillMaxWidth()
             )
             {

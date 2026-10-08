@@ -31,11 +31,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.alcoholtracker.R
 import com.example.alcoholtracker.ui.components.ArcBackground
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 import com.example.alcoholtracker.ui.viewmodel.UserEvents
@@ -66,21 +70,26 @@ fun SignInScreen(
                 .padding(16.dp),
 
         ) {
-            Button(
-            onClick = {viewModel.processEvent(UserEvents.AnonymousSignIn)},
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.semantics { heading() }
             )
-        ) {
-            Text("Continue as Guest")
-        }
-
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Track your drinks, spending and nights out.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                onClick = {viewModel.processEvent(UserEvents.AnonymousSignIn)},
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Continue as guest")
+            }
         }
     }
-
-
-
-
-
 }

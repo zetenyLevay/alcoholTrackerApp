@@ -16,6 +16,6 @@ fun AddButton(onClick: () -> Unit){
         onClick = { onClick() },
         )
     {
-        Icon(Icons.Filled.Add, "Add Button")
+        Icon(Icons.Filled.Add, "Log drink")
     }
 }

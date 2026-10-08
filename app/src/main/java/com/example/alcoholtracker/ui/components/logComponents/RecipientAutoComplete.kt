@@ -59,7 +59,7 @@ fun RecipientAutoComplete(
         Text(
             text = "Recipient",
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
         ExposedDropdownMenuBox(

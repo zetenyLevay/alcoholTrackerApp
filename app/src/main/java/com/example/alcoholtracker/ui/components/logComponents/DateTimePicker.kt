@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -73,57 +74,50 @@ fun DateAndTimePicker(
         currentTime?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: ""
     }
 
-    Column() {
-        Row(  ) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column(modifier = Modifier.weight(0.5f)) {
             Text(
                 text = "Time",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-
-                    .padding(start = 8.dp, bottom = 8.dp)
-                    .weight(0.5F)
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
-            Text(
-                text = "Date",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(start = 16.dp, bottom = 8.dp)
-                    .weight(1F)
-            )
-
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
             OutlinedTextField(
                 value = formattedTime,
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
                 suffix = {
-                    Icon(Icons.Default.Timer, contentDescription = "Time")
+                    Icon(Icons.Default.Timer, contentDescription = null)
                 },
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                     disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledSuffixColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     disabledContainerColor = Color.Transparent
                 ),
                 label = null,
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
-                    .weight(0.5f)
+                    .fillMaxWidth()
                     .clickable(
                         onClick = {
                             showTimeDialog = true
                         }
                     )
-                )
+            )
+        }
 
-
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Date",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            )
             OutlinedTextField(
                 value = formattedDate,
                 onValueChange = {},
@@ -133,78 +127,78 @@ fun DateAndTimePicker(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
                     disabledBorderColor = MaterialTheme.colorScheme.outline,
                     disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledSuffixColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     disabledContainerColor = Color.Transparent
                 ),
-                suffix = { Icon(Icons.Default.CalendarMonth, contentDescription = "Date") },
+                suffix = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
                 label = null,
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
                     .clickable(
                         onClick = {
                             showDateDialog = true
                         }
                     )
-
             )
-
-            if (showDateDialog) {
-
-                DatePickerDialog(
-                    onDismissRequest = { showDateDialog = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            datePickerState.selectedDateMillis?.let { millis ->
-                                val localDate = Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.of("UTC"))
-                                    .toLocalDate()
-                                onDateSelected(localDate)
-                            }
-                            showDateDialog = false
-                        }) {
-                            Text("OK")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDateDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
-            if (showTimeDialog) {
-
-                val timeState = rememberTimePickerState(
-                    initialHour = currentTime?.hour ?: 0,
-                    initialMinute = currentTime?.minute ?: 0,
-                    is24Hour = true
-                )
-
-                TimePickerDialog(
-                    onDismissRequest = { showTimeDialog = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            val selectedTime = LocalTime.of(timeState.hour, timeState.minute)
-                            onTimeSelected(selectedTime)
-                            showTimeDialog = false
-                        }) {
-                            Text("OK")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showTimeDialog = false }) {
-                            Text("Cancel")
-                        }
-                    },
-                    title = { Text("") }
-                ) {
-                    TimePicker(state = timeState)
-
-                }
-
-            }
         }
+    }
+
+    if (showDateDialog) {
+
+        DatePickerDialog(
+            onDismissRequest = { showDateDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val localDate = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                        onDateSelected(localDate)
+                    }
+                    showDateDialog = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDateDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+    if (showTimeDialog) {
+
+        val timeState = rememberTimePickerState(
+            initialHour = currentTime?.hour ?: 0,
+            initialMinute = currentTime?.minute ?: 0,
+            is24Hour = true
+        )
+
+        TimePickerDialog(
+            onDismissRequest = { showTimeDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val selectedTime = LocalTime.of(timeState.hour, timeState.minute)
+                    onTimeSelected(selectedTime)
+                    showTimeDialog = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimeDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Select time") }
+        ) {
+            TimePicker(state = timeState)
+
+        }
+
     }
 }
