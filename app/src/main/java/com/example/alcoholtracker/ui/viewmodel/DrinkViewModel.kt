@@ -1,19 +1,13 @@
 package com.example.alcoholtracker.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.alcoholtracker.data.model.Drink
 import com.example.alcoholtracker.data.repository.DrinkRepository
-import com.example.alcoholtracker.domain.logic.handlers.DrinkHandlerRegistry
-import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkCategory.*
-import com.example.alcoholtracker.domain.model.DrinkUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface DrinkEvent{

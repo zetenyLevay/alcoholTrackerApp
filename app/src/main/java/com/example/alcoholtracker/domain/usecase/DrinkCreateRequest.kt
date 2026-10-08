@@ -1,6 +1,5 @@
 package com.example.alcoholtracker.domain.usecase
 
-import androidx.room.ColumnInfo
 import com.example.alcoholtracker.domain.model.DrinkCategory
 import com.example.alcoholtracker.domain.model.DrinkUnit
 import java.time.LocalDateTime

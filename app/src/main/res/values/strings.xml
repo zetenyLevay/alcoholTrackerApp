@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">Alcohol Tracker</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="viewmodel_message">Message from ViewModel</string>
-    <string name="user_message">Message from user interaction</string>
-    <string name="feature_not_implemented">Feature not yet implemented</string>
 </resources>
