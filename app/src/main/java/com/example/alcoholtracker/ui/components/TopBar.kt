@@ -147,6 +147,30 @@ fun DetailTopBar(
 }
 
 @Composable
+fun ProfileTopBar() {
+    TopAppBar(
+        title = { TopBarTitle("Profile") },
+        colors = appTopBarColors(),
+    )
+}
+
+@Composable
+fun SignUpTopBar(onBackClick: () -> Unit) {
+    TopAppBar(
+        title = { TopBarTitle("Create account") },
+        colors = appTopBarColors(),
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                )
+            }
+        }
+    )
+}
+
+@Composable
 fun HistoryTopBar(){
     TopAppBar(
         title = { TopBarTitle("History") },

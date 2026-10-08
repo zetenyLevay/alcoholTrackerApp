@@ -40,6 +40,7 @@ import com.example.alcoholtracker.ui.navigation.Overview
 import com.example.alcoholtracker.ui.navigation.Profile
 import com.example.alcoholtracker.ui.navigation.Search
 import com.example.alcoholtracker.ui.navigation.SignIn
+import com.example.alcoholtracker.ui.navigation.SignUp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -186,7 +187,19 @@ fun MainScreen(
                 )
             }
             composable<Profile> {
-                ProfileScreen()
+                ProfileScreen(
+                    onCreateAccountClick = {
+                        navController.navigate(SignUp) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable<SignUp> {
+                SignUpScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onAccountCreated = { navController.popBackStack() },
+                )
             }
             composable<Overview> {
                 AnalyticsScreen()
