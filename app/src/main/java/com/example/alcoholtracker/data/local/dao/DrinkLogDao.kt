@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import androidx.room.Update
 import com.example.alcoholtracker.data.model.DrinkLog
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,17 @@ interface DrinkLogDao {
     @Query("SELECT * FROM log WHERE logId = :logId")
     fun getDrinkByIdFlow(logId: Int): Flow<DrinkLog?>
 
-    @Query("SELECT * FROM log WHERE userId = :userId ORDER BY date DESC")
+    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
+    @Query(
+        """
+        SELECT *, MAX(date) AS lastLogged
+        FROM log
+        WHERE userId = :userId
+        GROUP BY name COLLATE NOCASE, category, alcoholPercentage, amount
+        ORDER BY lastLogged DESC
+        LIMIT 20
+        """
+    )
     fun getRecentLogs(userId: String): Flow<List<DrinkLog>>
 
     @Query("""
@@ -50,18 +61,29 @@ interface DrinkLogDao {
     """)
     fun getFilterBounds(userId: String): Flow<FilterBounds?>
 
+    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Query(
         """
-        SELECT *, COUNT(*) as frequency 
-        FROM log 
-        WHERE userId = :userId 
-        GROUP BY name, category, alcoholPercentage, amount 
-        ORDER BY frequency DESC
+        SELECT *, COUNT(*) AS frequency, MAX(date) AS lastLogged
+        FROM log
+        WHERE userId = :userId
+        GROUP BY name COLLATE NOCASE, category, alcoholPercentage, amount
+        ORDER BY frequency DESC, lastLogged DESC
+        LIMIT 20
         """
     )
     fun getFrequentLogs(userId: String): Flow<List<DrinkLog>>
 
-    @Query("Select * from log where userId = :userId and isFavorite = 1")
+    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
+    @Query(
+        """
+        SELECT *, MAX(date) AS lastLogged
+        FROM log
+        WHERE userId = :userId AND isFavorite = 1
+        GROUP BY name COLLATE NOCASE, category, alcoholPercentage, amount
+        ORDER BY lastLogged DESC
+        """
+    )
     fun getFavoritesLogs(userId: String): Flow<List<DrinkLog>>
 
     @Query("SELECT * FROM log WHERE date BETWEEN :start AND :end AND userId = :userId")
