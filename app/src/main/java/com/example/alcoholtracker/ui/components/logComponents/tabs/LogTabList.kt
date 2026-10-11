@@ -1,5 +1,10 @@
 package com.example.alcoholtracker.ui.components.logComponents.tabs
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -37,30 +42,35 @@ fun LogTabList(
     onFavoriteToggle: (DrinkLog) -> Unit,
     listState: LazyListState = rememberLazyListState(),
 ) {
-    if (logs.isEmpty()) {
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        // The list stays composed when it empties so the last item can still animate out
+        LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+            items(logs, key = { it.logId }) { log ->
+                Column(modifier = Modifier.animateItem()) {
+                    LogTabItem(
+                        log = log,
+                        onClick = { onLogClick(log) },
+                        onLogAgainClick = { onLogAgainClick(log) },
+                        onFavoriteToggle = { onFavoriteToggle(log) }
+                    )
+                    HorizontalDivider()
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = logs.isEmpty(),
+            enter = fadeIn(tween(durationMillis = 200, delayMillis = 200)),
+            exit = fadeOut(tween(durationMillis = 100)),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.TopCenter
+                .align(Alignment.TopCenter)
+                .padding(16.dp)
         ) {
             Text(
                 emptyText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        }
-    } else {
-        LazyColumn(state = listState) {
-            items(logs, key = { it.logId }) { log ->
-                LogTabItem(
-                    log = log,
-                    onClick = { onLogClick(log) },
-                    onLogAgainClick = { onLogAgainClick(log) },
-                    onFavoriteToggle = { onFavoriteToggle(log) }
-                )
-                HorizontalDivider()
-            }
         }
     }
 }

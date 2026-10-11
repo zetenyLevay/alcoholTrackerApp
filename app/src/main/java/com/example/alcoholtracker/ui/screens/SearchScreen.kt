@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -81,7 +82,7 @@ fun SearchScreen(
             is SearchEffect.ShowError -> {
                 viewModel.processEvent(ConsumeEffect)
                 SnackbarController.sendEvent(
-                    event = SnackBarEvent(message = effect.message)
+                    event = SnackBarEvent(message = effect.message, type = SnackbarType.ERROR)
                 )
             }
 
@@ -90,6 +91,7 @@ fun SearchScreen(
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
                         message = "${effect.log.name} logged",
+                        type = SnackbarType.SUCCESS,
                         action = SnackbarAction(
                             name = "Undo",
                             action = { viewModel.processEvent(SearchEvent.OnUndoLogAgain(effect.log)) }

@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,7 @@ fun SignUpScreen(
         if (state.effect == UserEffect.AccountCreated) {
             viewModel.processEvent(UserEvents.ConsumeEffect)
             onAccountCreated()
-            SnackbarController.sendEvent(SnackBarEvent(message = "Account created"))
+            SnackbarController.sendEvent(SnackBarEvent(message = "Account created", type = SnackbarType.SUCCESS))
         }
     }
 

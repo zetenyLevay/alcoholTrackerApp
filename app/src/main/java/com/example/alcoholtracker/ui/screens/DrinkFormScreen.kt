@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -72,6 +73,7 @@ fun DrinkFormScreen(
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
                         message = "Drink saved",
+                        type = SnackbarType.SUCCESS,
                     )
                 )
 
@@ -81,7 +83,8 @@ fun DrinkFormScreen(
                 viewModel.processEvent(DrinkLogFormEvent.ConsumeEffect)
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
-                        effect.message
+                        message = effect.message,
+                        type = SnackbarType.ERROR
                     )
                 )
 

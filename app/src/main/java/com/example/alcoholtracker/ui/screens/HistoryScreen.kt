@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -82,6 +83,9 @@ fun HistoryScreen(
             }
             is HistoryEffect.ShowError -> {
                 viewModel.processEvent(HistoryEvent.ConsumeEffect)
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(message = effect.message, type = SnackbarType.ERROR)
+                )
             }
             is HistoryEffect.ShowItemRemoved -> {
                 viewModel.processEvent(HistoryEvent.ConsumeEffect)
@@ -122,10 +126,6 @@ fun HistoryScreen(
 
 
     val lifecycleOwner = LocalLifecycleOwner.current
-
-
-
-
     val listState = rememberLazyListState()
     val isScrolled by remember { derivedStateOf { listState.canScrollBackward } }
     val headerColor = headerColor(isScrolled)
@@ -145,7 +145,7 @@ fun HistoryScreen(
                 Row(
                     modifier = Modifier
                         .background(headerColor)
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
@@ -291,4 +291,3 @@ fun HistoryScreen(
 //        )
 //    }
 //}
-

@@ -81,7 +81,7 @@ interface DrinkLogDao {
         SELECT *, MAX(date) AS lastLogged
         FROM log
         WHERE userId = :userId AND isFavorite = 1
-        GROUP BY name COLLATE NOCASE, category, alcoholPercentage, amount
+        GROUP BY name COLLATE NOCASE, category, alcoholPercentage, amount, cost
         ORDER BY lastLogged DESC
         """
     )
@@ -96,6 +96,7 @@ interface DrinkLogDao {
             AND category = :category
             AND alcoholPercentage IS :alcoholPercentage
             AND amount = :amount
+            AND cost IS :cost
         """
     )
     suspend fun setFavoriteForGroup(
@@ -104,6 +105,7 @@ interface DrinkLogDao {
         category: DrinkCategory,
         alcoholPercentage: Double?,
         amount: Int,
+        cost: Double?,
         isFavorite: Boolean
     )
 

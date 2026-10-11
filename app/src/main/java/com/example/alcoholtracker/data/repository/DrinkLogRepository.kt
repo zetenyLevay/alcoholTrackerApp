@@ -43,7 +43,7 @@ class DrinkLogRepository @Inject constructor(
         drinkLogDao.deleteDrinkLog(log)
     }
 
-    // Recent/frequent/favorite lists are grouped by these columns, so favorite state is applied to the whole group
+    // Favorites are grouped by these columns (price included, so a free and a paid version are separate favorites)
     suspend fun setFavoriteForGroup(log: DrinkLog, isFavorite: Boolean) {
         drinkLogDao.setFavoriteForGroup(
             userId = log.userId,
@@ -51,6 +51,7 @@ class DrinkLogRepository @Inject constructor(
             category = log.category,
             alcoholPercentage = log.alcoholPercentage,
             amount = log.amount,
+            cost = log.cost,
             isFavorite = isFavorite
         )
     }

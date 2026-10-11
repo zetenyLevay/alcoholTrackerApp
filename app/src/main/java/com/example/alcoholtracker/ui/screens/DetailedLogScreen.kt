@@ -1,5 +1,8 @@
 package com.example.alcoholtracker.ui.screens
 
+import com.example.alcoholtracker.SnackBarEvent
+import com.example.alcoholtracker.SnackbarController
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,6 +48,9 @@ fun DetailedLogScreen(
         when (val effect = state.effect) {
             is DetailedLogEffect.ShowError -> {
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(message = effect.message, type = SnackbarType.ERROR)
+                )
             }
             is DetailedLogEffect.ShowItemRemoved -> {
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)

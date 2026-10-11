@@ -1,6 +1,7 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import com.example.alcoholtracker.SnackbarType
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,6 +64,9 @@ fun HomeScreen(
         when (val effect = state.value.effect) {
             is HomeEffect.ShowError -> {
                 viewModel.processEvent(ConsumeEffect)
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(message = effect.message, type = SnackbarType.ERROR)
+                )
             }
 
             is HomeEffect.NavigateToDetailedItem -> {
