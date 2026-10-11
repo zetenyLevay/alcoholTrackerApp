@@ -3,6 +3,7 @@ package com.example.alcoholtracker.ui.components.analytics
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -13,7 +14,7 @@ import com.example.alcoholtracker.ui.components.analytics.graphs.PieChart
 
 
 @Composable
-fun FinanceCharts(){
+fun FinanceCharts(scrollState: ScrollState = rememberScrollState()) {
     val test = listOf(
         PieSlice(
             label = "x",
@@ -25,7 +26,7 @@ fun FinanceCharts(){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
     ) {
 
         ChartCard(

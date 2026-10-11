@@ -213,6 +213,9 @@ fun MainScreen(
             composable<Search> {
                 SearchScreen(
                     onBackClick = { navController.popBackStack() },
+                    // TODO: AddDrink(logId) opens the form in edit mode; needs a copy/prefill route
+                    onNavigateToDrinkForm = { },
+                    onNavigateToDrinkFormWithDrink = { _, _ -> },
                 )
             }
             composable<DetailedLog> { backStackEntry ->

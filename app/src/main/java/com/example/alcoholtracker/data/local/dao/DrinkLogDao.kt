@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.RoomWarnings
 import androidx.room.Update
 import com.example.alcoholtracker.data.model.DrinkLog
+import com.example.alcoholtracker.domain.model.DrinkCategory
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
@@ -18,7 +19,7 @@ interface DrinkLogDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDrinkLog(log: DrinkLog)
+    suspend fun insertDrinkLog(log: DrinkLog): Long
 
     @Update
     suspend fun updateDrinkLog(log: DrinkLog)
@@ -85,6 +86,26 @@ interface DrinkLogDao {
         """
     )
     fun getFavoritesLogs(userId: String): Flow<List<DrinkLog>>
+
+    @Query(
+        """
+        UPDATE log
+        SET isFavorite = :isFavorite
+        WHERE userId = :userId
+            AND name = :name COLLATE NOCASE
+            AND category = :category
+            AND alcoholPercentage IS :alcoholPercentage
+            AND amount = :amount
+        """
+    )
+    suspend fun setFavoriteForGroup(
+        userId: String,
+        name: String,
+        category: DrinkCategory,
+        alcoholPercentage: Double?,
+        amount: Int,
+        isFavorite: Boolean
+    )
 
     @Query("SELECT * FROM log WHERE date BETWEEN :start AND :end AND userId = :userId")
     fun getTonightLogs(userId: String, start: LocalDateTime, end: LocalDateTime): Flow<List<DrinkLog>>

@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -37,18 +38,15 @@ fun RecipientAutoComplete(
 
     var expanded by remember { mutableStateOf(false) }
     var isSelection by remember { mutableStateOf(false) }
+    // Programmatic text (default value, loading a log for edit) arrives while unfocused and must not open the menu
+    var isFocused by remember { mutableStateOf(false) }
 
     LaunchedEffect(recipient) {
         snapshotFlow { recipient.text }
             .distinctUntilChanged()
             .collect { text ->
-                expanded = if (isSelection){
-                    false
-                } else if(text.isNotBlank()){
-                    true
-                } else{
-                    false
-                }
+                expanded = !isSelection && isFocused && text.isNotBlank()
+                isSelection = false
             }
     }
 
@@ -77,6 +75,7 @@ fun RecipientAutoComplete(
                 ),
                 modifier = Modifier
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable)
+                    .onFocusChanged { isFocused = it.isFocused }
                     .clickable { expanded = true }
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),

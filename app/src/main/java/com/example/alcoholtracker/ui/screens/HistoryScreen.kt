@@ -1,6 +1,11 @@
 package com.example.alcoholtracker.ui.screens
 
 
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.example.alcoholtracker.ui.components.headerColor
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -121,6 +126,10 @@ fun HistoryScreen(
 
 
 
+    val listState = rememberLazyListState()
+    val isScrolled by remember { derivedStateOf { listState.canScrollBackward } }
+    val headerColor = headerColor(isScrolled)
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
@@ -130,11 +139,13 @@ fun HistoryScreen(
             }
         },
         modifier = Modifier.fillMaxSize(),
-        topBar = { HistoryTopBar() }
+        topBar = { HistoryTopBar(isScrolled = isScrolled) }
     ) { innerPadding ->
-            Column(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp).animateContentSize()) {
+            Column(modifier = Modifier.fillMaxSize().padding(innerPadding).animateContentSize()) {
                 Row(
-                    modifier = Modifier.padding(vertical = 16.dp),
+                    modifier = Modifier
+                        .background(headerColor)
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
@@ -148,7 +159,7 @@ fun HistoryScreen(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                         ),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
                     )
@@ -156,7 +167,7 @@ fun HistoryScreen(
                         onClick = { /* TODO: Open filter sheet or dialog */ },
                         modifier = Modifier.padding(start = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                             .size(48.dp)
 
                     ) {
@@ -173,7 +184,10 @@ fun HistoryScreen(
                     onItemClick = { onEvent(HistoryEvent.OnItemClick(it)) },
                     onRemove = { onEvent(HistoryEvent.OnRemoveItem(it)) },
                     drinkLogs = pagedLogs,
-                    modifier = Modifier.weight(1f)
+                    listState = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
                 )
             }
         }

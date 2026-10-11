@@ -9,3 +9,11 @@ enum class DrinkCategory(val id: Int, val nameString: String, val defaultABV: Do
     COCKTAIL(4,"Cocktail", 10.0, R.drawable.glass_martini_alt),
     OTHER(5,"Other", 0.0, R.drawable.glass_martini_alt);
 }
+
+// Maps loose category labels (e.g. "Beer", "Cocktail") from Drink entries and remote sources to a DrinkCategory
+fun drinkCategoryFromLabel(label: String): DrinkCategory =
+    DrinkCategory.entries.firstOrNull {
+        it.name.equals(label, ignoreCase = true) ||
+                it.nameString.equals(label, ignoreCase = true) ||
+                it.nameString.startsWith(label, ignoreCase = true)
+    } ?: DrinkCategory.OTHER

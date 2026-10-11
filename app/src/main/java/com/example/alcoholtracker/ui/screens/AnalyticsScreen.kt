@@ -1,5 +1,8 @@
 package com.example.alcoholtracker.ui.screens
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.getValue
+import com.example.alcoholtracker.ui.components.headerColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,9 +39,16 @@ fun AnalyticsScreen(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { AnalyticsTabs.entries.size })
     val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
+    val tabScrollStates = AnalyticsTabs.entries.associateWith { rememberScrollState() }
+    val isScrolled by remember {
+        derivedStateOf {
+            tabScrollStates.getValue(AnalyticsTabs.entries[pagerState.currentPage]).canScrollBackward
+        }
+    }
+    val headerColor = headerColor(isScrolled)
 
     Scaffold(
-        topBar = { AnalyticsTopBar() },
+        topBar = { AnalyticsTopBar(isScrolled = isScrolled) },
         containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -50,7 +60,7 @@ fun AnalyticsScreen(
 
             PrimaryTabRow(
                 selectedTabIndex = selectedTabIndex.value,
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                containerColor = headerColor,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 AnalyticsTabs.entries.forEachIndexed { index, currentTab ->
@@ -86,9 +96,9 @@ fun AnalyticsScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     when (page) {
-                        0 -> OverviewCharts()
-                        1 -> FinanceCharts()
-                        2 -> HealthCharts()
+                        0 -> OverviewCharts(tabScrollStates.getValue(AnalyticsTabs.entries[0]))
+                        1 -> FinanceCharts(tabScrollStates.getValue(AnalyticsTabs.entries[1]))
+                        2 -> HealthCharts(tabScrollStates.getValue(AnalyticsTabs.entries[2]))
                     }
                 }
             }

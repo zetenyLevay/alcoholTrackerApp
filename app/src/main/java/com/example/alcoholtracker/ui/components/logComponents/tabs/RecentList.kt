@@ -1,23 +1,24 @@
 package com.example.alcoholtracker.ui.components.logComponents.tabs
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import com.example.alcoholtracker.data.model.DrinkLog
-import com.example.alcoholtracker.ui.components.AlcoholListType
-import com.example.alcoholtracker.ui.components.DrinkItem
 
 @Composable
 fun RecentList(
-    drinks: List<DrinkLog>
+    drinks: List<DrinkLog>,
+    onLogClick: (DrinkLog) -> Unit,
+    onLogAgainClick: (DrinkLog) -> Unit,
+    onFavoriteToggle: (DrinkLog) -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
-    if (drinks.isEmpty()) {
-        Text("No recent drinks found")
-    } else {
-        LazyColumn() {
-            items(drinks.size) { index ->
-                DrinkItem(drinks[index], AlcoholListType.LOG)
-            }
-        }
-    }
+    LogTabList(
+        logs = drinks,
+        emptyText = "No recent drinks found",
+        onLogClick = onLogClick,
+        onLogAgainClick = onLogAgainClick,
+        onFavoriteToggle = onFavoriteToggle,
+        listState = listState
+    )
 }

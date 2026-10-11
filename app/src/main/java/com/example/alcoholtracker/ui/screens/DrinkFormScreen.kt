@@ -117,7 +117,8 @@ fun DrinkFormScreen(
         topBar = {
             LogDrinkTopBar(
                 onBackClick = { onBackClick() },
-                isEdit = state.isEdit
+                isEdit = state.isEdit,
+                isScrolled = scrollState.canScrollBackward
             )
         },
         containerColor = MaterialTheme.colorScheme.background,

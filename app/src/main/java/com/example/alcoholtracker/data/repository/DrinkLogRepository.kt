@@ -24,14 +24,14 @@ class DrinkLogRepository @Inject constructor(
     private val userRepo: UserRepository
 ) {
 
-    suspend fun insertDrinkLog(log: DrinkLog) {
+    suspend fun insertDrinkLog(log: DrinkLog): Long {
 
         val user = userRepo.getCurrentUser()
         if (user == null) {
             throw Exception("User not found")
         } else {
             val completeLog = log.copy(userId = user)
-            drinkLogDao.insertDrinkLog(completeLog)
+            return drinkLogDao.insertDrinkLog(completeLog)
         }
     }
 
@@ -41,6 +41,18 @@ class DrinkLogRepository @Inject constructor(
 
     suspend fun deleteDrinkLog(log: DrinkLog) {
         drinkLogDao.deleteDrinkLog(log)
+    }
+
+    // Recent/frequent/favorite lists are grouped by these columns, so favorite state is applied to the whole group
+    suspend fun setFavoriteForGroup(log: DrinkLog, isFavorite: Boolean) {
+        drinkLogDao.setFavoriteForGroup(
+            userId = log.userId,
+            name = log.name,
+            category = log.category,
+            alcoholPercentage = log.alcoholPercentage,
+            amount = log.amount,
+            isFavorite = isFavorite
+        )
     }
 
     suspend fun getDrinkById(logId: Int): DrinkLog? {

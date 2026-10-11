@@ -2,6 +2,7 @@
 
 package com.example.alcoholtracker.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,17 +19,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.ui.components.detailitemcomponents.MinimalDropdownMenu
 
 
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(isScrolled: Boolean = false) {
     TopAppBar(
         title = { TopBarTitle("Tonight") },
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
     )
 }
 
@@ -38,7 +41,7 @@ fun FilterTopBar(
     onResetClick: () -> Unit
 ){
     TopAppBar(
-        colors = appTopBarColors(),
+        colors = filterTopBarColors(),
         navigationIcon = {
             IconButton(onClick = { onDismissRequest() }) {
                 Icon(
@@ -62,20 +65,21 @@ fun FilterTopBar(
 }
 
 @Composable
-fun AnalyticsTopBar() {
+fun AnalyticsTopBar(isScrolled: Boolean = false) {
     TopAppBar(
         title = { TopBarTitle("Analytics") },
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
     )
 }
 
 @Composable
 fun LogDrinkTopBar(
     onBackClick: () -> Unit,
-    isEdit: Boolean
+    isEdit: Boolean,
+    isScrolled: Boolean = false,
 ) {
     TopAppBar(
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
         title = {
             TopBarTitle(if (isEdit) "Edit drink" else "Log drink")
         },
@@ -103,7 +107,10 @@ fun DetailTopBar(
     scrollBehavior: TopAppBarScrollBehavior
 ) {
     TopAppBar(
-        colors = appTopBarColors(),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
         title = {
             TopBarTitle("Drink details")
         },
@@ -147,18 +154,18 @@ fun DetailTopBar(
 }
 
 @Composable
-fun ProfileTopBar() {
+fun ProfileTopBar(isScrolled: Boolean = false) {
     TopAppBar(
         title = { TopBarTitle("Profile") },
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
     )
 }
 
 @Composable
-fun SignUpTopBar(onBackClick: () -> Unit) {
+fun SignUpTopBar(onBackClick: () -> Unit, isScrolled: Boolean = false) {
     TopAppBar(
         title = { TopBarTitle("Create account") },
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -171,18 +178,33 @@ fun SignUpTopBar(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun HistoryTopBar(){
+fun HistoryTopBar(isScrolled: Boolean = false){
     TopAppBar(
         title = { TopBarTitle("History") },
-        colors = appTopBarColors(),
+        colors = appTopBarColors(isScrolled),
     )
 }
 
 @Composable
-private fun appTopBarColors() = TopAppBarDefaults.topAppBarColors(
-    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+private fun appTopBarColors(isScrolled: Boolean) = TopAppBarDefaults.topAppBarColors(
+    containerColor = headerColor(isScrolled),
 )
+
+// The filter dialog's own container is surfaceContainer, so its bar matches it rather than the screen background
+@Composable
+private fun filterTopBarColors() = TopAppBarDefaults.topAppBarColors(
+    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+)
+
+// Header blends with the background at rest and takes the accent color once content scrolls under it
+@Composable
+fun headerColor(isScrolled: Boolean): Color {
+    val color by animateColorAsState(
+        targetValue = if (isScrolled) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background,
+        label = "HeaderColor"
+    )
+    return color
+}
 
 @Composable
 private fun TopBarTitle(text: String) {

@@ -133,12 +133,12 @@ fun AlcoholListFull(
     onItemClick: (Int) -> Unit,
     onRemove:(DrinkLog) -> Unit,
     drinkLogs: LazyPagingItems<HistoryUiModel>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
 
     val count = drinkLogs.itemCount
     val refresh = drinkLogs.loadState.refresh
-    val listState = rememberLazyListState()
 
     Box(modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {
