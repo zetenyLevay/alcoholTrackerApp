@@ -27,6 +27,9 @@ interface DrinkLogDao {
     @Delete
     suspend fun deleteDrinkLog(log: DrinkLog)
 
+    @Query("UPDATE log SET userId = :newUserId WHERE userId = :oldUserId")
+    suspend fun reassignLogs(oldUserId: String, newUserId: String)
+
     @Query("SELECT * FROM log WHERE userId = :userId")
     fun getDrinkLogsByUserId(userId: String): Flow<List<DrinkLog>>
 

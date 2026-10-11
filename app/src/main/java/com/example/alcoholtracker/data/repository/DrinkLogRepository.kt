@@ -35,6 +35,10 @@ class DrinkLogRepository @Inject constructor(
         }
     }
 
+    suspend fun reassignLogs(oldUserId: String, newUserId: String) {
+        drinkLogDao.reassignLogs(oldUserId, newUserId)
+    }
+
     suspend fun updateDrinkLog(log: DrinkLog) {
         drinkLogDao.updateDrinkLog(log)
     }

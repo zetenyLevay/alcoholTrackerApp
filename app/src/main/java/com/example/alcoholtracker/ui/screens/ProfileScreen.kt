@@ -28,6 +28,7 @@ import com.example.alcoholtracker.ui.viewmodel.UserEvents
 @Composable
 fun ProfileScreen(
     onCreateAccountClick: () -> Unit,
+    onLogInClick: () -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
 ){
     val account by authViewModel.account.collectAsStateWithLifecycle()
@@ -35,6 +36,7 @@ fun ProfileScreen(
     ProfileScreen(
         account = account,
         onCreateAccountClick = onCreateAccountClick,
+        onLogInClick = onLogInClick,
         onLogout = { authViewModel.processEvent(UserEvents.SignOut) }
     )
 }
@@ -43,6 +45,7 @@ fun ProfileScreen(
 fun ProfileScreen(
     account: Account?,
     onCreateAccountClick: () -> Unit,
+    onLogInClick: () -> Unit,
     onLogout: () -> Unit
 ){
     Scaffold(
@@ -59,7 +62,7 @@ fun ProfileScreen(
         ) {
             when {
                 account == null -> Unit
-                account.isGuest -> GuestAccountCard(onCreateAccountClick)
+                account.isGuest -> GuestAccountCard(onCreateAccountClick, onLogInClick)
                 else -> {
                     SignedInCard(email = account.email.orEmpty())
                     OutlinedButton(
@@ -75,7 +78,10 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun GuestAccountCard(onCreateAccountClick: () -> Unit) {
+private fun GuestAccountCard(
+    onCreateAccountClick: () -> Unit,
+    onLogInClick: () -> Unit,
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -100,6 +106,13 @@ private fun GuestAccountCard(onCreateAccountClick: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Create account")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onLogInClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Log in")
             }
         }
     }

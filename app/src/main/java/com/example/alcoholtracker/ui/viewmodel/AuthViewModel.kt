@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.viewmodel
 
+import com.example.alcoholtracker.data.repository.DrinkLogRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alcoholtracker.data.model.Account
@@ -47,6 +48,7 @@ data class UserUiState(
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val userRepo: UserRepository,
+    private val drinkLogRepo: DrinkLogRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UserUiState())
@@ -70,8 +72,13 @@ class AuthViewModel @Inject constructor(
     private fun signIn(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val guestUserId = if (account.value?.isGuest == true) userRepo.getCurrentUser() else null
             userRepo.signIn(email.trim(), password)
                 .onSuccess {
+                    val newUserId = userRepo.getCurrentUser()
+                    if (guestUserId != null && newUserId != null && guestUserId != newUserId) {
+                        drinkLogRepo.reassignLogs(guestUserId, newUserId)
+                    }
                     _uiState.update { it.copy(isLoading = false, effect = UserEffect.NavigateToHome) }
                 }
                 .onFailure { e ->

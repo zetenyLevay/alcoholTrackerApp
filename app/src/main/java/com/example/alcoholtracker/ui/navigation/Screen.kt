@@ -17,6 +17,10 @@ object SignIn
 @Serializable
 object SignUp
 
+// Sign-in opened from Profile by a guest (SignIn is the signed-out start screen)
+@Serializable
+object LogIn
+
 
 @Serializable
 data class AddDrink(val logId: Int = -1)

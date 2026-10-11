@@ -23,26 +23,63 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.alcoholtracker.R
+import com.example.alcoholtracker.SnackBarEvent
+import com.example.alcoholtracker.SnackbarController
+import com.example.alcoholtracker.SnackbarType
 import com.example.alcoholtracker.ui.components.ArcBackground
 import com.example.alcoholtracker.ui.components.AuthFields
+import com.example.alcoholtracker.ui.components.LogInTopBar
 import com.example.alcoholtracker.ui.viewmodel.AuthViewModel
 import com.example.alcoholtracker.ui.viewmodel.UserEffect
 import com.example.alcoholtracker.ui.viewmodel.UserEvents
+import com.example.alcoholtracker.ui.viewmodel.UserUiState
 
+/**
+ * Signed-out start screen, or — when [onBackClick] is given — a guest logging in to an
+ * existing account from Profile.
+ */
 @Composable
 fun SignInScreen(
+    onBackClick: (() -> Unit)? = null,
+    onSignedIn: () -> Unit = {},
     viewModel: AuthViewModel = hiltViewModel(),
-
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val isFormValid = state.emailInput.isNotBlank() && state.passwordInput.isNotEmpty()
-    val signIn = { if (isFormValid && !state.isLoading) viewModel.processEvent(UserEvents.SignIn) }
+    val isGuestLogIn = onBackClick != null
 
     LaunchedEffect(state.effect) {
         if (state.effect == UserEffect.NavigateToHome) {
             viewModel.processEvent(UserEvents.ConsumeEffect)
+            if (isGuestLogIn) {
+                onSignedIn()
+                SnackbarController.sendEvent(
+                    SnackBarEvent(message = "Logged in", type = SnackbarType.SUCCESS)
+                )
+            }
         }
     }
+
+    if (onBackClick != null) {
+        GuestLogInScreen(
+            state = state,
+            onEvent = viewModel::processEvent,
+            onBackClick = onBackClick
+        )
+    } else {
+        SignInScreen(
+            state = state,
+            onEvent = viewModel::processEvent
+        )
+    }
+}
+
+@Composable
+fun SignInScreen(
+    state: UserUiState,
+    onEvent: (UserEvents) -> Unit,
+) {
+    val isFormValid = state.emailInput.isNotBlank() && state.passwordInput.isNotEmpty()
+    val signIn = { if (isFormValid && !state.isLoading) onEvent(UserEvents.SignIn) }
 
     Scaffold(
         modifier = Modifier.imePadding()
@@ -71,9 +108,9 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(24.dp))
             AuthFields(
                 email = state.emailInput,
-                onEmailChange = { viewModel.processEvent(UserEvents.OnEmailChange(it)) },
+                onEmailChange = { onEvent(UserEvents.OnEmailChange(it)) },
                 password = state.passwordInput,
-                onPasswordChange = { viewModel.processEvent(UserEvents.OnPasswordChange(it)) },
+                onPasswordChange = { onEvent(UserEvents.OnPasswordChange(it)) },
                 errorMessage = state.errorMessage,
                 enabled = !state.isLoading,
                 onDone = signIn
@@ -88,11 +125,60 @@ fun SignInScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedButton(
-                onClick = { viewModel.processEvent(UserEvents.AnonymousSignIn) },
+                onClick = { onEvent(UserEvents.AnonymousSignIn) },
                 enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Continue as guest")
+            }
+        }
+    }
+}
+
+@Composable
+fun GuestLogInScreen(
+    state: UserUiState,
+    onEvent: (UserEvents) -> Unit,
+    onBackClick: () -> Unit,
+) {
+    val isFormValid = state.emailInput.isNotBlank() && state.passwordInput.isNotEmpty()
+    val signIn = { if (isFormValid && !state.isLoading) onEvent(UserEvents.SignIn) }
+
+    Scaffold(
+        topBar = { LogInTopBar(onBackClick = onBackClick) },
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                "Log in to an existing account. Everything you've logged as a guest moves to that account.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            AuthFields(
+                email = state.emailInput,
+                onEmailChange = { onEvent(UserEvents.OnEmailChange(it)) },
+                password = state.passwordInput,
+                onPasswordChange = { onEvent(UserEvents.OnPasswordChange(it)) },
+                errorMessage = state.errorMessage,
+                enabled = !state.isLoading,
+                onDone = signIn
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = signIn,
+                enabled = isFormValid && !state.isLoading,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Log in")
             }
         }
     }

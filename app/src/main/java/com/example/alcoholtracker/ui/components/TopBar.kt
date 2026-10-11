@@ -178,6 +178,22 @@ fun SignUpTopBar(onBackClick: () -> Unit, isScrolled: Boolean = false) {
 }
 
 @Composable
+fun LogInTopBar(onBackClick: () -> Unit, isScrolled: Boolean = false) {
+    TopAppBar(
+        title = { TopBarTitle("Log in") },
+        colors = appTopBarColors(isScrolled),
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                )
+            }
+        }
+    )
+}
+
+@Composable
 fun HistoryTopBar(isScrolled: Boolean = false){
     TopAppBar(
         title = { TopBarTitle("History") },

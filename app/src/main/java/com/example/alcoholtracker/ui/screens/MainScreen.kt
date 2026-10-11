@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
+import com.example.alcoholtracker.ui.navigation.LogIn
 import com.example.alcoholtracker.ui.components.AppSnackbar
 import com.example.alcoholtracker.ui.components.AppSnackbarVisuals
 import kotlinx.coroutines.withTimeoutOrNull
@@ -200,6 +201,11 @@ fun MainScreen(
                         navController.navigate(SignUp) {
                             launchSingleTop = true
                         }
+                    },
+                    onLogInClick = {
+                        navController.navigate(LogIn) {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -207,6 +213,12 @@ fun MainScreen(
                 SignUpScreen(
                     onBackClick = { navController.popBackStack() },
                     onAccountCreated = { navController.popBackStack() },
+                )
+            }
+            composable<LogIn> {
+                SignInScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onSignedIn = { navController.popBackStack() },
                 )
             }
             composable<Overview> {
