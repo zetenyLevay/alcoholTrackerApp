@@ -55,7 +55,6 @@ data class SearchUiState(
     val effect: SearchEffect? = null,
 )
 
-
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository,
