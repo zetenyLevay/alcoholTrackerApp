@@ -1,10 +1,13 @@
 package com.example.alcoholtracker.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.example.alcoholtracker.data.local.dao.DrinkDao
 import com.example.alcoholtracker.data.local.dao.DrinkLogDao
 import com.example.alcoholtracker.data.local.dao.UserDao
 import com.example.alcoholtracker.data.local.database.AlcoholTrackerDatabase
+import com.example.alcoholtracker.data.preferences.userPreferencesDataStore
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
@@ -48,6 +51,11 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideUserPreferences(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.userPreferencesDataStore
 
     @Provides
     @Singleton

@@ -12,7 +12,8 @@ enum class DrinkCategory(val id: Int, val nameString: String, val defaultABV: Do
 
 // Maps loose category labels (e.g. "Beer", "Cocktail") from Drink entries and remote sources to a DrinkCategory
 fun drinkCategoryFromLabel(label: String): DrinkCategory =
-    DrinkCategory.entries.firstOrNull {
+    if (label.isBlank()) DrinkCategory.OTHER
+    else DrinkCategory.entries.firstOrNull {
         it.name.equals(label, ignoreCase = true) ||
                 it.nameString.equals(label, ignoreCase = true) ||
                 it.nameString.startsWith(label, ignoreCase = true)

@@ -219,19 +219,15 @@ class DrinkLogRepository @Inject constructor(
         }
     }
 
-    fun getCurrentSessionWindow(): Pair<LocalDateTime, LocalDateTime> {
-        val now = LocalDateTime.now()
+    fun getCurrentSessionWindow(): Pair<LocalDateTime, LocalDateTime> =
+        sessionWindowFor(LocalDateTime.now())
 
+}
 
-        val sessionStart = if (now.hour < 6) {
-            now.minusDays(1).withHour(6).withMinute(0)
-        } else {
-            now.withHour(6).withMinute(0)
-        }
-
-        val sessionEnd = sessionStart.plusDays(1).minusNanos(1)
-
-        return Pair(sessionStart, sessionEnd)
-    }
-
+// A night out runs 06:00 to 05:59:59.999 the next morning, so drinks after midnight count for the evening before
+fun sessionWindowFor(now: LocalDateTime): Pair<LocalDateTime, LocalDateTime> {
+    val sessionDay = if (now.hour < 6) now.toLocalDate().minusDays(1) else now.toLocalDate()
+    val sessionStart = sessionDay.atTime(6, 0)
+    val sessionEnd = sessionStart.plusDays(1).minusNanos(1)
+    return Pair(sessionStart, sessionEnd)
 }

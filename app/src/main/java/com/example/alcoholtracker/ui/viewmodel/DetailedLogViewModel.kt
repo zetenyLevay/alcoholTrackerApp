@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -57,11 +57,12 @@ class DetailedLogViewModel @Inject constructor(
     private val _localState = MutableStateFlow(DetailedLogUiState(isLoading = true))
     val detailedLogUiState: StateFlow<DetailedLogUiState> = combine(
         _localState,
-        drinkLogRepo.getDrinkByIdFlow(logId).filterNotNull()
+        // Keeps the last loaded drink on screen while it closes after a delete, but still emits (null) when there is none
+        drinkLogRepo.getDrinkByIdFlow(logId).runningFold(null as DrinkLog?) { last, log -> log ?: last }
     ){ localState, log ->
         localState.copy(
             drinkLog = log,
-            isLoading = false
+            isLoading = log == null && localState.isLoading
         )
     }.catch {
         _localState.update { it.copy(effect = DetailedLogEffect.ShowError("Error loading drink")) }
@@ -75,7 +76,7 @@ class DetailedLogViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             if (drinkLogRepo.getDrinkById(logId) == null) {
-                _localState.update { it.copy(effect = DetailedLogEffect.ShowError("No drink found")) }
+                _localState.update { it.copy(effect = DetailedLogEffect.ShowError("No drink found"), isLoading = false) }
             }
         }
     }

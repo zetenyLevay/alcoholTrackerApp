@@ -1,26 +1,27 @@
 package com.example.alcoholtracker.data.preferences
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.alcoholtracker.ui.components.progressbar.ProgressBarType
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
-private val Context.dataStore by preferencesDataStore(name = "user_preferences")
+val Context.userPreferencesDataStore by preferencesDataStore(name = "user_preferences")
 
 @Singleton
 class ProgressBarPreferences @Inject constructor (
-     @ApplicationContext private val context: Context
+    private val dataStore: DataStore<Preferences>
 ){
 
-    val activeProgressBarType: Flow<ProgressBarType> = context.dataStore.data
+    val activeProgressBarType: Flow<ProgressBarType> = dataStore.data
         .map { preferences ->
             val typeString = preferences[PROGRESS_BAR_TYPE] ?: ProgressBarType.MONEY.name
             try {
@@ -31,29 +32,29 @@ class ProgressBarPreferences @Inject constructor (
         }
 
 
-    val amountTarget: Flow<Double> = context.dataStore.data
+    val amountTarget: Flow<Double> = dataStore.data
         .map { preferences -> preferences[AMOUNT_PROGRESS_BAR_TARGET] ?: 1500.0 }
 
-    val countTarget: Flow<Double> = context.dataStore.data
+    val countTarget: Flow<Double> = dataStore.data
         .map { preferences -> preferences[COUNT_PROGRESS_BAR_TARGET] ?: 5.0 }
 
-    val moneyTarget: Flow<Double> = context.dataStore.data
+    val moneyTarget: Flow<Double> = dataStore.data
         .map { preferences -> preferences[MONEY_PROGRESS_BAR_TARGET] ?: 50.0 }
 
     suspend fun updateAmountTarget(target: Double) {
-        context.dataStore.edit { it[AMOUNT_PROGRESS_BAR_TARGET] = target }
+        dataStore.edit { it[AMOUNT_PROGRESS_BAR_TARGET] = target }
     }
 
     suspend fun updateCountTarget(target: Double) {
-        context.dataStore.edit { it[COUNT_PROGRESS_BAR_TARGET] = target }
+        dataStore.edit { it[COUNT_PROGRESS_BAR_TARGET] = target }
     }
 
     suspend fun updateMoneyTarget(target: Double) {
-        context.dataStore.edit { it[MONEY_PROGRESS_BAR_TARGET] = target }
+        dataStore.edit { it[MONEY_PROGRESS_BAR_TARGET] = target }
     }
 
     suspend fun updateType(type: ProgressBarType) {
-        context.dataStore.edit { it[PROGRESS_BAR_TYPE] = type.name }
+        dataStore.edit { it[PROGRESS_BAR_TYPE] = type.name }
     }
 
     companion object {

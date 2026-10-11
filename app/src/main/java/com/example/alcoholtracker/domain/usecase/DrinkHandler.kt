@@ -2,14 +2,14 @@ package com.example.alcoholtracker.domain.usecase
 
 import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.data.repository.DrinkLogRepository
-import com.google.firebase.auth.FirebaseAuth
+import com.example.alcoholtracker.data.auth.AuthService
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 
 class DrinkHandler @Inject constructor(
     private val logRepo: DrinkLogRepository,
-    private val auth: FirebaseAuth
+    private val auth: AuthService
 ) {
     suspend fun createDrink(
         request: DrinkCreateRequest

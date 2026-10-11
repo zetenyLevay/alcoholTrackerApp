@@ -6,11 +6,12 @@ import com.example.alcoholtracker.domain.usecase.DrinkCreateRequest
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import kotlin.math.roundToInt
 
 fun getFinalAmount(unit: DrinkUnit?, amount: Double?): Int {
 
     return if (unit != null && amount != null) {
-        (unit.amount * amount).toInt()
+        (unit.amount * amount).roundToInt()
     } else 0
 }
 

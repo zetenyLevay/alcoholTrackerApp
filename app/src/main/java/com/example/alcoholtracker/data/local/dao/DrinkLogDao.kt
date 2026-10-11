@@ -33,7 +33,7 @@ interface DrinkLogDao {
     @Query("SELECT * FROM log WHERE userId = :userId")
     fun getDrinkLogsByUserId(userId: String): Flow<List<DrinkLog>>
 
-    @Query("SELECT DISTINCT recipient FROM log WHERE userId = :userId")
+    @Query("SELECT DISTINCT recipient FROM log WHERE userId = :userId AND recipient IS NOT NULL")
     fun getRecipients(userId: String): Flow<List<String>>
 
     @Query("SELECT * FROM log WHERE logId = :logId")
