@@ -1,5 +1,19 @@
 package com.example.alcoholtracker.ui.components.logComponents.tabs
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.scale
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -20,7 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.HorizontalDivider
+
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.data.model.DrinkLog
 import com.example.alcoholtracker.ui.components.AlcoholListType
 import com.example.alcoholtracker.ui.components.DrinkItem
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LogTabList(
@@ -42,10 +57,11 @@ fun LogTabList(
     onFavoriteToggle: (DrinkLog) -> Unit,
     listState: LazyListState = rememberLazyListState(),
 ) {
+
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // The list stays composed when it empties so the last item can still animate out
         LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-            items(logs, key = { it.logId }) { log ->
+            items(logs, key = { it.groupKey() }) { log ->
                 Column(modifier = Modifier.animateItem()) {
                     LogTabItem(
                         log = log,
@@ -53,7 +69,6 @@ fun LogTabList(
                         onLogAgainClick = { onLogAgainClick(log) },
                         onFavoriteToggle = { onFavoriteToggle(log) }
                     )
-                    HorizontalDivider()
                 }
             }
         }
@@ -74,6 +89,9 @@ fun LogTabList(
         }
     }
 }
+
+
+private fun DrinkLog.groupKey(): String = "$name|$category|$alcoholPercentage|$amount|$cost"
 
 @Composable
 private fun LogTabItem(
@@ -101,12 +119,43 @@ private fun LogTabItem(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-        IconButton(onClick = onLogAgainClick) {
+        LogAgainButton(onClick = onLogAgainClick)
+    }
+}
+
+@Composable
+private fun LogAgainButton(onClick: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    val scale = remember { Animatable(1f) }
+    var showConfirmed by remember { mutableStateOf(false) }
+
+    IconButton(
+        onClick = {
+            onClick()
+            showConfirmed = true
+            scope.launch {
+                scale.animateTo(1.3f, tween(durationMillis = 90))
+                scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+            }
+        }
+    ) {
+        Crossfade(
+            targetState = showConfirmed,
+            label = "LogAgainIcon",
+            modifier = Modifier.scale(scale.value)
+        ) { confirmed ->
             Icon(
-                Icons.Filled.Add,
-                contentDescription = "Log again",
+                if (confirmed) Icons.Filled.Check else Icons.Filled.Add,
+                contentDescription = if (confirmed) "Logged" else "Log again",
                 tint = MaterialTheme.colorScheme.primary
             )
+        }
+    }
+
+    LaunchedEffect(showConfirmed) {
+        if (showConfirmed) {
+            delay(1000.milliseconds)
+            showConfirmed = false
         }
     }
 }
