@@ -1,5 +1,11 @@
 package com.example.alcoholtracker.ui.viewmodel
 
+import com.example.alcoholtracker.SnackBarEvent
+import com.example.alcoholtracker.SnackbarController
+import com.example.alcoholtracker.SnackbarType
+import com.example.alcoholtracker.di.ApplicationScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,6 +49,7 @@ data class DetailedLogUiState(
 @HiltViewModel
 class DetailedLogViewModel @Inject constructor(
     private val drinkLogRepo: DrinkLogRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -49,21 +57,12 @@ class DetailedLogViewModel @Inject constructor(
     private val _localState = MutableStateFlow(DetailedLogUiState(isLoading = true))
     val detailedLogUiState: StateFlow<DetailedLogUiState> = combine(
         _localState,
-        drinkLogRepo.getDrinkByIdFlow(logId)
+        drinkLogRepo.getDrinkByIdFlow(logId).filterNotNull()
     ){ localState, log ->
-        if (log != null) {
-            localState.copy(
-                drinkLog = log,
-                isLoading = false
-            )
-        } else {
-
-            localState.copy(
-                isLoading = false,
-                effect = DetailedLogEffect.ShowError("No drink found")
-            )
-        }
-
+        localState.copy(
+            drinkLog = log,
+            isLoading = false
+        )
     }.catch {
         _localState.update { it.copy(effect = DetailedLogEffect.ShowError("Error loading drink")) }
     }.stateIn(
@@ -72,6 +71,14 @@ class DetailedLogViewModel @Inject constructor(
         initialValue = DetailedLogUiState(isLoading = true)
     )
 
+
+    init {
+        viewModelScope.launch {
+            if (drinkLogRepo.getDrinkById(logId) == null) {
+                _localState.update { it.copy(effect = DetailedLogEffect.ShowError("No drink found")) }
+            }
+        }
+    }
 
     fun processEvent(event: DetailedLogEvent) {
         when (event) {
@@ -85,13 +92,37 @@ class DetailedLogViewModel @Inject constructor(
     }
 
     private fun onEditClick(logId: Int) {
-
+        _localState.update { it.copy(effect = DetailedLogEffect.NavigateToDrinkForm(logId)) }
     }
+
+
     private fun onRemoveClick(log: DrinkLog) {
-
+        _localState.update { it.copy(effect = DetailedLogEffect.ShowItemRemoved(log)) }
+        appScope.launch {
+            try {
+                drinkLogRepo.deleteDrinkLog(log)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackBarEvent(message = "Error deleting drink", type = SnackbarType.ERROR)
+                )
+            }
+        }
     }
-    private fun onUndoRemove(log: DrinkLog) {
 
+    private fun onUndoRemove(log: DrinkLog) {
+        appScope.launch {
+            try {
+                drinkLogRepo.insertDrinkLog(log)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackBarEvent(message = "Error restoring drink", type = SnackbarType.ERROR)
+                )
+            }
+        }
     }
     private fun onFavoriteClick(log: DrinkLog) {
 

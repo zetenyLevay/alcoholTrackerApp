@@ -1,5 +1,6 @@
 package com.example.alcoholtracker.ui.screens
 
+import com.example.alcoholtracker.SnackbarAction
 import com.example.alcoholtracker.SnackBarEvent
 import com.example.alcoholtracker.SnackbarController
 import com.example.alcoholtracker.SnackbarType
@@ -51,9 +52,21 @@ fun DetailedLogScreen(
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(message = effect.message, type = SnackbarType.ERROR)
                 )
+                if (state.drinkLog == null) onBackClick()
             }
             is DetailedLogEffect.ShowItemRemoved -> {
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
+                // Send before leaving: this effect is cancelled once the screen is popped
+                SnackbarController.sendEvent(
+                    event = SnackBarEvent(
+                        message = "Drink removed",
+                        action = SnackbarAction(
+                            name = "Undo",
+                            action = { viewModel.processEvent(DetailedLogEvent.OnUndoRemove(effect.log)) }
+                        )
+                    )
+                )
+                onBackClick()
             }
             is DetailedLogEffect.NavigateToDrinkForm -> {
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)

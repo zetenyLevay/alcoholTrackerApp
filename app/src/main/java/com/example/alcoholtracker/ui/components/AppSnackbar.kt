@@ -49,14 +49,15 @@ private fun SnackbarType.style(): SnackbarStyle {
         SnackbarType.SUCCESS -> SnackbarStyle(
             container = colors.primaryContainer,
             content = colors.onPrimaryContainer,
-            action = colors.primary,
+            // primary sits too close to primaryContainer in this theme to be readable on it
+            action = colors.onPrimaryContainer,
             icon = Icons.Filled.CheckCircle
         )
 
         SnackbarType.ERROR -> SnackbarStyle(
             container = colors.errorContainer,
             content = colors.onErrorContainer,
-            action = colors.error,
+            action = colors.onErrorContainer,
             icon = Icons.Filled.ErrorOutline
         )
 
@@ -82,7 +83,7 @@ fun AppSnackbar(data: SnackbarData) {
         action = data.visuals.actionLabel?.let { label ->
             {
                 TextButton(onClick = { data.performAction() }) {
-                    Text(label, color = style.action, fontWeight = FontWeight.SemiBold)
+                    Text(label, color = style.action, fontWeight = FontWeight.Bold)
                 }
             }
         }
