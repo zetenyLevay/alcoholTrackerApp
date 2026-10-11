@@ -56,7 +56,6 @@ fun DetailedLogScreen(
             }
             is DetailedLogEffect.ShowItemRemoved -> {
                 viewModel.processEvent(DetailedLogEvent.ConsumeEffect)
-                // Send before leaving: this effect is cancelled once the screen is popped
                 SnackbarController.sendEvent(
                     event = SnackBarEvent(
                         message = "Drink removed",
