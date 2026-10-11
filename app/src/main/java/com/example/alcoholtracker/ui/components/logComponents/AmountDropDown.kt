@@ -1,5 +1,9 @@
 package com.example.alcoholtracker.ui.components.logComponents
 
+import com.example.alcoholtracker.utils.formatVolume
+import com.example.alcoholtracker.utils.isMilliliters
+import com.example.alcoholtracker.utils.DrinkFormNumbers
+import com.example.alcoholtracker.utils.format
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,13 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.foundation.text.input.then
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.alcoholtracker.domain.model.DrinkUnit
 
@@ -50,6 +49,9 @@ fun AmountDropDown(
 ) {
 
     var expanded by remember { mutableStateOf(false) }
+    // Milliliters are whole numbers; cans/pints/bottles can be fractional (e.g. 2.5)
+    val amountSpec = DrinkFormNumbers.amountFor(selectedUnit)
+    val amountTransformation = remember(amountSpec) { NumberInputTransformation(amountSpec) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -64,15 +66,10 @@ fun AmountDropDown(
             )
             OutlinedTextField(
                 state = amount,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Decimal
-                ),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 lineLimits = TextFieldLineLimits.SingleLine,
-                inputTransformation = InputTransformation.maxLength(5).then {
-
-                },
+                inputTransformation = amountTransformation,
                 trailingIcon = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,8 +77,8 @@ fun AmountDropDown(
                     ) {
                         IconButton(
                             onClick = {
-                                val doubleAmount = (amount.text.toString().toDoubleOrNull() ?: 0.0) +1
-                                amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
+                                val currentAmount = amount.text.toString().toDoubleOrNull() ?: 0.0
+                                amount.setTextAndPlaceCursorAtEnd(amountSpec.format(currentAmount + 1))
                             },
                             modifier = Modifier.size(24.dp)
                         ) {
@@ -89,10 +86,8 @@ fun AmountDropDown(
                         }
                         IconButton(
                             onClick = {
-                                if (amount.text.toString().toDouble() > 0.0) {
-                                    val doubleAmount = (amount.text.toString().toDoubleOrNull()  ?: 0.0)-1
-                                    amount.setTextAndPlaceCursorAtEnd(doubleAmount.toString())
-                                }
+                                val currentAmount = amount.text.toString().toDoubleOrNull() ?: 0.0
+                                amount.setTextAndPlaceCursorAtEnd(amountSpec.format(currentAmount - 1))
                             },
                             modifier = Modifier.size(24.dp)
                         ) {
@@ -121,7 +116,7 @@ fun AmountDropDown(
                 OutlinedTextField(
                     value = selectedUnit?.name ?: "Select a unit",
                     onValueChange = { },
-                    maxLines = 1,
+                    singleLine = true,
                     readOnly = true,
                     label = null,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -145,6 +140,16 @@ fun AmountDropDown(
                     options.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(option.name) },
+                            // Size comes from the unit's amount, so it always matches what gets saved
+                            trailingIcon = if (option.isMilliliters) null else {
+                                {
+                                    Text(
+                                        formatVolume(option.amount),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
                             onClick = {
                                 onSelected(option)
                                 expanded = false

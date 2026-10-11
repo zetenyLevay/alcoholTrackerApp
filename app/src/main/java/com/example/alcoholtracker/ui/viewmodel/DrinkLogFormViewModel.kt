@@ -1,5 +1,8 @@
 package com.example.alcoholtracker.ui.viewmodel
 
+import com.example.alcoholtracker.utils.DrinkFormNumbers
+import com.example.alcoholtracker.utils.format
+import com.example.alcoholtracker.utils.isMilliliters
 import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
@@ -89,8 +92,8 @@ data class DrinkLogFormOptions(
 class DrinkLogFormTextStates {
     val drinkName: TextFieldState = TextFieldState()
     val inputAmount: TextFieldState = TextFieldState("500")
-    val alcoholPercentage: TextFieldState = TextFieldState("0.0")
-    val cost: TextFieldState = TextFieldState("0.0")
+    val alcoholPercentage: TextFieldState = TextFieldState("0")
+    val cost: TextFieldState = TextFieldState("0")
     val recipient: TextFieldState = TextFieldState("Me")
     val notes: TextFieldState = TextFieldState()
     val locationName: TextFieldState = TextFieldState()
@@ -196,9 +199,11 @@ class DrinkLogFormViewModel @Inject constructor(
 
 
                     textStates.drinkName.setTextAndPlaceCursorAtEnd(logToEdit.name)
-                    textStates.inputAmount.setTextAndPlaceCursorAtEnd(logToEdit.inputAmount?.toString() ?: "100.0")
-                    textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(logToEdit.alcoholPercentage?.toString() ?: "0.0")
-                    textStates.cost.setTextAndPlaceCursorAtEnd(logToEdit.cost?.toString() ?: "0.0")
+                    // Formatted to match each field's input rules, otherwise e.g. "500.0" in a whole-ml field couldn't be edited
+                    val amountSpec = DrinkFormNumbers.amountFor(logToEdit.drinkUnit)
+                    textStates.inputAmount.setTextAndPlaceCursorAtEnd(amountSpec.format(logToEdit.inputAmount ?: 100.0))
+                    textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(DrinkFormNumbers.ABV.format(logToEdit.alcoholPercentage ?: 0.0))
+                    textStates.cost.setTextAndPlaceCursorAtEnd(DrinkFormNumbers.PRICE.format(logToEdit.cost ?: 0.0))
                     textStates.recipient.setTextAndPlaceCursorAtEnd(logToEdit.recipient ?: "Me")
                     textStates.notes.setTextAndPlaceCursorAtEnd(logToEdit.notes ?: "")
                     textStates.locationName.setTextAndPlaceCursorAtEnd(logToEdit.locationName ?: "")
@@ -251,17 +256,26 @@ class DrinkLogFormViewModel @Inject constructor(
             return
         }
 
+        // Fields can be empty or end in "." while typing, so parse leniently instead of crashing on toDouble()
+        val inputAmount = textStates.inputAmount.text.toString().toDoubleOrNull() ?: 0.0
+        if (inputAmount <= 0.0) {
+            _localState.update { it.copy(effect = DrinkLogFormEffect.ShowError("Please enter an amount")) }
+            return
+        }
+        val cost = textStates.cost.text.toString().toDoubleOrNull() ?: 0.0
+        val alcoholPercentage = textStates.alcoholPercentage.text.toString().toDoubleOrNull() ?: 0.0
+
         val newLog = DrinkLog(
             drinkId = inputs.selectedDrink?.drinkId,
             userId = inputs.userId ?: "",
             logId = inputs.logId ?: 0,
             name = textStates.drinkName.text.toString(),
-            cost = textStates.cost.text.toString().toDouble(),
-            alcoholPercentage = textStates.alcoholPercentage.text.toString().toDouble(),
-            amount = getFinalAmount(inputs.selectedDrinkUnit,textStates.inputAmount.text.toString().toDouble()),
+            cost = cost,
+            alcoholPercentage = alcoholPercentage,
+            amount = getFinalAmount(inputs.selectedDrinkUnit, inputAmount),
             category = inputs.selectedCategory,
             recipient = textStates.recipient.text.toString(),
-            inputAmount = textStates.inputAmount.text.toString().toDouble(),
+            inputAmount = inputAmount,
             isFavorite = inputs.isFavorite,
             imgURI = inputs.imgURI,
             notes = textStates.notes.text.toString(),
@@ -323,21 +337,16 @@ class DrinkLogFormViewModel @Inject constructor(
         val oldUnit = _inputs.value.selectedDrinkUnit
         val newUnit = drinkUnit
 
-        if (oldUnit.name == "milliliters" && newUnit.name != "milliliters"){
-            textStates.inputAmount.setTextAndPlaceCursorAtEnd("1.0")
-            _inputs.update {
-                it.copy(
-                    selectedDrinkUnit = drinkUnit,
-                )
-            }
-        }
-        else if (oldUnit.name != "milliliters" && newUnit.name == "milliliters"){
+        // Reset the amount only when switching between ml and container units; between containers it carries over
+        if (oldUnit.isMilliliters && !newUnit.isMilliliters) {
+            textStates.inputAmount.setTextAndPlaceCursorAtEnd("1")
+        } else if (!oldUnit.isMilliliters && newUnit.isMilliliters) {
             textStates.inputAmount.setTextAndPlaceCursorAtEnd("500")
-            _inputs.update {
-                it.copy(
-                    selectedDrinkUnit = drinkUnit,
-                )
-            }
+        }
+        _inputs.update {
+            it.copy(
+                selectedDrinkUnit = drinkUnit,
+            )
         }
 
 
@@ -345,7 +354,7 @@ class DrinkLogFormViewModel @Inject constructor(
 
     private fun onDrinkChange(drink: Drink) {
 
-        textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(drink.alcoholContent.toString())
+        textStates.alcoholPercentage.setTextAndPlaceCursorAtEnd(DrinkFormNumbers.ABV.format(drink.alcoholContent))
         _inputs.update {
             it.copy(
                 selectedDrink = drink,

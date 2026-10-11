@@ -18,10 +18,10 @@ class WineHandler @Inject constructor(
 
     override fun getUnitOptions(): List<DrinkUnit> {
         return listOf(
-            DrinkUnit("Small Glass (125 ml)", 125),
-            DrinkUnit("Medium Glass (175 ml)", 175),
-            DrinkUnit("Large Glass (250 ml)", 250),
-            DrinkUnit("Bottle (750 ml)", 125),
+            DrinkUnit("Small glass", 125),
+            DrinkUnit("Medium glass", 175),
+            DrinkUnit("Large glass", 250),
+            DrinkUnit("Bottle", 750),
             DrinkUnit("milliliters", 1)
         )
     }

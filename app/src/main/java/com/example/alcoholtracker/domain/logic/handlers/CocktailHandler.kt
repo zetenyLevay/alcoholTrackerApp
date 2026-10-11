@@ -18,9 +18,9 @@ class CocktailHandler @Inject constructor(
 
     override fun getUnitOptions(): List<DrinkUnit> {
         return listOf(
-            DrinkUnit("Standard Cocktail (150ml)", 150),
-            DrinkUnit("Long Drink (300 ml)", 300),
-            DrinkUnit("Mixed Shot/Shooter (60 ml)", 60),
+            DrinkUnit("Standard cocktail", 150),
+            DrinkUnit("Long drink", 300),
+            DrinkUnit("Shooter", 60),
             DrinkUnit("milliliters", 1)
         )
     }
