@@ -256,7 +256,6 @@ class DrinkLogFormViewModel @Inject constructor(
             return
         }
 
-        // Fields can be empty or end in "." while typing, so parse leniently instead of crashing on toDouble()
         val inputAmount = textStates.inputAmount.text.toString().toDoubleOrNull() ?: 0.0
         if (inputAmount <= 0.0) {
             _localState.update { it.copy(effect = DrinkLogFormEffect.ShowError("Please enter an amount")) }
